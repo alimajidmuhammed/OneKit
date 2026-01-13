@@ -22,20 +22,26 @@ export function useReferral(userId) {
 
         try {
             // Check if user already has a code
-            const { data: existing } = await supabase
+            const { data: existing, error: fetchError } = await supabase
                 .from('referral_codes')
                 .select('code')
                 .eq('user_id', userId)
-                .single();
+                .maybeSingle();
 
-            if (existing) {
+            if (fetchError) {
+                console.error('Error fetching referral code:', fetchError);
+                // If table doesn't exist or other error, return a temporary code
+                return `ONEKIT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+            }
+
+            if (existing && existing.code) {
                 return existing.code;
             }
 
             // Generate new code (format: ONEKIT-XXXXX)
             const code = `ONEKIT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
-            const { data, error } = await supabase
+            const { data, error: insertError } = await supabase
                 .from('referral_codes')
                 .insert([{
                     user_id: userId,
@@ -45,11 +51,18 @@ export function useReferral(userId) {
                 .select()
                 .single();
 
-            if (error) throw error;
+            if (insertError) {
+                console.error('Error inserting referral code:', insertError);
+                // Return the generated code even if insert fails (for display purposes)
+                // User will still be able to share it, just won't be saved to DB yet
+                return code;
+            }
+
             return data.code;
         } catch (error) {
             console.error('Error generating referral code:', error);
-            return null;
+            // Fallback: return a temporary code
+            return `ONEKIT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
         }
     };
 

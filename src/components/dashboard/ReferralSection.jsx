@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useReferral } from '@/lib/hooks/useReferral';
+import { FaWhatsapp, FaFacebookMessenger, FaInstagram, FaTelegramPlane, FaViber, FaTwitter, FaCopy, FaLink } from 'react-icons/fa';
 
 export default function ReferralSection() {
     const { user } = useAuth();
@@ -10,11 +11,42 @@ export default function ReferralSection() {
     const [copied, setCopied] = useState(false);
 
     const copyToClipboard = () => {
-        if (referralCode) {
-            navigator.clipboard.writeText(referralCode);
+        if (!referralCode) return;
+
+        try {
+            if (typeof window !== 'undefined' && navigator.clipboard) {
+                navigator.clipboard.writeText(referralCode).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                }).catch(err => {
+                    console.error('Clipboard error:', err);
+                    // Fallback: create textarea and copy
+                    fallbackCopy(referralCode);
+                });
+            } else {
+                fallbackCopy(referralCode);
+            }
+        } catch (error) {
+            console.error('Copy error:', error);
+            fallbackCopy(referralCode);
+        }
+    };
+
+    const fallbackCopy = (text) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
         }
+        document.body.removeChild(textarea);
     };
 
     const shareUrl = `${window.location.origin}/register?ref=${referralCode}`;
@@ -90,13 +122,12 @@ export default function ReferralSection() {
             {/* Share Buttons */}
             <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
-                    Share via
+                    Share Your Referral Link
                 </label>
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
                     <button
                         onClick={shareOnWhatsApp}
                         style={{
-                            flex: 1,
                             padding: '12px',
                             background: '#25D366',
                             color: 'white',
@@ -107,15 +138,43 @@ export default function ReferralSection() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '8px'
+                            gap: '8px',
+                            fontSize: '13px',
+                            transition: 'transform 0.2s'
                         }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                        💬 WhatsApp
+                        <FaWhatsapp size={18} /> WhatsApp
+                    </button>
+                    <button
+                        onClick={() => {
+                            const message = `Join OneKit and get started with professional business tools! Use my referral code: ${referralCode}`;
+                            window.open(`https://www.messenger.com/new?text=${encodeURIComponent(message + ' ' + shareUrl)}`, '_blank');
+                        }}
+                        style={{
+                            padding: '12px',
+                            background: '#0084FF',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            transition: 'transform 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        <FaFacebookMessenger size={18} /> Messenger
                     </button>
                     <button
                         onClick={shareOnTwitter}
                         style={{
-                            flex: 1,
                             padding: '12px',
                             background: '#1DA1F2',
                             color: 'white',
@@ -126,11 +185,134 @@ export default function ReferralSection() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '8px'
+                            gap: '8px',
+                            fontSize: '13px',
+                            transition: 'transform 0.2s'
                         }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                        🐦 Twitter
+                        <FaTwitter size={18} /> Twitter
                     </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                    <button
+                        onClick={() => {
+                            // Instagram doesn't have direct sharing, open profile with link in clipboard
+                            navigator.clipboard.writeText(shareUrl);
+                            alert('Link copied! Share it in your Instagram bio or DMs 📸');
+                        }}
+                        style={{
+                            padding: '12px',
+                            background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            transition: 'transform 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        <FaInstagram size={18} /> Instagram
+                    </button>
+                    <button
+                        onClick={() => {
+                            const message = `🎁 Join OneKit with my code: ${referralCode}\n\n${shareUrl}`;
+                            window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(message)}`, '_blank');
+                        }}
+                        style={{
+                            padding: '12px',
+                            background: '#0088cc',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            transition: 'transform 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        <FaTelegramPlane size={18} /> Telegram
+                    </button>
+                    <button
+                        onClick={() => {
+                            const message = `Join OneKit with my code: ${referralCode}`;
+                            window.open(`viber://forward?text=${encodeURIComponent(message + ' ' + shareUrl)}`, '_blank');
+                        }}
+                        style={{
+                            padding: '12px',
+                            background: '#7360f2',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontSize: '13px',
+                            transition: 'transform 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        <FaViber size={18} /> Viber
+                    </button>
+                </div>
+            </div>
+
+            {/* Copy Link Button */}
+            <div style={{ marginBottom: '24px' }}>
+                <button
+                    onClick={() => {
+                        navigator.clipboard.writeText(shareUrl);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                    }}
+                    style={{
+                        width: '100%',
+                        padding: '14px',
+                        background: copied ? 'var(--success-500)' : 'var(--neutral-800)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        fontSize: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    {copied ? <><FaCopy size={16} /> Link Copied!</> : <><FaLink size={16} /> Copy Referral Link</>}
+                </button>
+                <div style={{
+                    marginTop: '8px',
+                    padding: '12px',
+                    background: 'var(--bg-secondary)',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    color: 'var(--text-tertiary)',
+                    wordBreak: 'break-all',
+                    fontFamily: 'monospace'
+                }}>
+                    {shareUrl}
                 </div>
             </div>
 

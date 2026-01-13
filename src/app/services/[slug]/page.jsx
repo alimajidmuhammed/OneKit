@@ -5,6 +5,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription';
 import { useServices } from '@/lib/hooks/useServices';
 import { APP_CONFIG } from '@/lib/utils/constants';
 import { getWhatsAppLink, formatCurrency } from '@/lib/utils/helpers';
+import { sendPaymentRequest } from '@/lib/utils/whatsapp';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState, use } from 'react';
@@ -79,6 +80,17 @@ export default function ServicePage({ params }) {
             ),
         };
         return icons[iconType] || icons.document;
+    };
+
+    const handleSubscribe = (e) => {
+        e.preventDefault();
+        sendPaymentRequest({
+            serviceName: service.name,
+            userName: user?.email?.split('@')[0] || 'Guest', // Fallback name
+            userEmail: user?.email || 'Not provided',
+            amount: service.price_yearly || service.price_monthly,
+            currency: 'IQD'
+        }, APP_CONFIG.whatsapp.number);
     };
 
     return (
@@ -183,14 +195,12 @@ export default function ServicePage({ params }) {
                                         Open {service.name}
                                     </Link>
                                 ) : (
-                                    <a
-                                        href={getWhatsAppLink(APP_CONFIG.whatsapp.number, APP_CONFIG.whatsapp.defaultMessage)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        onClick={handleSubscribe}
                                         className={styles.subscribeBtn}
                                     >
-                                        🚀 Subscribe Now (WhatsApp)
-                                    </a>
+                                        🚀 Subscribe via WhatsApp
+                                    </button>
                                 )}
                             </div>
                         </div>

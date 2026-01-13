@@ -15,6 +15,21 @@ export default function SettingsPage() {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
 
+    // Password change state
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        newPassword: '',
+        confirmPassword: ''
+    });
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+    // Delete account state
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -40,6 +55,81 @@ export default function SettingsPage() {
             setError('An unexpected error occurred');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setPasswordError('');
+        setPasswordSuccess(false);
+
+        // Validation
+        if (passwordData.newPassword.length < 6) {
+            setPasswordError('Password must be at least 6 characters');
+            return;
+        }
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setPasswordError('Passwords do not match');
+            return;
+        }
+
+        setPasswordLoading(true);
+
+        try {
+            const { getSupabaseClient } = await import('@/lib/supabase/client');
+            const supabase = getSupabaseClient();
+
+            const { error } = await supabase.auth.updateUser({
+                password: passwordData.newPassword
+            });
+
+            if (error) throw error;
+
+            setPasswordSuccess(true);
+            setPasswordData({ newPassword: '', confirmPassword: '' });
+            setTimeout(() => {
+                setShowPasswordModal(false);
+                setPasswordSuccess(false);
+            }, 2000);
+        } catch (error) {
+            setPasswordError(error.message || 'Failed to change password');
+        } finally {
+            setPasswordLoading(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (deleteConfirmation !== 'DELETE') {
+            alert('Please type DELETE to confirm');
+            return;
+        }
+
+        if (!confirm('This action CANNOT be undone. Are you absolutely sure?')) {
+            return;
+        }
+
+        setDeleteLoading(true);
+
+        try {
+            const { getSupabaseClient } = await import('@/lib/supabase/client');
+            const supabase = getSupabaseClient();
+
+            // Delete user data first
+            await supabase.from('profiles').delete().eq('id', user.id);
+
+            // Then delete auth user
+            const { error } = await supabase.auth.admin.deleteUser(user.id);
+
+            if (error) throw error;
+
+            // Sign out and redirect
+            await supabase.auth.signOut();
+            window.location.href = '/';
+        } catch (error) {
+            alert('Failed to delete account: ' + error.message);
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
@@ -162,7 +252,12 @@ export default function SettingsPage() {
                                 <h3>Password</h3>
                                 <p>Change your password to keep your account secure</p>
                             </div>
-                            <button className={styles.securityBtn}>Change Password</button>
+                            <button
+                                className={styles.securityBtn}
+                                onClick={() => setShowPasswordModal(true)}
+                            >
+                                Change Password
+                            </button>
                         </div>
 
                         <div className={styles.securityItem}>
@@ -197,11 +292,245 @@ export default function SettingsPage() {
                                 <h3>Delete Account</h3>
                                 <p>Permanently delete your account and all associated data</p>
                             </div>
-                            <button className={styles.dangerBtn}>Delete Account</button>
+                            <button
+                                className={styles.dangerBtn}
+                                onClick={() => setShowDeleteModal(true)}
+                            >
+                                Delete Account
+                            </button>
                         </div>
                     </div>
                 </section>
             </div>
+
+            {/* Password Change Modal */}
+            {showPasswordModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: 'var(--bg-elevated)',
+                        padding: '32px',
+                        borderRadius: '16px',
+                        width: '90%',
+                        maxWidth: '450px',
+                        boxShadow: 'var(--shadow-xl)'
+                    }}>
+                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: '700' }}>Change Password</h2>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                            Enter your new password below
+                        </p>
+
+                        {passwordError && (
+                            <div style={{
+                                padding: '12px',
+                                background: 'var(--error-50)',
+                                color: 'var(--error-700)',
+                                borderRadius: '8px',
+                                marginBottom: '16px',
+                                fontSize: '14px'
+                            }}>
+                                {passwordError}
+                            </div>
+                        )}
+
+                        {passwordSuccess && (
+                            <div style={{
+                                padding: '12px',
+                                background: 'var(--success-50)',
+                                color: 'var(--success-700)',
+                                borderRadius: '8px',
+                                marginBottom: '16px',
+                                fontSize: '14px'
+                            }}>
+                                ✅ Password changed successfully!
+                            </div>
+                        )}
+
+                        <form onSubmit={handlePasswordChange}>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                                    New Password
+                                </label>
+                                <input
+                                    type="password"
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    placeholder="Enter new password (min 6 characters)"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        border: '1px solid var(--border-light)',
+                                        borderRadius: '8px',
+                                        fontSize: '14px'
+                                    }}
+                                    required
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                                    Confirm Password
+                                </label>
+                                <input
+                                    type="password"
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                    placeholder="Confirm new password"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        border: '1px solid var(--border-light)',
+                                        borderRadius: '8px',
+                                        fontSize: '14px'
+                                    }}
+                                    required
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowPasswordModal(false);
+                                        setPasswordData({ newPassword: '', confirmPassword: '' });
+                                        setPasswordError('');
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        padding: '12px',
+                                        background: 'var(--neutral-200)',
+                                        color: 'var(--text-primary)',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontWeight: '600',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={passwordLoading}
+                                    style={{
+                                        flex: 1,
+                                        padding: '12px',
+                                        background: 'var(--primary-600)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '8px',
+                                        fontWeight: '600',
+                                        cursor: passwordLoading ? 'not-allowed' : 'pointer',
+                                        opacity: passwordLoading ? 0.6 : 1
+                                    }}
+                                >
+                                    {passwordLoading ? 'Changing...' : 'Change Password'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Account Modal */}
+            {showDeleteModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: 'var(--bg-elevated)',
+                        padding: '32px',
+                        borderRadius: '16px',
+                        width: '90%',
+                        maxWidth: '450px',
+                        boxShadow: 'var(--shadow-xl)'
+                    }}>
+                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: '700', color: 'var(--error-600)' }}>
+                            ⚠️ Delete Account
+                        </h2>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                            This action <strong>CANNOT</strong> be undone. All your data will be permanently deleted.
+                        </p>
+
+                        <div style={{ marginBottom: '24px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                                Type <code style={{ background: 'var(--neutral-200)', padding: '2px 8px', borderRadius: '4px' }}>DELETE</code> to confirm:
+                            </label>
+                            <input
+                                type="text"
+                                value={deleteConfirmation}
+                                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                placeholder="Type DELETE"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    border: '2px solid var(--error-500)',
+                                    borderRadius: '8px',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setDeleteConfirmation('');
+                                }}
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    background: 'var(--neutral-200)',
+                                    color: 'var(--text-primary)',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleDeleteAccount}
+                                disabled={deleteLoading || deleteConfirmation !== 'DELETE'}
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    background: 'var(--error-600)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontWeight: '600',
+                                    cursor: (deleteLoading || deleteConfirmation !== 'DELETE') ? 'not-allowed' : 'pointer',
+                                    opacity: (deleteLoading || deleteConfirmation !== 'DELETE') ? 0.4 : 1
+                                }}
+                            >
+                                {deleteLoading ? 'Deleting...' : 'Delete My Account'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
