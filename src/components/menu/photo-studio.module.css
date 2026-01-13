@@ -1,0 +1,302 @@
+.studioOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: var(--space-4);
+}
+
+.studioContainer {
+    width: 100%;
+    max-width: 1000px;
+    height: 85vh;
+    background: #1a1a1a;
+    border-radius: var(--radius-2xl);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+}
+
+/* Header */
+.studioHeader {
+    padding: var(--space-4) var(--space-6);
+    background: #252525;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.studioHeader h2 {
+    color: white;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 24px;
+    cursor: pointer;
+    padding: var(--space-1);
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: white;
+}
+
+/* Main Content */
+.studioMain {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    overflow: hidden;
+}
+
+.canvasArea {
+    background: #0f0f0f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    position: relative;
+    overflow: hidden;
+}
+
+.previewContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.previewImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    border-radius: var(--radius-lg);
+    transition: filter 0.3s ease;
+}
+
+/* Sidebar */
+.studioSidebar {
+    background: #252525;
+    border-left: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebarTabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #2a2a2a;
+    border-bottom: 1px solid #333;
+}
+
+.sidebarTabs button {
+    padding: var(--space-4);
+    background: none;
+    border: none;
+    color: #888;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+}
+
+.sidebarTabs button:hover {
+    color: #ccc;
+    background: #333;
+}
+
+.tabActive {
+    color: white !important;
+    background: #333 !important;
+    border-bottom-color: var(--primary-500) !important;
+}
+
+.sidebarSection {
+    padding: var(--space-5);
+    border-bottom: 1px solid #333;
+}
+
+.sidebarSection h3 {
+    color: #eee;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-4);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Controls */
+.controlGroup {
+    margin-bottom: var(--space-4);
+}
+
+.controlGroup label {
+    display: flex;
+    justify-content: space-between;
+    color: #999;
+    font-size: 12px;
+    margin-bottom: var(--space-2);
+}
+
+.controlGroup input[type="range"] {
+    width: 100%;
+    accent-color: var(--primary-500);
+}
+
+/* Filters Grid */
+.filterGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+.filterBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: #333;
+    border: 1px solid #444;
+    border-radius: var(--radius-lg);
+    color: #ccc;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s;
+}
+
+.filterBtn:hover {
+    background: #444;
+    border-color: #555;
+}
+
+.filterActive {
+    background: var(--primary-900);
+    border-color: var(--primary-500);
+    color: white;
+}
+
+.filterPreview {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-500);
+    opacity: 0.8;
+}
+
+/* AI Section */
+.aiSection {
+    background: linear-gradient(135deg, rgba(91, 110, 242, 0.1), rgba(139, 92, 246, 0.1));
+}
+
+.aiBtn {
+    width: 100%;
+    padding: var(--space-3);
+    background: linear-gradient(135deg, var(--primary-600), #8b5cf6);
+    color: white;
+    border: none;
+    border-radius: var(--radius-xl);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    box-shadow: 0 4px 12px rgba(91, 110, 242, 0.3);
+    transition: transform 0.2s;
+}
+
+.resetBtn {
+    width: 100%;
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: #333;
+    color: #999;
+    border: 1px solid #444;
+    border-radius: var(--radius-md);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.resetBtn:hover {
+    background: #444;
+    color: white;
+    border-color: #555;
+}
+
+.aiBtn:hover {
+    transform: scale(1.02);
+}
+
+.aiBtn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Footer */
+.studioFooter {
+    padding: var(--space-4) var(--space-6);
+    background: #252525;
+    border-top: 1px solid #333;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}
+
+.cancelBtn {
+    padding: var(--space-2) var(--space-5);
+    background: #333;
+    color: #eee;
+    border: 1px solid #444;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+}
+
+.saveBtn {
+    padding: var(--space-2) var(--space-6);
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
+.saveBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .studioMain {
+        grid-template-columns: 1fr;
+    }
+
+    .studioSidebar {
+        border-left: none;
+        border-top: 1px solid #333;
+        height: 300px;
+    }
+}

@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OneKit - Multi-Service Web Platform
 
-## Getting Started
+A professional multi-service web platform built with Next.js 14 and Supabase, featuring secure authentication, role-based access control, and service-based subscriptions.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Professional Homepage** - Modern, branded landing page with service cards
+- **Secure Authentication** - Email/password auth with Supabase
+- **Role-Based Access Control** - Admin, Super Admin, and User roles
+- **Service Subscriptions** - Per-service subscription management
+- **Admin Dashboard** - Manage users, subscriptions, and payments
+- **Manual Payments** - WhatsApp-based payment proof submission
+- **Modular Architecture** - Ready for future payment gateway integration
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 14 (App Router) |
+| Styling | Custom CSS with design tokens |
+| Auth/Backend | Supabase (PostgreSQL, Auth, RLS) |
+| Deployment | Vercel-ready |
+
+## 📦 Available Services
+
+1. **CV Maker** - Professional resume builder
+2. **Menu Maker** - Restaurant menu designer
+3. **QR Generator** - Dynamic QR code creation
+4. **Invoice Maker** - Professional invoice management
+5. **Logo Maker** - Brand logo designer
+6. **Business Card Maker** - Professional business cards
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
+
+### Installation
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Set up Supabase:**
+   - Create a new project at [supabase.com](https://supabase.com)
+   - Go to SQL Editor and run the following files in order:
+     1. `supabase/schema.sql` - Creates tables and functions
+     2. `supabase/policies.sql` - Sets up Row Level Security
+     3. `supabase/seed.sql` - Adds initial services and permissions
+
+3. **Configure environment variables:**
+   
+   Create a `.env.local` file in the project root:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   
+   # Optional
+   NEXT_PUBLIC_WHATSAPP_NUMBER=+964XXXXXXXXXX
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open [http://localhost:3000](http://localhost:3000)**
+
+### Creating Your First Admin User
+
+1. Register a new account through the app
+2. In Supabase Dashboard, go to **Table Editor** → **profiles**
+3. Find your user and change the `role` to `super_admin`
+4. Refresh the app and access `/admin`
+
+## 📁 Project Structure
+
+```
+OneKit/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── (auth)/             # Auth pages (login, register, etc.)
+│   │   ├── (dashboard)/        # User dashboard pages
+│   │   ├── admin/              # Admin panel pages
+│   │   ├── globals.css         # Design system & utilities
+│   │   ├── layout.js           # Root layout with AuthProvider
+│   │   └── page.js             # Homepage
+│   ├── components/
+│   │   ├── auth/               # Auth components & context
+│   │   ├── layout/             # Header, Footer, Sidebar
+│   │   └── services/           # Service card components
+│   ├── lib/
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── supabase/           # Supabase client config
+│   │   └── utils/              # Constants & helpers
+│   └── styles/
+│       └── components.css      # Component styles
+├── supabase/
+│   ├── schema.sql              # Database schema
+│   ├── policies.sql            # RLS policies
+│   └── seed.sql                # Initial data
+└── public/                     # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔐 Security Features
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Row Level Security (RLS)** - Database-level access control
+- **Protected Routes** - Middleware-based route protection
+- **Role-Based Access** - Admin, Super Admin, User roles
+- **Session Management** - Secure cookie-based sessions
+- **Audit Logging** - Track admin actions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💳 Payment Flow (Phase 1)
 
-## Learn More
+1. User selects a service and plan
+2. User sends payment via WhatsApp
+3. User uploads payment proof
+4. Admin reviews and approves/rejects
+5. Subscription is activated upon approval
 
-To learn more about Next.js, take a look at the following resources:
+## 🔄 Future Enhancements
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [ ] FIB payment integration
+- [ ] FastPay integration
+- [ ] ZainCash integration
+- [ ] Automated subscription renewals
+- [ ] Email notifications
+- [ ] Analytics dashboard
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 Scripts
 
-## Deploy on Vercel
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 Design System
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The project uses a comprehensive CSS custom properties system:
+
+- **Colors**: Primary (purple/blue), Accent (orange), Semantic colors
+- **Typography**: Inter font family with size/weight tokens
+- **Spacing**: Consistent spacing scale (space-1 to space-24)
+- **Shadows**: Multiple depth levels + glow effects
+- **Dark Mode**: Ready for dark theme implementation
+
+## 📄 License
+
+This project is private and proprietary.
+
+---
+
+Built with ❤️ using Next.js, Supabase, and modern web technologies.

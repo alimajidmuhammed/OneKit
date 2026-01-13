@@ -1,0 +1,264 @@
+.page {
+    padding: var(--space-8);
+    max-width: 1200px;
+}
+
+/* Header */
+.header {
+    margin-bottom: var(--space-8);
+}
+
+.greeting {
+    font-family: var(--font-display);
+    font-size: var(--font-size-3xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.03em;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+}
+
+/* Stats */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.statCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+}
+
+.statIcon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-50);
+    border-radius: var(--radius-lg);
+}
+
+.statIcon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--primary-600);
+}
+
+.statIconWarning {
+    background: var(--warning-50);
+}
+
+.statIconWarning svg {
+    color: var(--warning-600);
+}
+
+.statIconSuccess {
+    background: var(--success-50);
+}
+
+.statIconSuccess svg {
+    color: var(--success-600);
+}
+
+.statContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.statValue {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.statLabel {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+/* Sections */
+.section {
+    margin-bottom: var(--space-8);
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.sectionHeader h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.viewAllLink {
+    font-size: var(--font-size-sm);
+    color: var(--primary-600);
+    text-decoration: none;
+}
+
+.viewAllLink:hover {
+    text-decoration: underline;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-8);
+}
+
+/* Spinner is now global in globals.css */
+
+/* Services Grid */
+.servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-8);
+}
+
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: var(--space-12);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+}
+
+.emptyIcon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--neutral-100);
+    border-radius: var(--radius-xl);
+    margin: 0 auto var(--space-4);
+}
+
+.emptyIcon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--neutral-400);
+}
+
+.emptyState h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-2);
+}
+
+.emptyState p {
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-6);
+}
+
+.exploreBtn {
+    display: inline-flex;
+    padding: var(--space-3) var(--space-6);
+    background: var(--brand-gradient);
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 12px rgba(10, 36, 114, 0.2);
+    transition: all var(--transition-fast);
+}
+
+.exploreBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(10, 36, 114, 0.3);
+}
+
+
+/* Responsive */
+
+@media (max-width: 639px) {
+    .page {
+        padding: var(--space-4);
+    }
+
+}
+
+/* Service Card Styling */
+.serviceCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.serviceCard:hover {
+    border-color: var(--primary-300);
+    box-shadow: 0 4px 12px rgba(10, 36, 114, 0.08);
+    transform: translateY(-2px);
+}
+
+.serviceIcon {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-radius: var(--radius-xl);
+}
+
+.serviceIcon svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--primary-600);
+}
+
+.serviceInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.serviceInfo h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-1);
+    color: var(--text-primary);
+}
+
+.serviceExpiry {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+.serviceArrow {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    stroke: var(--text-tertiary);
+    transition: transform var(--transition-base);
+}
+
+.serviceCard:hover .serviceArrow {
+    transform: translateX(4px);
+    stroke: var(--primary-600);
+}

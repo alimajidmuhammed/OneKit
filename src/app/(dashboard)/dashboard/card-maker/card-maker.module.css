@@ -1,0 +1,227 @@
+.page {
+    padding: var(--space-8);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-8);
+}
+
+.header h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.createBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--brand-gradient);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-xl);
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.createBtn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.createBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(10, 36, 114, 0.3);
+}
+
+.freeBanner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--primary-50);
+    border: 1px solid var(--primary-100);
+    padding: 24px;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 40px;
+}
+
+.freeIcon {
+    font-size: 32px;
+}
+
+.freeBanner strong {
+    color: var(--primary-900);
+    font-size: 18px;
+}
+
+.freeBanner p {
+    color: var(--primary-700);
+    margin: 4px 0 0 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 32px;
+}
+
+.card {
+    background: white;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    transition: all var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+}
+
+.preview {
+    height: 180px;
+    background: var(--neutral-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.templateIcon {
+    font-size: 48px;
+}
+
+.info {
+    padding: 20px;
+}
+
+.info h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.info span {
+    font-size: 13px;
+    color: var(--text-tertiary);
+}
+
+.actions {
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    border-top: 1px solid var(--border-light);
+    background: var(--neutral-50);
+}
+
+.editBtn {
+    flex: 1;
+    text-align: center;
+    background: white;
+    color: var(--text-primary);
+    padding: 10px;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--border-light);
+}
+
+.deleteBtn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 40px;
+    border-radius: var(--radius-3xl);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.modal input {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default);
+    font-size: 16px;
+}
+
+.templatePicker {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.tCard {
+    padding: 16px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.tActive {
+    border-color: var(--primary-600);
+    background: var(--primary-50);
+}
+
+.modalActions {
+    display: flex;
+    gap: 12px;
+}
+
+.modalActions button {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+}
+
+.dangerBtn {
+    background: #ef4444 !important;
+    color: white !important;
+}
+
+.empty {
+    text-align: center;
+    padding: 100px 0;
+}
+
+.emptyIcon {
+    font-size: 64px;
+    margin-bottom: 24px;
+}
+
+/* Spinner is now global in globals.css */

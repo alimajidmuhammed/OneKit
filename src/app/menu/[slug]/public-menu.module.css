@@ -1,0 +1,1770 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+
+/* ============================================
+   PUBLIC MENU - Premium Branded Design System
+   ============================================ */
+
+/* CSS Custom Properties - Design Tokens */
+.page {
+    --menu-max-width: 900px;
+    --card-radius: 20px;
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 5px 20px -5px rgba(0, 0, 0, 0.1);
+    --shadow-floating: 0 30px 60px -12px rgba(0, 0, 0, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3);
+
+    /* Typography Tiers */
+    --font-h1: clamp(2.5rem, 8vw, 4.5rem);
+    --font-h2: clamp(1.75rem, 5vw, 2.75rem);
+    --font-h3: clamp(1.1rem, 3vw, 1.4rem);
+    --font-body: 1rem;
+    --font-small: 0.85rem;
+
+    min-height: 100vh;
+    position: relative;
+    background-color: var(--theme-bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+}
+
+/* Texture Overlay */
+.page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   HERO SECTION - High Impact Brand Entrance
+   ============================================ */
+.hero {
+    position: relative;
+    height: 85vh;
+    min-height: 600px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #000;
+}
+
+.heroContent {
+    position: relative;
+    z-index: 10;
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
+}
+
+.heroBg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.heroBg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    filter: brightness(0.6) saturate(1.1);
+    transform: scale(1.05);
+}
+
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.4) 0%,
+            transparent 50%,
+            rgba(var(--theme-bg-rgb), 1) 95%);
+}
+
+.brandCard {
+    background: rgba(var(--theme-bg-rgb), 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    padding: var(--space-12) var(--space-8);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-floating);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-6);
+    animation: heroSlideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.heroLogo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.brandCard h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: var(--font-h1);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin: 0;
+    color: var(--theme-primary);
+}
+
+.brandSlogan {
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.7;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-top: -10px;
+}
+
+.scrollIndicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--theme-primary);
+    opacity: 0.6;
+    animation: bounce 2s infinite;
+}
+
+.scrollIndicator span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+@keyframes heroSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0) translateX(-50%);
+    }
+
+    40% {
+        transform: translateY(-10px) translateX(-50%);
+    }
+
+    60% {
+        transform: translateY(-5px) translateX(-50%);
+    }
+}
+
+/* Redesign Header (fallback for without hero) */
+.header {
+    text-align: center;
+    padding: 120px 24px 60px;
+}
+
+/* ============================================
+   CATEGORY NAVIGATION - Desktop Sticky Nav
+   ============================================ */
+/* ============================================
+   CATEGORY NAVIGATION - Floating Pill
+   ============================================ */
+.categoryNav {
+    position: sticky;
+    top: 24px;
+    z-index: 50;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: rgba(var(--theme-bg-rgb), 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 100px;
+    width: max-content;
+    margin: -30px auto 40px;
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
+}
+
+.categoryNav::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar Chrome/Safari */
+}
+
+.categoryLink {
+    padding: var(--space-2) var(--space-5);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+
+.categoryLink:hover {
+    background: var(--theme-accent) !important;
+    color: var(--theme-bg) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--theme-accent-rgb), 0.3);
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+.content {
+    position: relative;
+    z-index: 1;
+    max-width: var(--menu-max-width);
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+}
+
+/* ============================================
+   CATEGORY SECTION - Base Styles
+   ============================================ */
+.category {
+    scroll-margin-top: 80px;
+}
+
+.category h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--space-6);
+    position: relative;
+    display: inline-block;
+}
+
+.category h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: var(--theme-accent);
+    border-radius: 2px;
+}
+
+.categoryTitleWrap {
+    position: relative;
+    margin-bottom: var(--space-8);
+    padding-left: var(--space-6);
+}
+
+.categoryDesc {
+    font-size: 0.9rem;
+    opacity: 0.6;
+    margin-top: var(--space-2);
+    line-height: 1.5;
+}
+
+/* ============================================
+   DEFAULT GRID LAYOUT - Clean Card Design
+   ============================================ */
+.itemsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-5);
+}
+
+.itemCard {
+    display: flex;
+    position: relative;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--category-bg);
+    border-radius: var(--card-radius);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border: 1px solid rgba(var(--theme-primary-rgb), 0.05);
+    box-shadow: var(--shadow-premium);
+}
+
+.itemCard:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: var(--shadow-floating);
+    border-color: rgba(var(--theme-primary-rgb), 0.1);
+}
+
+.itemImage {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.itemImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--transition-smooth);
+}
+
+.itemCard:hover .itemImage img {
+    transform: scale(1.08);
+}
+
+.itemInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.itemInfo h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+    line-height: 1.3;
+}
+
+.itemInfo p {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.price {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-top: auto;
+    padding: 6px 12px;
+    background: rgba(var(--theme-accent-rgb), 0.1);
+    border-radius: 8px;
+    width: fit-content;
+}
+
+/* Badges */
+.badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    z-index: 5;
+    background: var(--theme-accent);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   MAGAZINE LAYOUT
+   ============================================ */
+.magazineRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-10);
+    align-items: start;
+}
+
+.magazineRow:nth-child(even) {
+    direction: rtl;
+}
+
+.magazineRow:nth-child(even)>* {
+    direction: ltr;
+}
+
+.magazineContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.magazineList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.magazineItem {
+    padding: var(--space-4);
+    border-radius: 12px;
+    transition: all 0.4s var(--transition-smooth);
+    animation: reveal 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.magazineItem:hover {
+    background: rgba(var(--theme-accent-rgb), 0.05);
+    transform: translateX(10px);
+}
+
+.magazineItemHeader {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-1);
+}
+
+.magazineItemHeader h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.magazineDots {
+    flex: 1;
+    border-bottom: 2px dotted;
+    opacity: 0.2;
+    height: 1px;
+    margin-bottom: 6px;
+}
+
+.magazineDesc {
+    font-size: 0.85rem;
+    opacity: 0.55;
+    line-height: 1.5;
+}
+
+.magazineImageWrap {
+    width: 100%;
+    aspect-ratio: 4/5;
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    position: sticky;
+    top: 100px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+.magazineFeatureImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--transition-smooth);
+}
+
+.magazineRow:hover .magazineFeatureImage {
+    transform: scale(1.05);
+}
+
+/* ============================================
+   ELEGANT LAYOUT - Serif Typography
+   ============================================ */
+.elegantSection {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.elegantTitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid;
+}
+
+.elegantList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.elegantItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4);
+    border: 1px solid;
+    border-radius: 12px;
+    transition: background 0.3s ease;
+}
+
+.elegantItem:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.elegantItemContent h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.elegantItemContent p {
+    font-size: 0.85rem;
+    opacity: 0.55;
+    line-height: 1.4;
+}
+
+.elegantItemRight {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+.elegantThumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.elegantThumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================
+   CARDS LAYOUT - Full Image Cards
+   ============================================ */
+.cardsSection {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-5);
+}
+
+.cardItem {
+    background: var(--category-bg);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transition: all 0.35s var(--transition-smooth);
+}
+
+.cardItem:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.cardImage {
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+}
+
+.cardImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--transition-smooth);
+}
+
+.cardItem:hover .cardImage img {
+    transform: scale(1.08);
+}
+
+.cardContent {
+    padding: var(--space-4);
+}
+
+.cardContent h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.cardContent p {
+    font-size: 0.8rem;
+    opacity: 0.55;
+    line-height: 1.5;
+    margin-bottom: var(--space-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+/* ============================================
+   VINTAGE LAYOUT - Classic Ornamental
+   ============================================ */
+.vintageSection {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.vintageHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.vintageHeader h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    font-style: italic;
+}
+
+.vintageHeader h2::after {
+    display: none;
+}
+
+.vintageOrnament {
+    font-size: 1.25rem;
+    opacity: 0.4;
+}
+
+.vintageList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.vintageItem {
+    padding: var(--space-2) 0;
+}
+
+.vintageItemName {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+}
+
+.vintageItemName span:first-child {
+    font-weight: 600;
+}
+
+.vintageDots {
+    flex: 1;
+    border-bottom: 2px dotted;
+    opacity: 0.25;
+    margin-bottom: 4px;
+}
+
+.vintageDesc {
+    font-size: 0.85rem;
+    opacity: 0.5;
+    font-style: italic;
+    margin-top: var(--space-1);
+    padding-left: var(--space-2);
+}
+
+/* ============================================
+   MINIMAL LAYOUT - Text Only
+   ============================================ */
+.minimalSection {
+    max-width: 550px;
+    margin: 0 auto;
+}
+
+.minimalTitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid currentColor;
+}
+
+.minimalTitle::after {
+    display: none;
+}
+
+.minimalList {
+    display: flex;
+    flex-direction: column;
+}
+
+.minimalItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.minimalLeft h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: var(--space-1);
+}
+
+.minimalLeft p {
+    font-size: 0.8rem;
+    opacity: 0.45;
+    line-height: 1.4;
+}
+
+/* ============================================
+   BOLD LAYOUT - Large & Vibrant
+   ============================================ */
+.boldSection {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.boldTitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-6);
+}
+
+.boldTitle::after {
+    display: none;
+}
+
+.boldGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-5);
+}
+
+.boldCard {
+    background: var(--category-bg);
+    border: 3px solid;
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.boldCard:hover {
+    transform: scale(1.02);
+}
+
+.boldImage {
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+}
+
+.boldImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.boldContent {
+    padding: var(--space-4);
+}
+
+.boldContent h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: var(--space-1);
+}
+
+/* ============================================
+   NEON LAYOUT - Dark Cyber Glow
+   ============================================ */
+.neonSection {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.neonTitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1.25rem, 4vw, 2rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.neonTitle::after {
+    display: none;
+}
+
+.neonGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-5);
+}
+
+.neonCard {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid;
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    transition: all 0.35s var(--transition-smooth);
+}
+
+.neonCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.08);
+}
+
+.neonImage {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+}
+
+.neonImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--transition-smooth);
+}
+
+.neonCard:hover .neonImage img {
+    transform: scale(1.06);
+}
+
+.neonContent {
+    padding: var(--space-4);
+}
+
+.neonContent h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: var(--space-1);
+}
+
+.neonContent p {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    line-height: 1.4;
+    margin-bottom: var(--space-2);
+}
+
+.neonPrice {
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+/* ============================================
+   POSTER LAYOUT - Clean Grid
+   ============================================ */
+.posterSection {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.posterCategoryTitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid currentColor;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.posterGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8) var(--space-6);
+}
+
+.posterItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-3);
+    border-radius: 12px;
+    transition: background 0.3s ease;
+}
+
+.posterItem:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.posterItemText {
+    flex: 1;
+    padding-top: var(--space-1);
+}
+
+.posterItemText h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+    line-height: 1.25;
+}
+
+.posterItemText .price {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: var(--space-1);
+    opacity: 0.75;
+}
+
+.posterItemText p {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    line-height: 1.45;
+}
+
+.posterImage {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.4s ease;
+}
+
+.posterItem:hover .posterImage {
+    transform: scale(1.05);
+}
+
+.posterImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================
+   CHALKBOARD LAYOUT - Dark Elegant
+   ============================================ */
+.chalkboardSection {
+    position: relative;
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--card-radius);
+}
+
+.chalkboardSection::before,
+.chalkboardSection::after {
+    content: '❧';
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.25;
+    color: var(--theme-accent);
+}
+
+.chalkboardSection::before {
+    top: 12px;
+    left: 16px;
+}
+
+.chalkboardSection::after {
+    bottom: 12px;
+    right: 16px;
+    transform: rotate(180deg);
+}
+
+.chalkboardTitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+    font-weight: 600;
+    font-style: italic;
+    text-decoration: underline;
+    text-decoration-color: var(--theme-accent);
+    text-underline-offset: 8px;
+    text-decoration-thickness: 2px;
+    margin-bottom: var(--space-6);
+}
+
+.chalkboardContent {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-8);
+    align-items: center;
+}
+
+.chalkboardList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.chalkboardItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 1rem;
+    padding: var(--space-2) 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.chalkboardItem span:first-child {
+    font-weight: 500;
+}
+
+.chalkboardDash {
+    opacity: 0.25;
+    margin: 0 var(--space-1);
+}
+
+.chalkboardImages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.chalkboardImage {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s ease;
+}
+
+.chalkboardImage:hover {
+    transform: scale(1.08);
+}
+
+.chalkboardImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================
+   FOODTRUCK LAYOUT - Compact
+   ============================================ */
+.foodtruckSection {
+    margin-bottom: var(--space-8);
+}
+
+.foodtruckTitle {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: var(--space-2) var(--space-4);
+    background: var(--theme-accent);
+    color: var(--theme-bg);
+    display: inline-block;
+    margin-bottom: var(--space-5);
+    border-radius: 4px;
+}
+
+.foodtruckList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.foodtruckItem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-2);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+.foodtruckItem:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.foodtruckIcon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--theme-accent);
+}
+
+.foodtruckIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.foodtruckInfo {
+    flex: 1;
+}
+
+.foodtruckInfo h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: var(--space-1);
+}
+
+.foodtruckInfo p {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    line-height: 1.4;
+}
+
+/* ============================================
+   PREMIUM LAYOUT - Luxury Dark
+   ============================================ */
+.premiumSection {
+    margin-bottom: var(--space-12);
+}
+
+.premiumTitle {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 500;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.premiumGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+}
+
+.premiumCard {
+    text-align: center;
+    padding: var(--space-4);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--card-radius);
+    transition: all 0.3s var(--transition-smooth);
+}
+
+.premiumCard:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.premiumImageWrap {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto var(--space-4);
+    border-radius: 50%;
+    border: 4px solid var(--theme-accent);
+    padding: 4px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08), 0 12px 32px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s var(--transition-smooth);
+}
+
+.premiumCard:hover .premiumImageWrap {
+    transform: scale(1.05);
+}
+
+.premiumImageWrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.premiumCard h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.premiumCard .price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-style: italic;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+    text-align: center;
+    padding: var(--space-12) var(--space-6);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.08);
+    margin-top: var(--space-8);
+}
+
+/* ============================================
+   PAYWALL OVERLAY
+   ============================================ */
+.paywallOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    padding: var(--space-6);
+}
+
+.paywallCard {
+    background: #ffffff;
+    border-radius: var(--card-radius);
+    padding: var(--space-8);
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.paywallIcon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--space-5);
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.paywallIcon svg {
+    width: 32px;
+    height: 32px;
+    color: #ffffff;
+}
+
+.paywallCard h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: #1a1a1a;
+}
+
+.paywallCard p {
+    font-size: 0.9rem;
+    color: #666666;
+    line-height: 1.5;
+    margin-bottom: var(--space-5);
+}
+
+.paywallBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+}
+
+.paywallBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty {
+    text-align: center;
+    padding: var(--space-12);
+    opacity: 0.5;
+}
+
+/* ============================================
+   MOBILE HAMBURGER MENU
+   ============================================ */
+.mobileHeader {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: var(--space-3) var(--space-4);
+    background: var(--header-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.3s ease;
+}
+
+.mobileHeaderScrolled {
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.08);
+}
+
+.mobileHeaderContent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.mobileLogo {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+}
+
+.mobileMenuName {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--header-color);
+}
+
+.hamburger {
+    position: absolute;
+    right: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 110;
+}
+
+.hamburger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--header-color);
+    border-radius: 2px;
+    transition: all 0.3s var(--transition-smooth);
+    transform-origin: center;
+}
+
+.hamburgerOpen span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburgerOpen span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburgerOpen span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.mobileOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 90;
+    transition: background 0.3s ease;
+    pointer-events: none;
+}
+
+.mobileOverlayOpen {
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+}
+
+.mobileDrawer {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 300px;
+    background: var(--drawer-bg);
+    z-index: 95;
+    transform: translateX(100%);
+    transition: transform 0.4s var(--transition-smooth);
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+}
+
+.mobileDrawerOpen {
+    transform: translateX(0);
+}
+
+.drawerHeader {
+    padding: var(--space-6) var(--space-5);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.08);
+}
+
+.drawerLogo {
+    width: 50px;
+    height: 50px;
+    margin-top: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: var(--space-3);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.drawerHeader h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.drawerNav {
+    flex: 1;
+    padding: var(--space-5);
+    overflow-y: auto;
+}
+
+.drawerLabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.35;
+    margin-bottom: var(--space-3);
+}
+
+.drawerLink {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-3) 0;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: opacity 0.2s ease;
+}
+
+.drawerLink:hover {
+    opacity: 0.65;
+}
+
+.drawerLinkIcon {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.drawerFooter {
+    padding: var(--space-5);
+    border-top: 1px solid rgba(128, 128, 128, 0.08);
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+
+    .mobileHeader,
+    .mobileOverlay,
+    .mobileDrawer {
+        display: flex;
+    }
+
+    .categoryNav {
+        display: none;
+    }
+
+    .header {
+        padding-top: calc(56px + var(--space-8));
+    }
+
+    .header h1 {
+        font-size: clamp(1.5rem, 6vw, 2.25rem);
+    }
+
+    .logo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .content {
+        padding: var(--space-6) var(--space-4);
+        gap: var(--space-12);
+    }
+
+    .itemsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .itemCard {
+        padding: var(--space-3);
+    }
+
+    .itemImage {
+        width: 80px;
+        height: 80px;
+    }
+
+    .magazineRow,
+    .magazineRow:nth-child(even) {
+        grid-template-columns: 1fr;
+        direction: ltr;
+        gap: var(--space-6);
+    }
+
+    .magazineImageWrap {
+        position: relative;
+        top: 0;
+        aspect-ratio: 16/10;
+        order: -1;
+    }
+
+    .posterGrid {
+        grid-template-columns: 1fr;
+        gap: var(--space-5);
+    }
+
+    .posterImage {
+        width: 80px;
+        height: 80px;
+    }
+
+    .chalkboardContent {
+        grid-template-columns: 1fr;
+    }
+
+    .chalkboardImages {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--space-3);
+        margin-top: var(--space-5);
+    }
+
+    .chalkboardImage {
+        width: 70px;
+        height: 70px;
+    }
+
+    .premiumGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-4);
+    }
+
+    .premiumImageWrap {
+        width: 100px;
+        height: 100px;
+    }
+
+    .cardsGrid,
+    .boldGrid,
+    .neonGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding-top: calc(52px + var(--space-6));
+        padding-bottom: var(--space-8);
+    }
+
+    .logo {
+        width: 70px;
+        height: 70px;
+    }
+
+    .content {
+        padding: var(--space-5) var(--space-3);
+    }
+
+    .category h2 {
+        font-size: 1.25rem;
+    }
+
+    .categoryTitleWrap {
+        padding-left: var(--space-4);
+        margin-bottom: var(--space-6);
+    }
+
+    .itemCard {
+        flex-direction: column;
+    }
+
+    .itemImage {
+        width: 100%;
+        height: 160px;
+    }
+
+    .itemInfo {
+        padding-top: var(--space-3);
+    }
+
+    .premiumGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .premiumImageWrap {
+        width: 110px;
+        height: 110px;
+    }
+
+    .elegantItem {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .elegantItemRight {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Touch Device Optimization */
+@media (hover: none) and (pointer: coarse) {
+
+    .itemCard:hover,
+    .cardItem:hover,
+    .posterItem:hover,
+    .boldCard:hover,
+    .neonCard:hover,
+    .premiumCard:hover {
+        transform: none;
+    }
+
+    .drawerLink {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .page,
+    .category,
+    .itemCard,
+    .cardItem,
+    .neonCard,
+    .premiumCard,
+    .posterImage,
+    .chalkboardImage {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Animation */
+/* Reveal Animation */
+@keyframes reveal {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+        clip-path: inset(100% 0 0 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.category,
+.itemCard,
+.magazineItem,
+.cardItem,
+.posterItem,
+.boldCard,
+.neonCard,
+.premiumCard {
+    animation: reveal 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.category:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.category:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.category:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.category:nth-child(5) {
+    animation-delay: 0.4s;
+}
+
+.category {
+    animation: fadeIn 0.5s ease-out both;
+}
+
+.category:nth-child(2) {
+    animation-delay: 0.05s;
+}
+
+.category:nth-child(3) {
+    animation-delay: 0.1s;
+}
+
+.category:nth-child(4) {
+    animation-delay: 0.15s;
+}
+
+.category:nth-child(5) {
+    animation-delay: 0.2s;
+}

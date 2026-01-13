@@ -1,0 +1,234 @@
+.container {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    max-width: 450px;
+    width: 100%;
+    box-shadow: var(--shadow-2xl);
+    border: 1px solid var(--border-light);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.logo {
+    height: 48px;
+    margin-bottom: var(--space-4);
+}
+
+.header h2 {
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.header p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.content {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border-light);
+}
+
+.qrContainer {
+    width: 100%;
+}
+
+.qrWrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto var(--space-6);
+    background: white;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.qrImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.qrOverlay {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff0000;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+.instructions {
+    margin-bottom: var(--space-4);
+}
+
+.instructions ol {
+    padding-left: var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.instructions li {
+    margin-bottom: var(--space-2);
+}
+
+.instructions strong {
+    color: var(--text-primary);
+}
+
+.pollingHint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    background: var(--success);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.loadingState,
+.errorState {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-light);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto var(--space-4);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.footer {
+    text-align: center;
+}
+
+.cancelBtn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.cancelBtn:hover {
+    color: var(--error);
+}
+
+.successState {
+    text-align: center;
+    padding: var(--space-8) 0;
+}
+
+.successIcon {
+    width: 64px;
+    height: 64px;
+    color: var(--success);
+    margin: 0 auto var(--space-6);
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.successState h2 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.successState p {
+    color: var(--text-secondary);
+}
+
+.redirecting {
+    margin-top: var(--space-4);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.backBtn {
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}

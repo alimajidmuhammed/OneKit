@@ -1,0 +1,371 @@
+.page {
+    padding: var(--space-8);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-8);
+}
+
+.header h1 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.header p {
+    color: var(--text-secondary);
+}
+
+.createBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.createBtn:hover {
+    background: var(--primary-700);
+    transform: translateY(-1px);
+}
+
+.createBtn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Invoices Grid */
+.invoicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+}
+
+.invoiceCard {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.invoiceCard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-200);
+}
+
+.invoicePreview {
+    height: 160px;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.invoicePlaceholder {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.invoiceInfo {
+    padding: var(--space-4);
+}
+
+.invoiceInfo h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-1);
+}
+
+.invoiceMeta {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.invoiceActions {
+    display: flex;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-2);
+    border-top: 1px solid var(--border-light);
+}
+
+.editBtn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    background: var(--primary-50);
+    color: var(--primary-700);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.editBtn:hover {
+    background: var(--primary-100);
+}
+
+.editBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.deleteBtn {
+    padding: var(--space-2);
+    background: var(--error-50);
+    color: var(--error-600);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.deleteBtn:hover {
+    background: var(--error-100);
+}
+
+.deleteBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+}
+
+.modal {
+    background: var(--bg-elevated);
+    width: 100%;
+    max-width: 500px;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.modalHeader h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+}
+
+.modalBody {
+    padding: var(--space-6);
+}
+
+.formGroup {
+    margin-bottom: var(--space-6);
+}
+
+.formGroup label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-2);
+}
+
+.formGroup input {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+}
+
+.templatesGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+@media (min-width: 641px) {
+    .templatesGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.templateCard {
+    padding: var(--space-3);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.templateSelected {
+    border-color: var(--primary-500);
+    background: var(--primary-50);
+}
+
+.templatePreview {
+    display: block;
+    font-size: 24px;
+    margin-bottom: var(--space-1);
+}
+
+.templateName {
+    display: block;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-xs);
+}
+
+.templateDesc {
+    font-size: 10px;
+    color: var(--text-tertiary);
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--bg-secondary);
+}
+
+.cancelBtn {
+    padding: var(--space-2) var(--space-5);
+    background: white;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.confirmBtn {
+    padding: var(--space-2) var(--space-5);
+    background: var(--primary-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
+.confirmBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dangerBtn {
+    padding: var(--space-2) var(--space-5);
+    background: var(--error-600);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: var(--space-12) var(--space-6);
+    background: var(--bg-elevated);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-2xl);
+    color: var(--text-tertiary);
+}
+
+.emptyIcon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 50%;
+}
+
+.emptyIcon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.emptyState h3 {
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.emptyState p {
+    margin-bottom: var(--space-6);
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12);
+    gap: var(--space-4);
+    color: var(--text-tertiary);
+}
+
+/* Spinner is now global in globals.css */
+
+@media (max-width: 640px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .createBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .templatesGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .modal {
+        border-radius: var(--radius-xl);
+    }
+}
+
+@media (max-width: 480px) {
+    .templatesGrid {
+        grid-template-columns: 1fr;
+    }
+}
