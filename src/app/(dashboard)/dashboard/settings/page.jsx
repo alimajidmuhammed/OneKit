@@ -112,18 +112,24 @@ export default function SettingsPage() {
         setDeleteLoading(true);
 
         try {
-            const { getSupabaseClient } = await import('@/lib/supabase/client');
-            const supabase = getSupabaseClient();
+            // Call secure API endpoint for account deletion
+            const response = await fetch('/api/account/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ confirmation: 'DELETE' }),
+            });
 
-            // Delete user data first
-            await supabase.from('profiles').delete().eq('id', user.id);
+            const data = await response.json();
 
-            // Then delete auth user
-            const { error } = await supabase.auth.admin.deleteUser(user.id);
-
-            if (error) throw error;
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to delete account');
+            }
 
             // Sign out and redirect
+            const { getSupabaseClient } = await import('@/lib/supabase/client');
+            const supabase = getSupabaseClient();
             await supabase.auth.signOut();
             window.location.href = '/';
         } catch (error) {
@@ -132,6 +138,7 @@ export default function SettingsPage() {
             setDeleteLoading(false);
         }
     };
+
 
     return (
         <div className={styles.page}>
