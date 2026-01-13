@@ -69,11 +69,23 @@ export async function updateSession(request) {
         return NextResponse.redirect(url);
     }
 
-    // Check admin access - will be enhanced with database role check
+    // Check admin access with database role verification
     if (isAdminRoute && user) {
-        // TODO: Add role check from profiles table
-        // For now, we'll handle this in the admin layout
+        // Fetch user role from profiles table
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        // Block non-admins from accessing admin routes
+        if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/dashboard';
+            return NextResponse.redirect(url);
+        }
     }
+
 
     return supabaseResponse;
 }

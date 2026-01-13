@@ -1,0 +1,49 @@
+# Dependabot Security Updates Configuration
+# Automatically checks for vulnerabilities in dependencies
+
+version: 2
+updates:
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Baghdad"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "🔒 security:"
+    labels:
+      - "dependencies"
+      - "security"
+    # Group minor and patch updates to reduce PR noise
+    groups:
+      production-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier*"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "🔧 ci:"
+    labels:
+      - "ci/cd"
+      - "dependencies"

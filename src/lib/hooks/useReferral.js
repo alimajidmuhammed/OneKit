@@ -52,11 +52,11 @@ export function useReferral(userId) {
                 .single();
 
             if (insertError) {
-                console.error('Error inserting referral code:', insertError);
-                // Return the generated code even if insert fails (for display purposes)
-                // User will still be able to share it, just won't be saved to DB yet
+                // Use warn instead of error to avoid blocking error overlay
+                console.warn('Referral save warning:', insertError.message || 'Check RLS policies');
                 return code;
             }
+
 
             return data.code;
         } catch (error) {

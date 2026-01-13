@@ -1,8 +1,31 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, RATE_LIMITS, getRateLimitHeaders } from '@/lib/utils/rateLimit';
 
 export async function POST(req) {
     try {
+        // SECURITY: Authenticate user to prevent API abuse
+        const supabase = await createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json(
+                { error: "Unauthorized. Please log in." },
+                { status: 401 }
+            );
+        }
+
+        // SECURITY: Rate limiting per user
+        const rateCheck = checkRateLimit(`ai:${user.id}`, RATE_LIMITS.AI_ENDPOINTS.maxRequests, RATE_LIMITS.AI_ENDPOINTS.windowMs);
+        if (!rateCheck.success) {
+            return NextResponse.json(
+                { error: "Too many requests. Please wait a minute." },
+                { status: 429, headers: getRateLimitHeaders(rateCheck) }
+            );
+        }
+
+
         const { text, position, company, generateNew } = await req.json();
 
         if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
@@ -11,6 +34,7 @@ export async function POST(req) {
                 { status: 500 }
             );
         }
+
 
         const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
         const genAI = new GoogleGenerativeAI(apiKey);
