@@ -2,6 +2,7 @@ import '@/app/globals.css';
 import '@/styles/components.css';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import SplashScreen from '@/components/ui/SplashScreen';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
   title: {
@@ -68,8 +69,8 @@ export default function RootLayout({ children }) {
           <SplashScreen />
           {children}
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
 }
-
