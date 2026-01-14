@@ -21,9 +21,23 @@ function ResetPasswordForm() {
     useEffect(() => {
         const handlePasswordRecovery = async () => {
             try {
-                // Method 1: Check for PKCE code in URL query params
                 const urlParams = new URLSearchParams(window.location.search);
+
+                // Check for error in URL (Supabase sends error when link expires)
+                const urlError = urlParams.get('error');
+                const errorDescription = urlParams.get('error_description');
+
+                if (urlError === 'access_denied') {
+                    setError(errorDescription?.replace(/%20/g, ' ') || 'Reset link has expired. Please request a new one.');
+                    setCheckingSession(false);
+                    // Clear URL params
+                    window.history.replaceState(null, '', window.location.pathname);
+                    return;
+                }
+
+                // Method 1: Check for PKCE code in URL query params
                 const code = urlParams.get('code');
+
 
                 if (code) {
                     // Exchange the code for a session (PKCE flow)
