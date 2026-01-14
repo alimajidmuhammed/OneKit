@@ -28,12 +28,15 @@ function ResetPasswordForm() {
                 const errorDescription = urlParams.get('error_description');
 
                 if (urlError === 'access_denied') {
+                    // Sign out to clear any stale session
+                    await supabase.auth.signOut();
                     setError(errorDescription?.replace(/%20/g, ' ') || 'Reset link has expired. Please request a new one.');
                     setCheckingSession(false);
                     // Clear URL params
                     window.history.replaceState(null, '', window.location.pathname);
                     return;
                 }
+
 
                 // Method 1: Check for PKCE code in URL query params
                 const code = urlParams.get('code');
