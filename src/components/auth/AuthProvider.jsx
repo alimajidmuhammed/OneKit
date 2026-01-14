@@ -46,19 +46,30 @@ export function AuthProvider({ children }) {
     }, []);
 
     useEffect(() => {
+        let isMounted = true;
+
         // Get initial session
         const getSession = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
+
+                if (!isMounted) return;
+
                 setUser(session?.user ?? null);
 
                 if (session?.user) {
                     await fetchProfile(session.user.id);
                 }
             } catch (error) {
-                console.error('Error getting session:', error);
+                // Silence abort errors during navigation
+                if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+                    return;
+                }
+                console.warn('Session fetch issue:', error?.message || error);
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
@@ -67,6 +78,8 @@ export function AuthProvider({ children }) {
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
+                if (!isMounted) return;
+
                 setUser(session?.user ?? null);
 
                 if (session?.user) {
@@ -75,11 +88,14 @@ export function AuthProvider({ children }) {
                     setProfile(null);
                 }
 
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         );
 
         return () => {
+            isMounted = false;
             subscription.unsubscribe();
         };
     }, [fetchProfile]);
