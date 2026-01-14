@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase/client';
-import styles from '../login/auth.module.css';
+import styles from '../(auth)/login/auth.module.css';
 
 function ResetPasswordForm() {
     const [password, setPassword] = useState('');
