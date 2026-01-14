@@ -42,7 +42,8 @@ export async function updateSession(request) {
 
     // Protected routes configuration
     const protectedRoutes = ['/dashboard', '/services', '/admin', '/profile', '/settings'];
-    const authRoutes = ['/login', '/register', '/forgot-password'];
+    const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+
     const adminRoutes = ['/admin'];
 
     const pathname = request.nextUrl.pathname;
