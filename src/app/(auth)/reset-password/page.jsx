@@ -19,37 +19,55 @@ function ResetPasswordForm() {
 
     // Check if user arrived via valid reset link
     useEffect(() => {
-        const checkSession = async () => {
+        const handlePasswordRecovery = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                // Check URL hash for recovery tokens (Supabase puts tokens in hash)
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                const refreshToken = hashParams.get('refresh_token');
+                const type = hashParams.get('type');
 
-                // User should have a session after clicking the reset link
+                if (type === 'recovery' && accessToken) {
+                    // Set the session from the recovery tokens
+                    const { data, error } = await supabase.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken || '',
+                    });
+
+                    if (error) {
+                        console.error('Session error:', error);
+                        setError('Invalid or expired reset link. Please request a new password reset.');
+                        setCheckingSession(false);
+                        return;
+                    }
+
+                    if (data.session) {
+                        setIsValidSession(true);
+                        // Clear the hash from URL for security
+                        window.history.replaceState(null, '', window.location.pathname);
+                    }
+                    setCheckingSession(false);
+                    return;
+                }
+
+                // Fallback: check if we already have a session
+                const { data: { session } } = await supabase.auth.getSession();
                 if (session) {
                     setIsValidSession(true);
                 } else {
                     setError('Invalid or expired reset link. Please request a new password reset.');
                 }
             } catch (err) {
+                console.error('Recovery check error:', err);
                 setError('Unable to verify reset link. Please try again.');
             } finally {
                 setCheckingSession(false);
             }
         };
 
-        checkSession();
-
-        // Listen for auth state changes (when user clicks the email link)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (event, session) => {
-                if (event === 'PASSWORD_RECOVERY') {
-                    setIsValidSession(true);
-                    setCheckingSession(false);
-                }
-            }
-        );
-
-        return () => subscription.unsubscribe();
+        handlePasswordRecovery();
     }, [supabase.auth]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
