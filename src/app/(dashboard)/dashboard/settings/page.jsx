@@ -127,17 +127,33 @@ export default function SettingsPage() {
                 throw new Error(data.error || 'Failed to delete account');
             }
 
-            // Sign out and redirect
-            const { getSupabaseClient } = await import('@/lib/supabase/client');
-            const supabase = getSupabaseClient();
-            await supabase.auth.signOut();
+            // Account deleted successfully - redirect immediately
+            // Don't wait for signOut since user is already deleted from auth
+            try {
+                const { getSupabaseClient } = await import('@/lib/supabase/client');
+                const supabase = getSupabaseClient();
+                await supabase.auth.signOut();
+            } catch (signOutError) {
+                // Ignore signOut errors - user is already deleted
+                console.log('SignOut after delete:', signOutError);
+            }
+
+            // Redirect to home page
             window.location.href = '/';
         } catch (error) {
-            alert('Failed to delete account: ' + error.message);
+            // Only show error if it's not a network error after deletion
+            if (error.message && !error.message.includes('fetch')) {
+                alert('Failed to delete account: ' + error.message);
+            } else {
+                // If we got here with a fetch error, account might still be deleted
+                // Try to redirect anyway
+                window.location.href = '/';
+            }
         } finally {
             setDeleteLoading(false);
         }
     };
+
 
 
     return (
