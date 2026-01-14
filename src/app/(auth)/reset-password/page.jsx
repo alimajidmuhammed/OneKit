@@ -21,14 +21,37 @@ function ResetPasswordForm() {
     useEffect(() => {
         const handlePasswordRecovery = async () => {
             try {
-                // Check URL hash for recovery tokens (Supabase puts tokens in hash)
+                // Method 1: Check for PKCE code in URL query params
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+
+                if (code) {
+                    // Exchange the code for a session (PKCE flow)
+                    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+                    if (error) {
+                        console.error('Code exchange error:', error);
+                        setError('Invalid or expired reset link. Please request a new password reset.');
+                        setCheckingSession(false);
+                        return;
+                    }
+
+                    if (data.session) {
+                        setIsValidSession(true);
+                        // Clear the code from URL for security
+                        window.history.replaceState(null, '', window.location.pathname);
+                    }
+                    setCheckingSession(false);
+                    return;
+                }
+
+                // Method 2: Check URL hash for legacy token flow
                 const hashParams = new URLSearchParams(window.location.hash.substring(1));
                 const accessToken = hashParams.get('access_token');
                 const refreshToken = hashParams.get('refresh_token');
                 const type = hashParams.get('type');
 
                 if (type === 'recovery' && accessToken) {
-                    // Set the session from the recovery tokens
                     const { data, error } = await supabase.auth.setSession({
                         access_token: accessToken,
                         refresh_token: refreshToken || '',
@@ -43,14 +66,13 @@ function ResetPasswordForm() {
 
                     if (data.session) {
                         setIsValidSession(true);
-                        // Clear the hash from URL for security
                         window.history.replaceState(null, '', window.location.pathname);
                     }
                     setCheckingSession(false);
                     return;
                 }
 
-                // Fallback: check if we already have a session
+                // Method 3: Check if we already have a session
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session) {
                     setIsValidSession(true);
@@ -67,6 +89,7 @@ function ResetPasswordForm() {
 
         handlePasswordRecovery();
     }, [supabase.auth]);
+
 
 
     const handleSubmit = async (e) => {
