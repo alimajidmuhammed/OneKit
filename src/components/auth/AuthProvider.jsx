@@ -149,8 +149,11 @@ export function AuthProvider({ children }) {
 
     const resetPassword = useCallback(async (email) => {
         try {
+            // Use production URL from env, fallback to current origin
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`,
+                redirectTo: `${baseUrl}/reset-password`,
             });
 
             if (error) throw error;
@@ -160,6 +163,7 @@ export function AuthProvider({ children }) {
             return { error };
         }
     }, []);
+
 
     const updateProfile = useCallback(async (updates) => {
         try {
