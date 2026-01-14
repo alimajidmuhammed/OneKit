@@ -117,6 +117,27 @@
     flex-shrink: 0;
 }
 
+/* Success */
+.authSuccess {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--success-50, #ecfdf5);
+    border: 1px solid var(--success-200, #a7f3d0);
+    border-radius: var(--radius-lg);
+    color: var(--success-700, #047857);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-6);
+}
+
+.authSuccess svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+
 /* Form */
 .authForm {
     display: flex;
