@@ -192,7 +192,7 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                     <div className={styles.cvSidebar}>
                         {cv.personal_info?.photo && (
                             <div className={styles.cvPhoto}>
-                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} />
+                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                             </div>
                         )}
                         <div className={styles.sidebarName}>{cv.personal_info?.fullName || 'Your Name'}</div>
@@ -278,6 +278,36 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                                 ))}
                             </div>
                         )}
+
+                        {cv.certifications?.length > 0 && (
+                            <div className={styles.cvSection}>
+                                <h3>Certifications</h3>
+                                {cv.certifications.map((cert, i) => (
+                                    <div key={i} className={styles.cvItem}>
+                                        <div className={styles.cvItemHeader}>
+                                            <strong>{cert.name}</strong>
+                                            <span>{cert.date}</span>
+                                        </div>
+                                        <p>{cert.issuer}{cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {cv.organizations?.length > 0 && (
+                            <div className={styles.cvSection}>
+                                <h3>Organizations</h3>
+                                {cv.organizations.map((org, i) => (
+                                    <div key={i} className={styles.cvItem}>
+                                        <div className={styles.cvItemHeader}>
+                                            <strong>{org.name}</strong>
+                                            <span>{org.startDate} - {org.endDate || 'Present'}</span>
+                                        </div>
+                                        <p>{org.role}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             ) : (
@@ -285,7 +315,7 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                     <div className={styles.cvHeader}>
                         {cv.personal_info?.photo && (
                             <div className={styles.cvPhoto}>
-                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} />
+                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                             </div>
                         )}
                         <div className={styles.cvHeaderText}>
@@ -377,6 +407,36 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                                     <span key={i} className={styles.skillTag}>{lang.name} ({lang.level})</span>
                                 ))}
                             </div>
+                        </div>
+                    )}
+
+                    {cv.certifications?.length > 0 && (
+                        <div className={styles.cvSection}>
+                            <h3>Certifications</h3>
+                            {cv.certifications.map((cert, i) => (
+                                <div key={i} className={styles.cvItem}>
+                                    <div className={styles.cvItemHeader}>
+                                        <strong>{cert.name}</strong>
+                                        <span>{cert.date}</span>
+                                    </div>
+                                    <p>{cert.issuer}{cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {cv.organizations?.length > 0 && (
+                        <div className={styles.cvSection}>
+                            <h3>Organizations</h3>
+                            {cv.organizations.map((org, i) => (
+                                <div key={i} className={styles.cvItem}>
+                                    <div className={styles.cvItemHeader}>
+                                        <strong>{org.name}</strong>
+                                        <span>{org.startDate} - {org.endDate || 'Present'}</span>
+                                    </div>
+                                    <p>{org.role}</p>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -971,7 +1031,7 @@ export default function CVEditorPage({ params }) {
                                                 onClick={() => setIsPhotoStudioOpen(true)}
                                                 style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', cursor: 'pointer', border: '3px solid white', boxShadow: '0 2px 4px -1px rgba(0,0,0,0.1)', position: 'relative' }}
                                             >
-                                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} />
+                                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                                                 <div className={styles.photoEditOverlay} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}>
                                                     <span style={{ fontSize: '10px' }}>Edit</span>
                                                 </div>
