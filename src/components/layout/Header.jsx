@@ -104,7 +104,7 @@ export default function Header({ initialUser = null, initialProfile = null }) {
 
                 {/* Auth Actions */}
                 <div className={styles.actions}>
-                    {loading ? (
+                    {auth.loading ? (
                         <div className={styles.skeleton} />
                     ) : user ? (
                         <>
