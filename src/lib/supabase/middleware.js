@@ -42,7 +42,9 @@ export async function updateSession(request) {
 
     // Protected routes configuration
     const protectedRoutes = ['/dashboard', '/services', '/admin', '/profile', '/settings'];
-    const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+    // Note: /reset-password is NOT in authRoutes because authenticated users need to access it
+    // (PKCE code exchange creates session before reaching the page)
+    const authRoutes = ['/login', '/register', '/forgot-password'];
 
     const adminRoutes = ['/admin'];
 
@@ -61,7 +63,7 @@ export async function updateSession(request) {
         return NextResponse.redirect(url);
     }
 
-    // Redirect authenticated users from auth routes
+    // Redirect authenticated users from auth routes (except reset-password)
     if (isAuthRoute && user) {
         const url = request.nextUrl.clone();
         const redirect = url.searchParams.get('redirect') || '/dashboard';
@@ -69,6 +71,7 @@ export async function updateSession(request) {
         url.searchParams.delete('redirect');
         return NextResponse.redirect(url);
     }
+
 
     // Check admin access with database role verification
     if (isAdminRoute && user) {
