@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import styles from '../(auth)/login/auth.module.css';
 
-const PAGE_VERSION = 'v2.1.0';
+const PAGE_VERSION = 'v2.1.1';
 
 function ResetPasswordForm() {
     const [password, setPassword] = useState('');
@@ -14,68 +14,35 @@ function ResetPasswordForm() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [tokens, setTokens] = useState(null);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Quick init - no blocking
+    // Exchange code on mount
     useEffect(() => {
         const init = async () => {
             const url = new URL(window.location.href);
             const code = url.searchParams.get('code');
             const errorParam = url.searchParams.get('error');
 
-            // Clear URL immediately
             if (code || errorParam) {
                 window.history.replaceState({}, '', '/reset-password');
             }
 
-            // Handle errors
             if (errorParam) {
                 const desc = url.searchParams.get('error_description');
                 setError(decodeURIComponent(desc || 'Reset link expired.'));
                 return;
             }
 
-            // Exchange code if present
             if (code) {
                 try {
-                    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+                    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
                     if (exchangeError) {
                         setError('Reset link expired. Please request a new one.');
-                        return;
-                    }
-                    if (data?.session) {
-                        setTokens({
-                            accessToken: data.session.access_token,
-                            refreshToken: data.session.refresh_token
-                        });
                     }
                 } catch (e) {
                     setError('Failed to process reset link.');
                 }
-                return;
-            }
-
-            // No code - check for existing session (with timeout)
-            try {
-                const sessionPromise = supabase.auth.getSession();
-                const timeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('timeout')), 3000)
-                );
-
-                const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
-
-                if (session) {
-                    setTokens({
-                        accessToken: session.access_token,
-                        refreshToken: session.refresh_token
-                    });
-                } else {
-                    setError('Please use the reset link from your email.');
-                }
-            } catch (e) {
-                setError('Please use the reset link from your email.');
             }
         };
 
@@ -96,20 +63,25 @@ function ResetPasswordForm() {
             return;
         }
 
-        if (!tokens?.accessToken) {
-            setError('No valid session. Please use a fresh reset link.');
-            return;
-        }
-
         setLoading(true);
 
         try {
+            // Get current session
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session?.access_token) {
+                setError('Session expired. Please request a new reset link.');
+                setLoading(false);
+                return;
+            }
+
+            // Call API to reset password
             const response = await fetch('/api/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    accessToken: tokens.accessToken,
-                    refreshToken: tokens.refreshToken,
+                    accessToken: session.access_token,
+                    refreshToken: session.refresh_token || '',
                     newPassword: password
                 })
             });
@@ -127,6 +99,7 @@ function ResetPasswordForm() {
             setTimeout(() => router.push('/login'), 2000);
 
         } catch (err) {
+            console.error('Submit error:', err);
             setError('Network error. Please try again.');
             setLoading(false);
         }
