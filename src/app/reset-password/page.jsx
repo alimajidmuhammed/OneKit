@@ -71,12 +71,26 @@ function ResetPasswordForm() {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.updateUser({ password });
+            // First check if we have a valid session
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                setError('Session expired. Please request a new reset link.');
+                setLoading(false);
+                return;
+            }
+
+            // Update password with timeout
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timed out')), 10000)
+            );
+
+            const updatePromise = supabase.auth.updateUser({ password });
+
+            const { error } = await Promise.race([updatePromise, timeoutPromise]);
 
             if (error) {
-                setError(error.message?.includes('session')
-                    ? 'Session expired. Please request a new reset link.'
-                    : error.message || 'Failed to reset password.');
+                setError(error.message || 'Failed to reset password.');
                 setLoading(false);
                 return;
             }
@@ -84,10 +98,14 @@ function ResetPasswordForm() {
             setSuccess(true);
             setTimeout(() => router.push('/login'), 2000);
         } catch (err) {
-            setError('An error occurred. Please try again.');
+            const errorMsg = err.message === 'Request timed out'
+                ? 'Request timed out. Please try again.'
+                : 'An error occurred. Please try again.';
+            setError(errorMsg);
             setLoading(false);
         }
     };
+
 
     if (success) {
         return (
