@@ -6,13 +6,8 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import styles from '../(auth)/login/auth.module.css';
 
-// Helper: wrap async call with timeout
-async function withTimeout(promise, ms, errorMsg) {
-    const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(errorMsg)), ms)
-    );
-    return Promise.race([promise, timeout]);
-}
+// Version for debugging - confirms Vercel deployed latest code
+const PAGE_VERSION = 'v2.0.0';
 
 function ResetPasswordForm() {
     const [password, setPassword] = useState('');
@@ -21,56 +16,65 @@ function ResetPasswordForm() {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [ready, setReady] = useState(false);
+    const [tokens, setTokens] = useState(null);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Setup session from URL code
+    // Setup: exchange code for tokens
     useEffect(() => {
-        const setup = async () => {
-            const url = new URL(window.location.href);
-            const code = url.searchParams.get('code');
-            const errorParam = url.searchParams.get('error');
+        const init = async () => {
+            try {
+                const url = new URL(window.location.href);
+                const code = url.searchParams.get('code');
+                const errorParam = url.searchParams.get('error');
 
-            // Clear URL immediately
-            window.history.replaceState({}, '', '/reset-password');
+                // Clear URL
+                window.history.replaceState({}, '', '/reset-password');
 
-            // Check for error
-            if (errorParam) {
-                const desc = url.searchParams.get('error_description');
-                setError(decodeURIComponent(desc || 'Reset link expired. Request a new one.'));
-                setReady(true);
-                return;
-            }
-
-            // Exchange code for session
-            if (code) {
-                try {
-                    const result = await withTimeout(
-                        supabase.auth.exchangeCodeForSession(code),
-                        8000,
-                        'Connection timeout'
-                    );
-                    if (result.error) {
-                        setError('Reset link expired. Please request a new one.');
-                    }
-                } catch (e) {
-                    console.error('Code exchange failed:', e);
-                    // Don't set error - might still have session
+                if (errorParam) {
+                    const desc = url.searchParams.get('error_description');
+                    setError(decodeURIComponent(desc || 'Reset link expired.'));
+                    setReady(true);
+                    return;
                 }
+
+                if (code) {
+                    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+                    if (exchangeError) {
+                        setError('Reset link expired. Please request a new one.');
+                        setReady(true);
+                        return;
+                    }
+
+                    if (data?.session) {
+                        setTokens({
+                            accessToken: data.session.access_token,
+                            refreshToken: data.session.refresh_token
+                        });
+                    }
+                } else {
+                    // Check for existing session
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session) {
+                        setTokens({
+                            accessToken: session.access_token,
+                            refreshToken: session.refresh_token
+                        });
+                    } else {
+                        setError('No session found. Please request a new reset link.');
+                    }
+                }
+
+                setReady(true);
+            } catch (err) {
+                console.error('Init error:', err);
+                setError('Setup failed. Please try again.');
+                setReady(true);
             }
-
-            // Brief delay then check session
-            await new Promise(r => setTimeout(r, 500));
-
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                setError('No valid session. Please request a new reset link.');
-            }
-
-            setReady(true);
         };
 
-        setup();
+        init();
     }, [supabase.auth]);
 
     const handleSubmit = async (e) => {
@@ -87,53 +91,58 @@ function ResetPasswordForm() {
             return;
         }
 
+        if (!tokens?.accessToken) {
+            setError('Session expired. Please request a new reset link.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            // Verify session first
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                setError('Session expired. Request a new reset link.');
-                setLoading(false);
-                return;
-            }
+            // Call server-side API for password reset
+            const response = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken,
+                    newPassword: password
+                })
+            });
 
-            // Update password with timeout
-            const result = await withTimeout(
-                supabase.auth.updateUser({ password }),
-                10000,
-                'Request timed out. Please try again.'
-            );
+            const result = await response.json();
 
-            if (result.error) {
-                setError(result.error.message || 'Failed to reset password.');
+            if (!response.ok) {
+                setError(result.error || 'Failed to reset password.');
                 setLoading(false);
                 return;
             }
 
             // Success!
             setSuccess(true);
-
-            // Sign out and redirect
             await supabase.auth.signOut().catch(() => { });
             setTimeout(() => router.push('/login'), 2500);
 
         } catch (err) {
-            setError(err.message || 'An error occurred. Please try again.');
+            console.error('Submit error:', err);
+            setError('Network error. Please try again.');
             setLoading(false);
         }
     };
 
-    // Loading state while setting up
+    // Loading
     if (!ready) {
         return (
             <div className={styles.authCard}>
                 <div className={styles.spinner} style={{ margin: '40px auto' }} />
+                <p className={styles.authSubtitle} style={{ textAlign: 'center', fontSize: '10px', opacity: 0.5 }}>
+                    {PAGE_VERSION}
+                </p>
             </div>
         );
     }
 
-    // Success state
+    // Success
     if (success) {
         return (
             <div className={styles.authCard}>
@@ -162,7 +171,7 @@ function ResetPasswordForm() {
         );
     }
 
-    // Form state
+    // Form
     return (
         <div className={styles.authCard}>
             <Link href="/" className={styles.authLogo}>
@@ -203,7 +212,7 @@ function ResetPasswordForm() {
                         required
                         minLength={6}
                         autoComplete="new-password"
-                        disabled={!!error}
+                        disabled={!tokens}
                     />
                 </div>
 
@@ -219,14 +228,14 @@ function ResetPasswordForm() {
                         required
                         minLength={6}
                         autoComplete="new-password"
-                        disabled={!!error}
+                        disabled={!tokens}
                     />
                 </div>
 
                 <button
                     type="submit"
                     className={styles.authSubmit}
-                    disabled={loading || !!error}
+                    disabled={loading || !tokens}
                 >
                     {loading ? (
                         <><span className={styles.spinner} /> Resetting...</>
@@ -240,6 +249,10 @@ function ResetPasswordForm() {
                 <Link href="/forgot-password">Request new reset link</Link>
                 {' • '}
                 <Link href="/login">Sign in</Link>
+            </p>
+
+            <p style={{ textAlign: 'center', fontSize: '10px', opacity: 0.3, marginTop: '16px' }}>
+                {PAGE_VERSION}
             </p>
         </div>
     );
