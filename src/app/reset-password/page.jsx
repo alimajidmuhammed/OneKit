@@ -16,9 +16,10 @@ function ResetPasswordForm() {
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Exchange code for session - MUST complete before form can be used
+    // Exchange code for session with timeout
     useEffect(() => {
         let isMounted = true;
+        let timeoutId;
 
         const initSession = async () => {
             try {
@@ -36,47 +37,61 @@ function ResetPasswordForm() {
                     return;
                 }
 
-                // Exchange PKCE code for session - WAIT for this
+                // Exchange PKCE code for session with 5 second timeout
                 const code = urlParams.get('code');
                 if (code) {
-                    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+                    window.history.replaceState(null, '', window.location.pathname);
 
-                    if (exchangeError) {
-                        if (isMounted) {
-                            setError('Reset link has expired. Please request a new one.');
-                            setReady(true);
+                    // Race between exchange and timeout
+                    const timeoutPromise = new Promise((_, reject) => {
+                        timeoutId = setTimeout(() => reject(new Error('timeout')), 5000);
+                    });
+
+                    try {
+                        const result = await Promise.race([
+                            supabase.auth.exchangeCodeForSession(code),
+                            timeoutPromise
+                        ]);
+
+                        clearTimeout(timeoutId);
+
+                        if (result?.error) {
+                            if (isMounted) {
+                                setError('Reset link has expired. Please request a new one.');
+                            }
                         }
-                        window.history.replaceState(null, '', window.location.pathname);
-                        return;
+                    } catch (e) {
+                        // Timeout or error - still show form, will check session on submit
+                        clearTimeout(timeoutId);
                     }
 
-                    // Successfully got session
-                    window.history.replaceState(null, '', window.location.pathname);
                     if (isMounted) setReady(true);
                     return;
                 }
 
                 // No code in URL - check existing session
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                    if (isMounted) {
-                        setError('No valid reset session. Please request a new reset link.');
-                    }
+                if (!session && isMounted) {
+                    setError('No valid reset session. Please request a new reset link.');
                 }
                 if (isMounted) setReady(true);
 
             } catch (err) {
                 console.error('Session init error:', err);
                 if (isMounted) {
-                    setError('Failed to initialize. Please try again.');
-                    setReady(true);
+                    setReady(true); // Show form anyway
                 }
             }
         };
 
         initSession();
-        return () => { isMounted = false; };
+
+        return () => {
+            isMounted = false;
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, [supabase.auth]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
