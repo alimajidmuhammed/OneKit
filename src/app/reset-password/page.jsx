@@ -12,102 +12,44 @@ function ResetPasswordForm() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [isValidSession, setIsValidSession] = useState(false);
-    const [checkingSession, setCheckingSession] = useState(true);
+    const [initializing, setInitializing] = useState(true);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Check if user arrived via valid reset link
+    // Initialize session from URL code (runs once on mount)
     useEffect(() => {
-        const handlePasswordRecovery = async () => {
+        const initSession = async () => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
 
                 // Check for error in URL (Supabase sends error when link expires)
                 const urlError = urlParams.get('error');
-                const errorDescription = urlParams.get('error_description');
-
                 if (urlError === 'access_denied') {
-                    // Sign out to clear any stale session
-                    await supabase.auth.signOut();
-                    setError(errorDescription?.replace(/%20/g, ' ') || 'Reset link has expired. Please request a new one.');
-                    setCheckingSession(false);
-                    // Clear URL params
+                    const errorDescription = urlParams.get('error_description');
+                    setError(decodeURIComponent(errorDescription || 'Reset link has expired. Please request a new one.'));
                     window.history.replaceState(null, '', window.location.pathname);
+                    setInitializing(false);
                     return;
                 }
 
-
-                // Method 1: Check for PKCE code in URL query params
+                // Exchange PKCE code for session
                 const code = urlParams.get('code');
-
-
                 if (code) {
-                    // Exchange the code for a session (PKCE flow)
-                    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
+                    const { error } = await supabase.auth.exchangeCodeForSession(code);
                     if (error) {
-                        console.error('Code exchange error:', error);
-                        setError('Invalid or expired reset link. Please request a new password reset.');
-                        setCheckingSession(false);
-                        return;
+                        setError('Reset link has expired. Please request a new one.');
                     }
-
-                    if (data.session) {
-                        setIsValidSession(true);
-                        // Clear the code from URL for security
-                        window.history.replaceState(null, '', window.location.pathname);
-                    }
-                    setCheckingSession(false);
-                    return;
-                }
-
-                // Method 2: Check URL hash for legacy token flow
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                const accessToken = hashParams.get('access_token');
-                const refreshToken = hashParams.get('refresh_token');
-                const type = hashParams.get('type');
-
-                if (type === 'recovery' && accessToken) {
-                    const { data, error } = await supabase.auth.setSession({
-                        access_token: accessToken,
-                        refresh_token: refreshToken || '',
-                    });
-
-                    if (error) {
-                        console.error('Session error:', error);
-                        setError('Invalid or expired reset link. Please request a new password reset.');
-                        setCheckingSession(false);
-                        return;
-                    }
-
-                    if (data.session) {
-                        setIsValidSession(true);
-                        window.history.replaceState(null, '', window.location.pathname);
-                    }
-                    setCheckingSession(false);
-                    return;
-                }
-
-                // Method 3: Check if we already have a session
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    setIsValidSession(true);
-                } else {
-                    setError('Invalid or expired reset link. Please request a new password reset.');
+                    window.history.replaceState(null, '', window.location.pathname);
                 }
             } catch (err) {
-                console.error('Recovery check error:', err);
-                setError('Unable to verify reset link. Please try again.');
+                console.error('Init error:', err);
             } finally {
-                setCheckingSession(false);
+                setInitializing(false);
             }
         };
 
-        handlePasswordRecovery();
+        initSession();
     }, [supabase.auth]);
-
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -132,31 +74,32 @@ function ResetPasswordForm() {
             });
 
             if (error) {
-                setError(error.message || 'Failed to reset password. Please try again.');
+                if (error.message.includes('session') || error.message.includes('logged in')) {
+                    setError('Reset link has expired. Please request a new password reset.');
+                } else {
+                    setError(error.message || 'Failed to reset password. Please try again.');
+                }
                 setLoading(false);
                 return;
             }
 
             setSuccess(true);
 
-            // Redirect to login after 3 seconds
+            // Redirect to login after 2 seconds
             setTimeout(() => {
                 router.push('/login');
-            }, 3000);
+            }, 2000);
         } catch (err) {
             setError('An unexpected error occurred. Please try again.');
             setLoading(false);
         }
     };
 
-    // Show loading while checking session
-    if (checkingSession) {
+    // Brief loading while exchanging code
+    if (initializing) {
         return (
             <div className={styles.authCard}>
                 <div className={styles.spinner} style={{ margin: '40px auto' }} />
-                <p className={styles.authSubtitle} style={{ textAlign: 'center' }}>
-                    Verifying reset link...
-                </p>
             </div>
         );
     }
@@ -220,60 +163,52 @@ function ResetPasswordForm() {
                 </div>
             )}
 
-            {isValidSession ? (
-                <form onSubmit={handleSubmit} className={styles.authForm}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="password" className={styles.formLabel}>New Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={styles.formInput}
-                            placeholder="••••••••"
-                            required
-                            minLength={6}
-                            autoComplete="new-password"
-                        />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label htmlFor="confirmPassword" className={styles.formLabel}>Confirm Password</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className={styles.formInput}
-                            placeholder="••••••••"
-                            required
-                            minLength={6}
-                            autoComplete="new-password"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className={styles.authSubmit}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <>
-                                <span className={styles.spinner} />
-                                Resetting...
-                            </>
-                        ) : (
-                            'Reset Password'
-                        )}
-                    </button>
-                </form>
-            ) : (
-                <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                    <Link href="/forgot-password" className={styles.authSubmit} style={{ display: 'inline-block', textDecoration: 'none' }}>
-                        Request New Reset Link
-                    </Link>
+            <form onSubmit={handleSubmit} className={styles.authForm}>
+                <div className={styles.formGroup}>
+                    <label htmlFor="password" className={styles.formLabel}>New Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={styles.formInput}
+                        placeholder="••••••••"
+                        required
+                        minLength={6}
+                        autoComplete="new-password"
+                    />
                 </div>
-            )}
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="confirmPassword" className={styles.formLabel}>Confirm Password</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={styles.formInput}
+                        placeholder="••••••••"
+                        required
+                        minLength={6}
+                        autoComplete="new-password"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className={styles.authSubmit}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <>
+                            <span className={styles.spinner} />
+                            Resetting...
+                        </>
+                    ) : (
+                        'Reset Password'
+                    )}
+                </button>
+            </form>
 
             <p className={styles.authSwitch}>
                 Remember your password?{' '}
