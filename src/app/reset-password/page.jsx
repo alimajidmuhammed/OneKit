@@ -18,6 +18,8 @@ function ResetPasswordForm() {
 
     // Initialize session from URL code (runs once on mount)
     useEffect(() => {
+        let isMounted = true;
+
         const initSession = async () => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -26,9 +28,11 @@ function ResetPasswordForm() {
                 const urlError = urlParams.get('error');
                 if (urlError === 'access_denied') {
                     const errorDescription = urlParams.get('error_description');
-                    setError(decodeURIComponent(errorDescription || 'Reset link has expired. Please request a new one.'));
+                    if (isMounted) {
+                        setError(decodeURIComponent(errorDescription || 'Reset link has expired. Please request a new one.'));
+                        setInitializing(false);
+                    }
                     window.history.replaceState(null, '', window.location.pathname);
-                    setInitializing(false);
                     return;
                 }
 
@@ -36,20 +40,31 @@ function ResetPasswordForm() {
                 const code = urlParams.get('code');
                 if (code) {
                     const { error } = await supabase.auth.exchangeCodeForSession(code);
-                    if (error) {
+                    if (isMounted && error) {
                         setError('Reset link has expired. Please request a new one.');
                     }
                     window.history.replaceState(null, '', window.location.pathname);
                 }
             } catch (err) {
+                // Silence abort errors during navigation
+                if (err?.name === 'AbortError' || err?.message?.includes('aborted')) {
+                    return;
+                }
                 console.error('Init error:', err);
             } finally {
-                setInitializing(false);
+                if (isMounted) {
+                    setInitializing(false);
+                }
             }
         };
 
         initSession();
+
+        return () => {
+            isMounted = false;
+        };
     }, [supabase.auth]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
