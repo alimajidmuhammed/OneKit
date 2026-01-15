@@ -7,7 +7,7 @@ import { updatePassword } from '@/lib/auth/actions';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import styles from '../(auth)/login/auth.module.css';
 
-const PAGE_VERSION = 'v3.0.0';
+const PAGE_VERSION = 'v3.0.1';
 
 function ResetPasswordForm() {
     const [error, setError] = useState('');
@@ -144,7 +144,7 @@ function ResetPasswordForm() {
                         required
                         minLength={6}
                         autoComplete="new-password"
-                        disabled={!sessionReady && !error}
+
                     />
                 </div>
 
@@ -159,7 +159,7 @@ function ResetPasswordForm() {
                         required
                         minLength={6}
                         autoComplete="new-password"
-                        disabled={!sessionReady && !error}
+
                     />
                 </div>
 
