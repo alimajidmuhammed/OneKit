@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import styles from '../(auth)/login/auth.module.css';
 
-// Version for debugging - confirms Vercel deployed latest code
-const PAGE_VERSION = 'v2.0.0';
+const PAGE_VERSION = 'v2.1.0';
 
 function ResetPasswordForm() {
     const [password, setPassword] = useState('');
@@ -15,62 +14,68 @@ function ResetPasswordForm() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [ready, setReady] = useState(false);
     const [tokens, setTokens] = useState(null);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Setup: exchange code for tokens
+    // Quick init - no blocking
     useEffect(() => {
         const init = async () => {
-            try {
-                const url = new URL(window.location.href);
-                const code = url.searchParams.get('code');
-                const errorParam = url.searchParams.get('error');
+            const url = new URL(window.location.href);
+            const code = url.searchParams.get('code');
+            const errorParam = url.searchParams.get('error');
 
-                // Clear URL
+            // Clear URL immediately
+            if (code || errorParam) {
                 window.history.replaceState({}, '', '/reset-password');
+            }
 
-                if (errorParam) {
-                    const desc = url.searchParams.get('error_description');
-                    setError(decodeURIComponent(desc || 'Reset link expired.'));
-                    setReady(true);
-                    return;
-                }
+            // Handle errors
+            if (errorParam) {
+                const desc = url.searchParams.get('error_description');
+                setError(decodeURIComponent(desc || 'Reset link expired.'));
+                return;
+            }
 
-                if (code) {
+            // Exchange code if present
+            if (code) {
+                try {
                     const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-
                     if (exchangeError) {
                         setError('Reset link expired. Please request a new one.');
-                        setReady(true);
                         return;
                     }
-
                     if (data?.session) {
                         setTokens({
                             accessToken: data.session.access_token,
                             refreshToken: data.session.refresh_token
                         });
                     }
-                } else {
-                    // Check for existing session
-                    const { data: { session } } = await supabase.auth.getSession();
-                    if (session) {
-                        setTokens({
-                            accessToken: session.access_token,
-                            refreshToken: session.refresh_token
-                        });
-                    } else {
-                        setError('No session found. Please request a new reset link.');
-                    }
+                } catch (e) {
+                    setError('Failed to process reset link.');
                 }
+                return;
+            }
 
-                setReady(true);
-            } catch (err) {
-                console.error('Init error:', err);
-                setError('Setup failed. Please try again.');
-                setReady(true);
+            // No code - check for existing session (with timeout)
+            try {
+                const sessionPromise = supabase.auth.getSession();
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('timeout')), 3000)
+                );
+
+                const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
+
+                if (session) {
+                    setTokens({
+                        accessToken: session.access_token,
+                        refreshToken: session.refresh_token
+                    });
+                } else {
+                    setError('Please use the reset link from your email.');
+                }
+            } catch (e) {
+                setError('Please use the reset link from your email.');
             }
         };
 
@@ -92,14 +97,13 @@ function ResetPasswordForm() {
         }
 
         if (!tokens?.accessToken) {
-            setError('Session expired. Please request a new reset link.');
+            setError('No valid session. Please use a fresh reset link.');
             return;
         }
 
         setLoading(true);
 
         try {
-            // Call server-side API for password reset
             const response = await fetch('/api/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -118,31 +122,16 @@ function ResetPasswordForm() {
                 return;
             }
 
-            // Success!
             setSuccess(true);
             await supabase.auth.signOut().catch(() => { });
-            setTimeout(() => router.push('/login'), 2500);
+            setTimeout(() => router.push('/login'), 2000);
 
         } catch (err) {
-            console.error('Submit error:', err);
             setError('Network error. Please try again.');
             setLoading(false);
         }
     };
 
-    // Loading
-    if (!ready) {
-        return (
-            <div className={styles.authCard}>
-                <div className={styles.spinner} style={{ margin: '40px auto' }} />
-                <p className={styles.authSubtitle} style={{ textAlign: 'center', fontSize: '10px', opacity: 0.5 }}>
-                    {PAGE_VERSION}
-                </p>
-            </div>
-        );
-    }
-
-    // Success
     if (success) {
         return (
             <div className={styles.authCard}>
@@ -171,7 +160,6 @@ function ResetPasswordForm() {
         );
     }
 
-    // Form
     return (
         <div className={styles.authCard}>
             <Link href="/" className={styles.authLogo}>
@@ -212,7 +200,6 @@ function ResetPasswordForm() {
                         required
                         minLength={6}
                         autoComplete="new-password"
-                        disabled={!tokens}
                     />
                 </div>
 
@@ -228,15 +215,10 @@ function ResetPasswordForm() {
                         required
                         minLength={6}
                         autoComplete="new-password"
-                        disabled={!tokens}
                     />
                 </div>
 
-                <button
-                    type="submit"
-                    className={styles.authSubmit}
-                    disabled={loading || !tokens}
-                >
+                <button type="submit" className={styles.authSubmit} disabled={loading}>
                     {loading ? (
                         <><span className={styles.spinner} /> Resetting...</>
                     ) : (
