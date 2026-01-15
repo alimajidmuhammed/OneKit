@@ -2,36 +2,32 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { requestPasswordReset } from '@/lib/auth/actions';
 import styles from './auth.module.css';
 
 export default function ForgotPasswordPage() {
-    const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const { resetPassword } = useAuth();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    async function handleSubmit(formData) {
         setError('');
         setLoading(true);
 
-        try {
-            const { error } = await resetPassword(email);
+        const result = await requestPasswordReset(formData);
 
-            if (error) {
-                setError(error.message || 'Failed to send reset email. Please try again.');
-                setLoading(false);
-                return;
-            }
-
-            setSuccess(true);
-        } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
+        if (result?.error) {
+            setError(result.error);
             setLoading(false);
+            return;
         }
-    };
+
+        if (result?.success) {
+            setEmail(result.email);
+            setSuccess(true);
+        }
+    }
 
     if (success) {
         return (
@@ -39,7 +35,6 @@ export default function ForgotPasswordPage() {
                 <div className={styles.authBackground}>
                     <div className={styles.authGradient} />
                 </div>
-
                 <div className={styles.authContainer}>
                     <div className={styles.authCard}>
                         <div className={styles.successIcon}>
@@ -67,13 +62,11 @@ export default function ForgotPasswordPage() {
             <div className={styles.authBackground}>
                 <div className={styles.authGradient} />
             </div>
-
             <div className={styles.authContainer}>
                 <div className={styles.authCard}>
-                    {/* Logo */}
                     <Link href="/" className={styles.authLogo}>
                         <div className={styles.logoIcon}>
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg viewBox="0 0 24 24" fill="none">
                                 <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
                                 <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
                                 <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
@@ -98,14 +91,13 @@ export default function ForgotPasswordPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className={styles.authForm}>
+                    <form action={handleSubmit} className={styles.authForm}>
                         <div className={styles.formGroup}>
                             <label htmlFor="email" className={styles.formLabel}>Email</label>
                             <input
                                 type="email"
                                 id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                name="email"
                                 className={styles.formInput}
                                 placeholder="you@example.com"
                                 required
@@ -113,16 +105,9 @@ export default function ForgotPasswordPage() {
                             />
                         </div>
 
-                        <button
-                            type="submit"
-                            className={styles.authSubmit}
-                            disabled={loading}
-                        >
+                        <button type="submit" className={styles.authSubmit} disabled={loading}>
                             {loading ? (
-                                <>
-                                    <span className={styles.spinner} />
-                                    Sending...
-                                </>
+                                <><span className={styles.spinner} /> Sending...</>
                             ) : (
                                 'Send Reset Link'
                             )}

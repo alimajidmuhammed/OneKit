@@ -10,11 +10,8 @@ const AuthContext = createContext({
     user: null,
     profile: null,
     loading: true,
-    signIn: async () => { },
-    signUp: async () => { },
-    signOut: async () => { },
-    resetPassword: async () => { },
     updateProfile: async () => { },
+    refreshProfile: async () => { },
 });
 
 export function AuthProvider({ children }) {
@@ -31,17 +28,15 @@ export function AuthProvider({ children }) {
                 .single();
 
             if (error && error.code !== 'PGRST116') {
-                // Only warn for non-empty errors
-                if (error.message) {
-                    console.warn('Profile fetch issue:', error.message);
-                }
-                return;
+                console.warn('Profile fetch issue:', error.message);
+                return null;
             }
 
             setProfile(data);
+            return data;
         } catch (error) {
-            if (error?.name === 'AbortError') return;
-            // Silently handle - likely RLS or network issue
+            if (error?.name === 'AbortError') return null;
+            return null;
         }
     }, []);
 
@@ -61,11 +56,9 @@ export function AuthProvider({ children }) {
                     await fetchProfile(session.user.id);
                 }
             } catch (error) {
-                // Silence abort errors during navigation
                 if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
                     return;
                 }
-                console.warn('Session fetch issue:', error?.message || error);
             } finally {
                 if (isMounted) {
                     setLoading(false);
@@ -100,71 +93,6 @@ export function AuthProvider({ children }) {
         };
     }, [fetchProfile]);
 
-    const signIn = useCallback(async (email, password) => {
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (error) throw error;
-
-            return { data, error: null };
-        } catch (error) {
-            return { data: null, error };
-        }
-    }, []);
-
-    const signUp = useCallback(async (email, password, metadata = {}) => {
-        try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: metadata,
-                },
-            });
-
-            if (error) throw error;
-
-            return { data, error: null };
-        } catch (error) {
-            return { data: null, error };
-        }
-    }, []);
-
-    const signOut = useCallback(async () => {
-        try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-
-            setUser(null);
-            setProfile(null);
-
-            return { error: null };
-        } catch (error) {
-            return { error };
-        }
-    }, []);
-
-    const resetPassword = useCallback(async (email) => {
-        try {
-            // Use production URL from env, fallback to current origin
-            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${baseUrl}/reset-password`,
-            });
-
-            if (error) throw error;
-
-            return { error: null };
-        } catch (error) {
-            return { error };
-        }
-    }, []);
-
-
     const updateProfile = useCallback(async (updates) => {
         try {
             if (!user) throw new Error('No user logged in');
@@ -185,19 +113,23 @@ export function AuthProvider({ children }) {
         }
     }, [user]);
 
+    const refreshProfile = useCallback(async () => {
+        if (user?.id) {
+            return await fetchProfile(user.id);
+        }
+        return null;
+    }, [user, fetchProfile]);
+
     // Memoize the context value to prevent unnecessary re-renders
     const value = useMemo(() => ({
         user,
         profile,
         loading,
-        signIn,
-        signUp,
-        signOut,
-        resetPassword,
         updateProfile,
+        refreshProfile,
         isAdmin: profile?.role === 'admin' || profile?.role === 'super_admin',
         isSuperAdmin: profile?.role === 'super_admin',
-    }), [user, profile, loading, signIn, signUp, signOut, resetPassword, updateProfile]);
+    }), [user, profile, loading, updateProfile, refreshProfile]);
 
     return (
         <AuthContext.Provider value={value}>
@@ -215,4 +147,3 @@ export function useAuth() {
 }
 
 export default AuthContext;
-

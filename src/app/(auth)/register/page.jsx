@@ -1,61 +1,33 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/components/auth/AuthProvider';
+import { signUp } from '@/lib/auth/actions';
 import styles from './auth.module.css';
 
 function RegisterForm() {
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signUp } = useAuth();
-    const router = useRouter();
-    const searchParams = useSearchParams();
 
-    const redirect = searchParams.get('redirect') || '/dashboard';
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    async function handleSubmit(formData) {
         setError('');
         setLoading(true);
 
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters long.');
+        const result = await signUp(formData);
+
+        if (result?.error) {
+            setError(result.error);
             setLoading(false);
             return;
         }
 
-        if (password !== confirmPassword) {
-            setError('Passwords do not match.');
-            setLoading(false);
-            return;
+        if (result?.emailConfirmation) {
+            setEmail(result.email);
+            setSuccess(true);
         }
-
-        try {
-            const { error, data } = await signUp(email, password, { full_name: fullName });
-
-            if (error) {
-                setError(error.message || 'Registration failed. Please try again.');
-                setLoading(false);
-                return;
-            }
-
-            if (data?.user && !data?.session) {
-                setSuccess(true);
-            } else {
-                router.push(redirect);
-            }
-        } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
-            setLoading(false);
-        }
-    };
+    }
 
     if (success) {
         return (
@@ -82,7 +54,7 @@ function RegisterForm() {
         <div className={styles.authCard}>
             <Link href="/" className={styles.authLogo}>
                 <div className={styles.logoIcon}>
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" fill="none">
                         <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
                         <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
                         <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
@@ -105,14 +77,13 @@ function RegisterForm() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className={styles.authForm}>
+            <form action={handleSubmit} className={styles.authForm}>
                 <div className={styles.formGroup}>
                     <label htmlFor="fullName" className={styles.formLabel}>Full Name</label>
                     <input
                         type="text"
                         id="fullName"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        name="fullName"
                         className={styles.formInput}
                         placeholder="John Doe"
                         required
@@ -125,8 +96,7 @@ function RegisterForm() {
                     <input
                         type="email"
                         id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        name="email"
                         className={styles.formInput}
                         placeholder="you@example.com"
                         required
@@ -139,15 +109,13 @@ function RegisterForm() {
                     <input
                         type="password"
                         id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        name="password"
                         className={styles.formInput}
                         placeholder="••••••••"
                         required
-                        autoComplete="new-password"
                         minLength={8}
+                        autoComplete="new-password"
                     />
-                    <span className={styles.formHelper}>At least 8 characters</span>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -155,42 +123,27 @@ function RegisterForm() {
                     <input
                         type="password"
                         id="confirmPassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        name="confirmPassword"
                         className={styles.formInput}
                         placeholder="••••••••"
                         required
+                        minLength={8}
                         autoComplete="new-password"
                     />
                 </div>
 
-                <button
-                    type="submit"
-                    className={styles.authSubmit}
-                    disabled={loading}
-                >
+                <button type="submit" className={styles.authSubmit} disabled={loading}>
                     {loading ? (
-                        <>
-                            <span className={styles.spinner} />
-                            Creating account...
-                        </>
+                        <><span className={styles.spinner} /> Creating account...</>
                     ) : (
-                        'Create Account'
+                        'Create account'
                     )}
                 </button>
             </form>
 
-            <p className={styles.authTerms}>
-                By creating an account, you agree to our{' '}
-                <Link href="/terms">Terms of Service</Link> and{' '}
-                <Link href="/privacy">Privacy Policy</Link>.
-            </p>
-
             <p className={styles.authSwitch}>
                 Already have an account?{' '}
-                <Link href={`/login${redirect !== '/dashboard' ? `?redirect=${redirect}` : ''}`}>
-                    Sign in
-                </Link>
+                <Link href="/login">Sign in</Link>
             </p>
         </div>
     );
@@ -202,11 +155,8 @@ export default function RegisterPage() {
             <div className={styles.authBackground}>
                 <div className={styles.authGradient} />
             </div>
-
             <div className={styles.authContainer}>
-                <Suspense fallback={<div className={styles.authCard}><div className={styles.spinner} /></div>}>
-                    <RegisterForm />
-                </Suspense>
+                <RegisterForm />
             </div>
         </div>
     );

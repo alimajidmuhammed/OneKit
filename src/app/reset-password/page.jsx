@@ -3,17 +3,17 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { updatePassword } from '@/lib/auth/actions';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import styles from '../(auth)/login/auth.module.css';
 
-const PAGE_VERSION = 'v2.1.1';
+const PAGE_VERSION = 'v3.0.0';
 
 function ResetPasswordForm() {
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [sessionReady, setSessionReady] = useState(false);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
@@ -39,9 +39,19 @@ function ResetPasswordForm() {
                     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
                     if (exchangeError) {
                         setError('Reset link expired. Please request a new one.');
+                        return;
                     }
+                    setSessionReady(true);
                 } catch (e) {
                     setError('Failed to process reset link.');
+                }
+            } else {
+                // Check for existing session
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    setSessionReady(true);
+                } else {
+                    setError('Please use the reset link from your email.');
                 }
             }
         };
@@ -49,61 +59,23 @@ function ResetPasswordForm() {
         init();
     }, [supabase.auth]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    async function handleSubmit(formData) {
         setError('');
-
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters.');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            setError('Passwords do not match.');
-            return;
-        }
-
         setLoading(true);
 
-        try {
-            // Get current session
-            const { data: { session } } = await supabase.auth.getSession();
+        const result = await updatePassword(formData);
 
-            if (!session?.access_token) {
-                setError('Session expired. Please request a new reset link.');
-                setLoading(false);
-                return;
-            }
-
-            // Call API to reset password
-            const response = await fetch('/api/auth/reset-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    accessToken: session.access_token,
-                    refreshToken: session.refresh_token || '',
-                    newPassword: password
-                })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                setError(result.error || 'Failed to reset password.');
-                setLoading(false);
-                return;
-            }
-
-            setSuccess(true);
-            await supabase.auth.signOut().catch(() => { });
-            setTimeout(() => router.push('/login'), 2000);
-
-        } catch (err) {
-            console.error('Submit error:', err);
-            setError('Network error. Please try again.');
+        if (result?.error) {
+            setError(result.error);
             setLoading(false);
+            return;
         }
-    };
+
+        if (result?.success) {
+            setSuccess(true);
+            setTimeout(() => router.push('/login'), 2000);
+        }
+    }
 
     if (success) {
         return (
@@ -160,19 +132,19 @@ function ResetPasswordForm() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className={styles.authForm}>
+            <form action={handleSubmit} className={styles.authForm}>
                 <div className={styles.formGroup}>
                     <label htmlFor="password" className={styles.formLabel}>New Password</label>
                     <input
                         type="password"
                         id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        name="password"
                         className={styles.formInput}
                         placeholder="••••••••"
                         required
                         minLength={6}
                         autoComplete="new-password"
+                        disabled={!sessionReady && !error}
                     />
                 </div>
 
@@ -181,17 +153,17 @@ function ResetPasswordForm() {
                     <input
                         type="password"
                         id="confirmPassword"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        name="confirmPassword"
                         className={styles.formInput}
                         placeholder="••••••••"
                         required
                         minLength={6}
                         autoComplete="new-password"
+                        disabled={!sessionReady && !error}
                     />
                 </div>
 
-                <button type="submit" className={styles.authSubmit} disabled={loading}>
+                <button type="submit" className={styles.authSubmit} disabled={loading || !sessionReady}>
                     {loading ? (
                         <><span className={styles.spinner} /> Resetting...</>
                     ) : (
