@@ -12,45 +12,69 @@ function ResetPasswordForm() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [sessionReady, setSessionReady] = useState(false);
+    const [ready, setReady] = useState(false);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Exchange code for session in background - show form immediately
+    // Exchange code for session - MUST complete before form can be used
     useEffect(() => {
         let isMounted = true;
 
-        const exchangeCode = async () => {
+        const initSession = async () => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
 
-                // Check for error in URL
+                // Check for error in URL first
                 const urlError = urlParams.get('error');
                 if (urlError === 'access_denied') {
                     if (isMounted) {
                         const desc = urlParams.get('error_description');
                         setError(decodeURIComponent(desc || 'Reset link has expired.'));
+                        setReady(true);
                     }
                     window.history.replaceState(null, '', window.location.pathname);
                     return;
                 }
 
-                // Exchange PKCE code for session in background
+                // Exchange PKCE code for session - WAIT for this
                 const code = urlParams.get('code');
                 if (code) {
-                    await supabase.auth.exchangeCodeForSession(code);
+                    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+                    if (exchangeError) {
+                        if (isMounted) {
+                            setError('Reset link has expired. Please request a new one.');
+                            setReady(true);
+                        }
+                        window.history.replaceState(null, '', window.location.pathname);
+                        return;
+                    }
+
+                    // Successfully got session
                     window.history.replaceState(null, '', window.location.pathname);
+                    if (isMounted) setReady(true);
+                    return;
                 }
 
-                if (isMounted) setSessionReady(true);
+                // No code in URL - check existing session
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    if (isMounted) {
+                        setError('No valid reset session. Please request a new reset link.');
+                    }
+                }
+                if (isMounted) setReady(true);
+
             } catch (err) {
-                // Ignore errors - will show when user submits
-                if (isMounted) setSessionReady(true);
+                console.error('Session init error:', err);
+                if (isMounted) {
+                    setError('Failed to initialize. Please try again.');
+                    setReady(true);
+                }
             }
         };
 
-        exchangeCode();
-
+        initSession();
         return () => { isMounted = false; };
     }, [supabase.auth]);
 
@@ -71,41 +95,48 @@ function ResetPasswordForm() {
         setLoading(true);
 
         try {
-            // First check if we have a valid session
+            // Double-check session exists
             const { data: { session } } = await supabase.auth.getSession();
-
             if (!session) {
                 setError('Session expired. Please request a new reset link.');
                 setLoading(false);
                 return;
             }
 
-            // Update password with timeout
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Request timed out')), 10000)
-            );
+            // Update the password
+            const { error: updateError } = await supabase.auth.updateUser({ password });
 
-            const updatePromise = supabase.auth.updateUser({ password });
-
-            const { error } = await Promise.race([updatePromise, timeoutPromise]);
-
-            if (error) {
-                setError(error.message || 'Failed to reset password.');
+            if (updateError) {
+                setError(updateError.message || 'Failed to reset password.');
                 setLoading(false);
                 return;
             }
 
+            // Success!
             setSuccess(true);
+
+            // Sign out and redirect to login
+            await supabase.auth.signOut();
             setTimeout(() => router.push('/login'), 2000);
+
         } catch (err) {
-            const errorMsg = err.message === 'Request timed out'
-                ? 'Request timed out. Please try again.'
-                : 'An error occurred. Please try again.';
-            setError(errorMsg);
+            console.error('Password update error:', err);
+            setError('An error occurred. Please try again.');
             setLoading(false);
         }
     };
 
+    // Show loading while setting up session
+    if (!ready) {
+        return (
+            <div className={styles.authCard}>
+                <div className={styles.spinner} style={{ margin: '40px auto' }} />
+                <p className={styles.authSubtitle} style={{ textAlign: 'center' }}>
+                    Setting up...
+                </p>
+            </div>
+        );
+    }
 
     if (success) {
         return (
@@ -135,7 +166,6 @@ function ResetPasswordForm() {
         );
     }
 
-    // ALWAYS show the form - no spinner, no verification message
     return (
         <div className={styles.authCard}>
             <Link href="/" className={styles.authLogo}>
@@ -194,7 +224,7 @@ function ResetPasswordForm() {
                     />
                 </div>
 
-                <button type="submit" className={styles.authSubmit} disabled={loading}>
+                <button type="submit" className={styles.authSubmit} disabled={loading || !!error}>
                     {loading ? (
                         <><span className={styles.spinner} /> Resetting...</>
                     ) : (
