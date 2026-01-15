@@ -1,7 +1,6 @@
 import '@/app/globals.css';
 import '@/styles/components.css';
 import { AuthProvider } from '@/components/auth/AuthProvider';
-import SplashScreen from '@/components/ui/SplashScreen';
 import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
@@ -66,7 +65,6 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <AuthProvider>
-          <SplashScreen />
           {children}
         </AuthProvider>
         <Analytics />
@@ -74,3 +72,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+

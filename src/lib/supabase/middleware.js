@@ -74,21 +74,29 @@ export async function updateSession(request) {
 
 
     // Check admin access with database role verification
+    // Only runs for admin routes, not on every request
     if (isAdminRoute && user) {
-        // Fetch user role from profiles table
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
 
-        // Block non-admins from accessing admin routes
-        if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+            // Block non-admins from accessing admin routes
+            if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+                const url = request.nextUrl.clone();
+                url.pathname = '/dashboard';
+                return NextResponse.redirect(url);
+            }
+        } catch (error) {
+            // On error, redirect to dashboard for safety
             const url = request.nextUrl.clone();
             url.pathname = '/dashboard';
             return NextResponse.redirect(url);
         }
     }
+
 
 
     return supabaseResponse;
