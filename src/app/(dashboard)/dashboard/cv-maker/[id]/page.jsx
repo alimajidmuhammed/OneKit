@@ -58,6 +58,8 @@ const SECTIONS = [
     { id: 'experience', label: 'Experience', icon: '💼' },
     { id: 'education', label: 'Education', icon: '🎓' },
     { id: 'skills', label: 'Skills', icon: '⚡' },
+    { id: 'certifications', label: 'Certifications', icon: '🏆' },
+    { id: 'organizations', label: 'Organizations', icon: '🤝' },
     { id: 'languages', label: 'Languages', icon: '🌍' },
     { id: 'design', label: 'Design', icon: '🎨' },
 ];
@@ -611,7 +613,35 @@ export default function CVEditorPage({ params }) {
         try {
             await document.fonts.ready;
             const element = exportRef.current;
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, width: 794, height: element.scrollHeight });
+
+            // Pre-load images to base64
+            const images = element.querySelectorAll('img');
+            await Promise.all(Array.from(images).map(async (img) => {
+                if (img.src && !img.src.startsWith('data:')) {
+                    try {
+                        const response = await fetch(img.src);
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+                        await new Promise((resolve) => {
+                            reader.onloadend = () => {
+                                img.src = reader.result;
+                                resolve();
+                            };
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (e) { console.log('Image fetch failed:', e); }
+                }
+            }));
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                width: 794,
+                height: element.scrollHeight
+            });
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = 210;
             const pdfHeight = 297;
@@ -638,7 +668,35 @@ export default function CVEditorPage({ params }) {
         try {
             await document.fonts.ready;
             const element = exportRef.current;
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, width: 794, height: element.scrollHeight });
+
+            // Pre-load images to base64
+            const images = element.querySelectorAll('img');
+            await Promise.all(Array.from(images).map(async (img) => {
+                if (img.src && !img.src.startsWith('data:')) {
+                    try {
+                        const response = await fetch(img.src);
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+                        await new Promise((resolve) => {
+                            reader.onloadend = () => {
+                                img.src = reader.result;
+                                resolve();
+                            };
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (e) { console.log('Image fetch failed:', e); }
+                }
+            }));
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+                width: 794,
+                height: element.scrollHeight
+            });
             const link = document.createElement('a');
             link.download = `${cv.name || 'CV'}.jpg`;
             link.href = canvas.toDataURL('image/jpeg', 0.95);
@@ -697,6 +755,40 @@ export default function CVEditorPage({ params }) {
     const addLanguage = () => { setCV(prev => ({ ...prev, languages: [...(prev.languages || []), { name: '', level: 'intermediate' }] })); setHasChanges(true); };
     const updateLanguage = (index, field, value) => { setCV(prev => { const l = [...(prev.languages || [])]; l[index] = { ...l[index], [field]: value }; return { ...prev, languages: l }; }); setHasChanges(true); };
     const removeLanguage = (index) => { setCV(prev => ({ ...prev, languages: prev.languages.filter((_, i) => i !== index) })); setHasChanges(true); };
+
+    // Certifications CRUD
+    const addCertification = () => { setCV(prev => ({ ...prev, certifications: [...(prev.certifications || []), { id: Date.now(), name: '', issuer: '', date: '', credentialId: '' }] })); setHasChanges(true); };
+    const updateCertification = (index, field, value) => { setCV(prev => { const c = [...(prev.certifications || [])]; c[index] = { ...c[index], [field]: value }; return { ...prev, certifications: c }; }); setHasChanges(true); };
+    const removeCertification = (index) => { setCV(prev => ({ ...prev, certifications: prev.certifications.filter((_, i) => i !== index) })); setHasChanges(true); };
+
+    // Organizations CRUD
+    const addOrganization = () => { setCV(prev => ({ ...prev, organizations: [...(prev.organizations || []), { id: Date.now(), name: '', role: '', startDate: '', endDate: '' }] })); setHasChanges(true); };
+    const updateOrganization = (index, field, value) => { setCV(prev => { const o = [...(prev.organizations || [])]; o[index] = { ...o[index], [field]: value }; return { ...prev, organizations: o }; }); setHasChanges(true); };
+    const removeOrganization = (index) => { setCV(prev => ({ ...prev, organizations: prev.organizations.filter((_, i) => i !== index) })); setHasChanges(true); };
+
+    // AI Experience Description Generator
+    const [generatingExpDesc, setGeneratingExpDesc] = useState(null);
+    const handleGenerateExperienceDescription = async (index) => {
+        const exp = cv.experience?.[index];
+        if (!exp?.position || !exp?.company) return alert('Enter position and company first');
+        setGeneratingExpDesc(index);
+        try {
+            const res = await fetch('/api/ai/generate-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jobTitle: exp.position,
+                    keywords: `${exp.company}, ${exp.location || ''}`,
+                    experience: `${exp.position} at ${exp.company}`,
+                    type: 'experience_description'
+                })
+            });
+            const data = await res.json();
+            if (data.summary) updateExperience(index, 'description', data.summary);
+        } catch (e) { console.error(e); }
+        finally { setGeneratingExpDesc(null); }
+    };
+
 
     if (loading) return <div className={styles.loading}><div className={styles.spinner} /><span>Loading CV...</span></div>;
     if (!cv) return null;
@@ -990,12 +1082,22 @@ export default function CVEditorPage({ params }) {
                                                 <input style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="Jan 2020" value={e.startDate} onChange={v => updateExperience(idx, 'startDate', v.target.value)} />
                                                 <input style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="Present" value={e.endDate} onChange={v => updateExperience(idx, 'endDate', v.target.value)} />
                                             </div>
-                                            <textarea
-                                                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px', minHeight: '80px' }}
-                                                placeholder="Key responsibilities and achievements..."
-                                                value={e.description}
-                                                onChange={v => updateExperience(idx, 'description', v.target.value)}
-                                            />
+                                            <div style={{ position: 'relative' }}>
+                                                <textarea
+                                                    style={{ width: '100%', padding: '8px', paddingRight: '90px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px', minHeight: '80px' }}
+                                                    placeholder="Key responsibilities and achievements..."
+                                                    value={e.description}
+                                                    onChange={v => updateExperience(idx, 'description', v.target.value)}
+                                                />
+                                                <button
+                                                    onClick={() => handleGenerateExperienceDescription(idx)}
+                                                    disabled={generatingExpDesc === idx}
+                                                    style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', background: 'white', fontSize: '11px', fontWeight: '600', cursor: 'pointer', color: '#6366f1' }}
+                                                >
+                                                    {generatingExpDesc === idx ? <Icons.spinner /> : <Icons.magic />}
+                                                    AI
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -1087,6 +1189,96 @@ export default function CVEditorPage({ params }) {
                                         <button onClick={() => removeLanguage(idx)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#f43f5e' }}>
                                             <Icons.close />
                                         </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeSection === 'certifications' && (
+                        <div className={styles.formSection}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Certifications</h2>
+                                <button onClick={addCertification} style={{ height: '32px', width: '32px', borderRadius: '50%', background: '#2563eb', color: 'white', border: 'none', cursor: 'pointer' }}>+</button>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {(cv.certifications || []).map((c, idx) => (
+                                    <div key={idx} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                            <input
+                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                placeholder="Certification Name"
+                                                value={c.name}
+                                                onChange={v => updateCertification(idx, 'name', v.target.value)}
+                                            />
+                                            <input
+                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                placeholder="Issuing Organization"
+                                                value={c.issuer}
+                                                onChange={v => updateCertification(idx, 'issuer', v.target.value)}
+                                            />
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <input
+                                                    type="month"
+                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                    value={c.date}
+                                                    onChange={v => updateCertification(idx, 'date', v.target.value)}
+                                                />
+                                                <input
+                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                    placeholder="Credential ID (optional)"
+                                                    value={c.credentialId}
+                                                    onChange={v => updateCertification(idx, 'credentialId', v.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <button onClick={() => removeCertification(idx)} style={{ marginTop: '12px', color: '#f43f5e', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}>Remove</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeSection === 'organizations' && (
+                        <div className={styles.formSection}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Organizations</h2>
+                                <button onClick={addOrganization} style={{ height: '32px', width: '32px', borderRadius: '50%', background: '#2563eb', color: 'white', border: 'none', cursor: 'pointer' }}>+</button>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {(cv.organizations || []).map((o, idx) => (
+                                    <div key={idx} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'grid', gap: '12px' }}>
+                                            <input
+                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                placeholder="Organization Name"
+                                                value={o.name}
+                                                onChange={v => updateOrganization(idx, 'name', v.target.value)}
+                                            />
+                                            <input
+                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                placeholder="Your Role"
+                                                value={o.role}
+                                                onChange={v => updateOrganization(idx, 'role', v.target.value)}
+                                            />
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <input
+                                                    type="month"
+                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                    placeholder="Start"
+                                                    value={o.startDate}
+                                                    onChange={v => updateOrganization(idx, 'startDate', v.target.value)}
+                                                />
+                                                <input
+                                                    type="month"
+                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
+                                                    placeholder="End"
+                                                    value={o.endDate}
+                                                    onChange={v => updateOrganization(idx, 'endDate', v.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <button onClick={() => removeOrganization(idx)} style={{ marginTop: '12px', color: '#f43f5e', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}>Remove</button>
                                     </div>
                                 ))}
                             </div>

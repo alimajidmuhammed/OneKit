@@ -2,13 +2,14 @@
 
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from '@/lib/auth/actions';
 import styles from './auth.module.css';
 
 function LoginForm() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = searchParams.get('redirect') || '/dashboard';
 
@@ -18,10 +19,15 @@ function LoginForm() {
 
         const result = await signIn(formData);
 
-        // If we get here, there was an error (successful login redirects)
         if (result?.error) {
             setError(result.error);
             setLoading(false);
+            return;
+        }
+
+        // Success - navigate using client-side router
+        if (result?.success) {
+            router.push(result.redirect || '/dashboard');
         }
     }
 

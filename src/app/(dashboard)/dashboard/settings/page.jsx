@@ -139,6 +139,7 @@ export default function SettingsPage() {
             }
 
             // Redirect to home page
+            alert('Your account has been deleted successfully.');
             window.location.href = '/';
         } catch (error) {
             // Only show error if it's not a network error after deletion

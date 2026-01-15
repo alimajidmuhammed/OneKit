@@ -117,7 +117,7 @@ export const APP_CONFIG = {
 
     // Trial configuration
     trial: {
-        days: 0, // 0-day trial (disabled) for all paid services
+        days: 2, // 2-day trial for all paid services
     },
 
     // Pricing (in IQD)

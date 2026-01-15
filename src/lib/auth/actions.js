@@ -28,7 +28,7 @@ export async function signIn(formData) {
     }
 
     revalidatePath('/', 'layout');
-    redirect(redirectTo);
+    return { success: true, redirect: redirectTo };
 }
 
 /**

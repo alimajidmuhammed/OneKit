@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ADMIN_NAV } from '@/lib/utils/constants';
@@ -12,6 +12,7 @@ export default function AdminLayout({ children }) {
     const { user, profile, loading, signOut, isAdmin } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -20,6 +21,11 @@ export default function AdminLayout({ children }) {
             router.push('/dashboard');
         }
     }, [user, loading, isAdmin, router]);
+
+    // Close mobile menu when route changes
+    useEffect(() => {
+        setMobileMenuOpen(false);
+    }, [pathname]);
 
     if (loading) {
         return (
@@ -36,8 +42,30 @@ export default function AdminLayout({ children }) {
 
     return (
         <div className={styles.adminLayout}>
+            {/* Mobile Header */}
+            <header className={styles.mobileHeader}>
+                <button
+                    className={styles.burgerBtn}
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    aria-label="Toggle menu"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <span className={styles.mobileTitle}>OneKit Admin</span>
+            </header>
+
+            {/* Mobile Overlay */}
+            {mobileMenuOpen && (
+                <div
+                    className={styles.mobileOverlay}
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className={styles.sidebar}>
+            <aside className={`${styles.sidebar} ${mobileMenuOpen ? styles.sidebarOpen : ''}`}>
                 <div className={styles.sidebarHeader}>
                     <Link href="/admin" className={styles.logo}>
                         <div className={styles.logoIcon}>
