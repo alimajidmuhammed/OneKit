@@ -7,13 +7,19 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { NAV_ITEMS } from '@/lib/utils/constants';
 import styles from './Header.module.css';
 
-export default function Header() {
+export default function Header({ initialUser = null, initialProfile = null }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('/');
-    const { user, profile, signOut, isAdmin, loading } = useAuth();
+    const auth = useAuth();
     const pathname = usePathname();
+
+    // Use initial props if context is still loading, otherwise use context
+    const user = auth.loading ? initialUser : (auth.user ?? initialUser);
+    const profile = auth.loading ? initialProfile : (auth.profile ?? initialProfile);
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+    const signOut = auth.signOut;
 
     // Scroll-based section tracking
     useEffect(() => {

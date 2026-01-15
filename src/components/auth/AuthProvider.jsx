@@ -14,10 +14,10 @@ const AuthContext = createContext({
     refreshProfile: async () => { },
 });
 
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
+export function AuthProvider({ children, initialUser = null, initialProfile = null }) {
+    const [user, setUser] = useState(initialUser);
+    const [profile, setProfile] = useState(initialProfile);
+    const [loading, setLoading] = useState(false); // Initialized from server, so we know the state immediately
 
     const fetchProfile = useCallback(async (userId) => {
         try {
@@ -45,20 +45,24 @@ export function AuthProvider({ children }) {
 
         // Get initial session
         const getSession = async () => {
+            // If we have initial data, we already set loading to false in useState
+            // But we can check session here silently to ensure it's still valid
             try {
                 const { data: { session } } = await supabase.auth.getSession();
 
                 if (!isMounted) return;
 
-                setUser(session?.user ?? null);
-
-                if (session?.user) {
-                    await fetchProfile(session.user.id);
+                // Only update if it's different to avoid re-renders
+                if (session?.user?.id !== user?.id) {
+                    setUser(session?.user ?? null);
+                    if (session?.user) {
+                        await fetchProfile(session.user.id);
+                    } else {
+                        setProfile(null);
+                    }
                 }
             } catch (error) {
-                if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
-                    return;
-                }
+                console.error('Session check error:', error);
             } finally {
                 if (isMounted) {
                     setLoading(false);
@@ -66,7 +70,13 @@ export function AuthProvider({ children }) {
             }
         };
 
-        getSession();
+        // Only run getSession if we don't have initialUser or if we want to force refresh
+        if (!initialUser) {
+            getSession();
+        } else {
+            // Already have user/profile from server, but we should still setup the listener below
+            setLoading(false);
+        }
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(

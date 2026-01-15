@@ -47,6 +47,8 @@ const MENU_THEMES = [
     { id: 'bar', name: 'Bar & Grill', preview: '🍺', colors: { primary: '#1e293b', accent: '#f59e0b', bg: '#fafafa' } },
     // Dark mode
     { id: 'dark', name: 'Dark Mode', preview: '🌙', colors: { primary: '#f1f5f9', accent: '#8b5cf6', bg: '#0f172a' } },
+    // NEW: OddMenu
+    { id: 'oddmenu', name: 'OddMenu', preview: '📱', colors: { primary: '#111827', accent: '#FF7F50', bg: '#F9FAFB' } },
 ];
 
 export default function MenuEditorPage({ params }) {
@@ -870,6 +872,73 @@ export default function MenuEditorPage({ params }) {
                                     <option value="IQD">IQD - Iraqi Dinar</option>
                                     <option value="USD">USD - US Dollar</option>
                                 </select>
+                            </div>
+
+                            <div className={styles.settingGroup}>
+                                <label>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                                        <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    Restaurant Address
+                                </label>
+                                <input
+                                    type="text"
+                                    value={menu.theme?.address || ''}
+                                    onChange={(e) => {
+                                        setMenu(prev => ({
+                                            ...prev,
+                                            theme: { ...(prev.theme || {}), address: e.target.value }
+                                        }));
+                                        setHasChanges(true);
+                                    }}
+                                    placeholder="e.g., 123 Main St, Baghdad"
+                                    disabled={!canEdit}
+                                />
+                            </div>
+
+                            <div className={styles.settingGroup}>
+                                <label>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.81 12.81 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l2.27-2.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                                    </svg>
+                                    Contact Phone
+                                </label>
+                                <input
+                                    type="text"
+                                    value={menu.theme?.phone || ''}
+                                    onChange={(e) => {
+                                        setMenu(prev => ({
+                                            ...prev,
+                                            theme: { ...(prev.theme || {}), phone: e.target.value }
+                                        }));
+                                        setHasChanges(true);
+                                    }}
+                                    placeholder="e.g., +964 770 123 4567"
+                                    disabled={!canEdit}
+                                />
+                            </div>
+
+                            <div className={styles.settingGroup}>
+                                <label>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" />
+                                    </svg>
+                                    WiFi Name / Password
+                                </label>
+                                <input
+                                    type="text"
+                                    value={menu.theme?.wifi || ''}
+                                    onChange={(e) => {
+                                        setMenu(prev => ({
+                                            ...prev,
+                                            theme: { ...(prev.theme || {}), wifi: e.target.value }
+                                        }));
+                                        setHasChanges(true);
+                                    }}
+                                    placeholder="e.g., GuestWifi / 12345678"
+                                    disabled={!canEdit}
+                                />
                             </div>
                             <div className={styles.settingGroup}>
                                 <label>

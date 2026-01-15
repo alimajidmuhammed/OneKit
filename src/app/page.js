@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
+import ServerAuthHeader from '@/components/layout/ServerAuthHeader';
 import Footer from '@/components/layout/Footer';
 import ServicesSection from '@/components/services/ServicesSection';
 import { APP_CONFIG } from '@/lib/utils/constants';
@@ -9,7 +9,7 @@ import styles from './page.module.css';
 export default function HomePage() {
   return (
     <>
-      <Header />
+      <ServerAuthHeader />
 
       <main className={styles.main}>
         {/* Light Mode Professional Hero */}

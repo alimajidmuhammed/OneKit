@@ -1,6 +1,5 @@
 import '@/app/globals.css';
 import '@/styles/components.css';
-import { AuthProvider } from '@/components/auth/AuthProvider';
 import { Analytics } from '@vercel/analytics/next';
 
 export const metadata = {
@@ -60,13 +59,15 @@ export const viewport = {
   themeColor: '#ffffff',
 };
 
+import ServerAuthProvider from '@/components/auth/ServerAuthProvider';
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
+        <ServerAuthProvider>
           {children}
-        </AuthProvider>
+        </ServerAuthProvider>
         <Analytics />
       </body>
     </html>

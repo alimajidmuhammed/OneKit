@@ -176,6 +176,131 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
         return levels[l] || 50;
     };
 
+    const order = cv.section_order || ['personal', 'summary', 'experience', 'education', 'skills', 'certifications', 'organizations', 'languages', 'design'];
+
+    const renderSection = (id) => {
+        switch (id) {
+            case 'summary':
+                return cv.summary && (
+                    <div className={styles.cvSection} key="summary">
+                        <h3>{currentTemplate.baseTemplate === 'sydney' ? 'About Me' : 'Summary'}</h3>
+                        <p>{cv.summary}</p>
+                    </div>
+                );
+            case 'experience':
+                return cv.experience?.length > 0 && (
+                    <div className={styles.cvSection} key="experience">
+                        <h3>Experience</h3>
+                        {cv.experience.map((exp, i) => (
+                            <div key={i} className={styles.cvItem}>
+                                <div className={styles.cvItemHeader}>
+                                    <strong>{exp.position || 'Position'}</strong>
+                                    <span>{exp.startDate} - {exp.endDate || 'Present'}</span>
+                                </div>
+                                <p className={styles.company}>{exp.company}</p>
+                                {exp.description && <p>{exp.description}</p>}
+                            </div>
+                        ))}
+                    </div>
+                );
+            case 'education':
+                return cv.education?.length > 0 && (
+                    <div className={styles.cvSection} key="education">
+                        <h3>Education</h3>
+                        {cv.education.map((edu, i) => (
+                            <div key={i} className={styles.cvItem}>
+                                <div className={styles.cvItemHeader}>
+                                    <strong>{edu.degree} in {edu.field}</strong>
+                                    <span>{edu.endDate}</span>
+                                </div>
+                                <p>{edu.institution}</p>
+                            </div>
+                        ))}
+                    </div>
+                );
+            case 'skills':
+                return cv.skills?.length > 0 && (
+                    <div className={styles.cvSection} key="skills">
+                        <h3>Skills</h3>
+                        {currentTemplate.baseTemplate === 'sydney' ? (
+                            <div className={styles.skillList}>
+                                {cv.skills.map((skill, i) => (
+                                    <div key={i} className={styles.skillItem}>
+                                        <span className={styles.skillName}>{skill.name}</span>
+                                        <div className={styles.skillBar}>
+                                            <div className={styles.skillFill} style={{ width: `${getSkillLevel(skill.level)}%` }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className={styles.skillTags}>
+                                {cv.skills.map((skill, i) => (
+                                    <span key={i} className={styles.skillTag}>{skill.name}</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            case 'languages':
+                return cv.languages?.length > 0 && (
+                    <div className={styles.cvSection} key="languages">
+                        <h3>Languages</h3>
+                        {currentTemplate.baseTemplate === 'sydney' ? (
+                            <div className={styles.skillList}>
+                                {cv.languages.map((lang, i) => (
+                                    <div key={i} className={styles.skillItem}>
+                                        <span className={styles.skillName}>{lang.name}</span>
+                                        <div className={styles.skillBar}>
+                                            <div className={styles.skillFill} style={{ width: `${getSkillLevel(lang.level)}%` }} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className={styles.skillTags}>
+                                {cv.languages.map((lang, i) => (
+                                    <span key={i} className={styles.skillTag}>{lang.name} ({lang.level})</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            case 'certifications':
+                return cv.certifications?.length > 0 && (
+                    <div className={styles.cvSection} key="certifications">
+                        <h3>Certifications</h3>
+                        {cv.certifications.map((cert, i) => (
+                            <div key={i} className={styles.cvItem}>
+                                <div className={styles.cvItemHeader}>
+                                    <strong>{cert.name}</strong>
+                                    <span>{cert.date}</span>
+                                </div>
+                                <p>{cert.issuer}{cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}</p>
+                            </div>
+                        ))}
+                    </div>
+                );
+            case 'organizations':
+                return cv.organizations?.length > 0 && (
+                    <div className={styles.cvSection} key="organizations">
+                        <h3>Organizations</h3>
+                        {cv.organizations.map((org, i) => (
+                            <div key={i} className={styles.cvItem}>
+                                <div className={styles.cvItemHeader}>
+                                    <strong>{org.name}</strong>
+                                    <span>{org.startDate} - {org.endDate || 'Present'}</span>
+                                </div>
+                                <p>{org.role}</p>
+                            </div>
+                        ))}
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
     return (
         <div
             ref={contentRef}
@@ -208,106 +333,12 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                             </div>
                         </div>
 
-                        {cv.skills?.length > 0 && (
-                            <div className={styles.sidebarSection}>
-                                <h4>Skills</h4>
-                                <div className={styles.skillList}>
-                                    {cv.skills.map((skill, i) => (
-                                        <div key={i} className={styles.skillItem}>
-                                            <span className={styles.skillName}>{skill.name}</span>
-                                            <div className={styles.skillBar}>
-                                                <div className={styles.skillFill} style={{ width: `${getSkillLevel(skill.level)}%` }} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {cv.languages?.length > 0 && (
-                            <div className={styles.sidebarSection}>
-                                <h4>Languages</h4>
-                                <div className={styles.skillList}>
-                                    {cv.languages.map((lang, i) => (
-                                        <div key={i} className={styles.skillItem}>
-                                            <span className={styles.skillName}>{lang.name}</span>
-                                            <div className={styles.skillBar}>
-                                                <div className={styles.skillFill} style={{ width: `${getSkillLevel(lang.level)}%` }} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        {/* Order-aware Sidebar Sections (Skills/Languages usually sidebar in Sydney) */}
+                        {order.map(id => (id === 'skills' || id === 'languages') && renderSection(id))}
                     </div>
                     <div className={styles.cvMain}>
-                        {cv.summary && (
-                            <div className={styles.cvSection}>
-                                <h3>About Me</h3>
-                                <p>{cv.summary}</p>
-                            </div>
-                        )}
-
-                        {cv.experience?.length > 0 && (
-                            <div className={styles.cvSection}>
-                                <h3>Experience</h3>
-                                {cv.experience.map((exp, i) => (
-                                    <div key={i} className={styles.cvItem}>
-                                        <div className={styles.cvItemHeader}>
-                                            <strong>{exp.position || 'Position'}</strong>
-                                            <span>{exp.startDate} - {exp.endDate || 'Present'}</span>
-                                        </div>
-                                        <p className={styles.company}>{exp.company}</p>
-                                        {exp.description && <p>{exp.description}</p>}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {cv.education?.length > 0 && (
-                            <div className={styles.cvSection}>
-                                <h3>Education</h3>
-                                {cv.education.map((edu, i) => (
-                                    <div key={i} className={styles.cvItem}>
-                                        <div className={styles.cvItemHeader}>
-                                            <strong>{edu.degree} in {edu.field}</strong>
-                                            <span>{edu.endDate}</span>
-                                        </div>
-                                        <p>{edu.institution}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {cv.certifications?.length > 0 && (
-                            <div className={styles.cvSection}>
-                                <h3>Certifications</h3>
-                                {cv.certifications.map((cert, i) => (
-                                    <div key={i} className={styles.cvItem}>
-                                        <div className={styles.cvItemHeader}>
-                                            <strong>{cert.name}</strong>
-                                            <span>{cert.date}</span>
-                                        </div>
-                                        <p>{cert.issuer}{cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {cv.organizations?.length > 0 && (
-                            <div className={styles.cvSection}>
-                                <h3>Organizations</h3>
-                                {cv.organizations.map((org, i) => (
-                                    <div key={i} className={styles.cvItem}>
-                                        <div className={styles.cvItemHeader}>
-                                            <strong>{org.name}</strong>
-                                            <span>{org.startDate} - {org.endDate || 'Present'}</span>
-                                        </div>
-                                        <p>{org.role}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        {/* Order-aware Main Sections (Excluding personal, design, and sidebar items) */}
+                        {order.map(id => (id !== 'personal' && id !== 'design' && id !== 'skills' && id !== 'languages') && renderSection(id))}
                     </div>
                 </div>
             ) : (
@@ -350,95 +381,8 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                         </div>
                     </div>
 
-                    {cv.summary && (
-                        <div className={styles.cvSection}>
-                            <h3>Summary</h3>
-                            <p>{cv.summary}</p>
-                        </div>
-                    )}
-
-                    {cv.experience?.length > 0 && (
-                        <div className={styles.cvSection}>
-                            <h3>Experience</h3>
-                            {cv.experience.map((exp, i) => (
-                                <div key={i} className={styles.cvItem}>
-                                    <div className={styles.cvItemHeader}>
-                                        <strong>{exp.position || 'Position'}</strong>
-                                        <span>{exp.startDate} - {exp.endDate || 'Present'}</span>
-                                    </div>
-                                    <p className={styles.company}>{exp.company}</p>
-                                    {exp.description && <p>{exp.description}</p>}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {cv.education?.length > 0 && (
-                        <div className={styles.cvSection}>
-                            <h3>Education</h3>
-                            {cv.education.map((edu, i) => (
-                                <div key={i} className={styles.cvItem}>
-                                    <div className={styles.cvItemHeader}>
-                                        <strong>{edu.degree} in {edu.field}</strong>
-                                        <span>{edu.endDate}</span>
-                                    </div>
-                                    <p>{edu.institution}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {cv.skills?.length > 0 && (
-                        <div className={styles.cvSection}>
-                            <h3>Skills</h3>
-                            <div className={styles.skillTags}>
-                                {cv.skills.map((skill, i) => (
-                                    <span key={i} className={styles.skillTag}>{skill.name}</span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {cv.languages?.length > 0 && (
-                        <div className={styles.cvSection}>
-                            <h3>Languages</h3>
-                            <div className={styles.skillTags}>
-                                {cv.languages.map((lang, i) => (
-                                    <span key={i} className={styles.skillTag}>{lang.name} ({lang.level})</span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {cv.certifications?.length > 0 && (
-                        <div className={styles.cvSection}>
-                            <h3>Certifications</h3>
-                            {cv.certifications.map((cert, i) => (
-                                <div key={i} className={styles.cvItem}>
-                                    <div className={styles.cvItemHeader}>
-                                        <strong>{cert.name}</strong>
-                                        <span>{cert.date}</span>
-                                    </div>
-                                    <p>{cert.issuer}{cert.credentialId ? ` • ID: ${cert.credentialId}` : ''}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {cv.organizations?.length > 0 && (
-                        <div className={styles.cvSection}>
-                            <h3>Organizations</h3>
-                            {cv.organizations.map((org, i) => (
-                                <div key={i} className={styles.cvItem}>
-                                    <div className={styles.cvItemHeader}>
-                                        <strong>{org.name}</strong>
-                                        <span>{org.startDate} - {org.endDate || 'Present'}</span>
-                                    </div>
-                                    <p>{org.role}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    {/* Order-aware Sections (All except personal and design) */}
+                    {order.map(id => (id !== 'personal' && id !== 'design') && renderSection(id))}
                 </div>
             )}
         </div>
@@ -467,6 +411,8 @@ export default function CVEditorPage({ params }) {
     const [mobileView, setMobileView] = useState('edit'); // 'edit' or 'preview'
     const [generatingSummary, setGeneratingSummary] = useState(false);
     const [generatingStyle, setGeneratingStyle] = useState(false);
+    const [sectionOrder, setSectionOrder] = useState(['personal', 'summary', 'experience', 'education', 'skills', 'certifications', 'organizations', 'languages', 'design']);
+    const [draggedSection, setDraggedSection] = useState(null);
     const isMounted = useRef(true);
 
     const updateScale = useCallback(() => {
@@ -528,6 +474,9 @@ export default function CVEditorPage({ params }) {
                 }
 
                 setCV(data);
+                if (data.section_order && Array.isArray(data.section_order)) {
+                    setSectionOrder(data.section_order);
+                }
                 if (data.personal_info) {
                     setPhotoZoom(data.personal_info.photoZoom || 1);
                     setPhotoRotation(data.personal_info.photoRotation || 0);
@@ -556,14 +505,17 @@ export default function CVEditorPage({ params }) {
                 experience: cv.experience,
                 education: cv.education,
                 skills: cv.skills,
-                languages: cv.languages
+                languages: cv.languages,
+                certifications: cv.certifications,
+                organizations: cv.organizations,
+                section_order: sectionOrder
             });
             if (error) throw new Error(error);
             setHasChanges(false);
         } catch (err) {
             console.error('Save Error:', err);
         }
-    }, [cv, id, updateCV]);
+    }, [cv, id, updateCV, sectionOrder]);
 
     useEffect(() => {
         if (!hasChanges || !cv) return;
@@ -800,6 +752,41 @@ export default function CVEditorPage({ params }) {
         finally { setGeneratingStyle(false); }
     };
 
+    // Section drag-drop handlers
+    const handleDragStart = (e, sectionId) => {
+        setDraggedSection(sectionId);
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e, sectionId) => {
+        e.preventDefault();
+        if (draggedSection === sectionId) return;
+    };
+
+    const handleDrop = (e, targetSection) => {
+        e.preventDefault();
+        if (!draggedSection || draggedSection === targetSection) return;
+
+        const newOrder = [...sectionOrder];
+        const dragIndex = newOrder.indexOf(draggedSection);
+        const dropIndex = newOrder.indexOf(targetSection);
+
+        newOrder.splice(dragIndex, 1);
+        newOrder.splice(dropIndex, 0, draggedSection);
+
+        setSectionOrder(newOrder);
+        setCV(prev => ({ ...prev, section_order: newOrder }));
+        setHasChanges(true);
+        setDraggedSection(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedSection(null);
+    };
+
+    // Get ordered sections for rendering
+    const orderedSections = sectionOrder.map(id => SECTIONS.find(s => s.id === id)).filter(Boolean);
+
     const addExperience = () => { setCV(prev => ({ ...prev, experience: [...(prev.experience || []), { id: Date.now(), company: '', position: '', location: '', startDate: '', endDate: '', description: '' }] })); setHasChanges(true); };
     const updateExperience = (index, field, value) => { setCV(prev => { const exp = [...(prev.experience || [])]; exp[index] = { ...exp[index], [field]: value }; return { ...prev, experience: exp }; }); setHasChanges(true); };
     const removeExperience = (index) => { setCV(prev => ({ ...prev, experience: prev.experience.filter((_, i) => i !== index) })); setHasChanges(true); };
@@ -988,10 +975,15 @@ export default function CVEditorPage({ params }) {
                             gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
                             gap: '8px'
                         }}>
-                            {SECTIONS.map(s => (
+                            {orderedSections.map(s => (
                                 <button
                                     key={s.id}
                                     onClick={() => setActiveSection(s.id)}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, s.id)}
+                                    onDragOver={(e) => handleDragOver(e, s.id)}
+                                    onDrop={(e) => handleDrop(e, s.id)}
+                                    onDragEnd={handleDragEnd}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -999,13 +991,14 @@ export default function CVEditorPage({ params }) {
                                         gap: '6px',
                                         padding: '12px 8px',
                                         borderRadius: '12px',
-                                        border: 'none',
-                                        background: activeSection === s.id ? '#1a1a1a' : 'transparent',
+                                        border: draggedSection === s.id ? '2px dashed #2563eb' : 'none',
+                                        background: activeSection === s.id ? '#1a1a1a' : draggedSection === s.id ? '#eff6ff' : 'transparent',
                                         color: activeSection === s.id ? 'white' : '#6b7280',
-                                        cursor: 'pointer',
+                                        cursor: 'grab',
                                         transition: 'all 0.15s ease',
                                         fontWeight: '500',
-                                        fontSize: '12px'
+                                        fontSize: '12px',
+                                        opacity: draggedSection === s.id ? 0.5 : 1
                                     }}
                                 >
                                     <span style={{ fontSize: '20px', opacity: activeSection === s.id ? 1 : 0.7 }}>{s.icon}</span>
@@ -1493,6 +1486,7 @@ export default function CVEditorPage({ params }) {
                                             objectFit: 'cover'
                                         }}
                                         draggable={false}
+                                        crossOrigin="anonymous"
                                     />
                                     <div style={{ position: 'absolute', inset: 0, border: '1px solid rgba(0,0,0,0.1)', borderRadius: '50%', pointerEvents: 'none' }} />
                                 </div>

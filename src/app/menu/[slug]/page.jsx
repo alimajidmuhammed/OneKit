@@ -39,6 +39,8 @@ const MENU_THEMES = {
     bar: { primary: '#1e293b', accent: '#f59e0b', bg: '#fafafa', layout: 'cards' },
     // Dark Modes
     dark: { primary: '#f1f5f9', accent: '#8b5cf6', bg: '#0f172a', layout: 'neon' },
+    // OddMenu Aesthetic
+    oddmenu: { primary: '#111827', accent: '#FF7F50', bg: '#F9FAFB', layout: 'oddmenu' },
 };
 
 async function getMenu(slug) {
@@ -155,6 +157,8 @@ export async function generateMetadata({ params }) {
     };
 }
 
+import MenuClient from './MenuClient';
+
 export default async function PublicMenuPage({ params }) {
     const { slug } = await params;
     const data = await getMenu(slug);
@@ -188,349 +192,6 @@ export default async function PublicMenuPage({ params }) {
         minHeight: '100vh',
     };
 
-    // --- Layout Components ---
-
-    const ModernGridLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={styles.category}>
-            <div className={styles.categoryTitleWrap}>
-                <h2 style={{ color: theme.primary }}>{cat.name}</h2>
-                {cat.description && <p className={styles.categoryDesc}>{cat.description}</p>}
-                <div style={{ position: 'absolute', left: '-20px', top: '0', bottom: '0', width: '4px', background: theme.accent, borderRadius: '2px' }} />
-            </div>
-
-            <div className={styles.itemsGrid}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.itemCard}>
-                        {item.is_featured && <div className={styles.badge}>Chef's Choice</div>}
-                        {item.image_url && (
-                            <div className={styles.itemImage}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                        <div className={styles.itemInfo}>
-                            <h3 style={{ color: theme.primary }}>{item.name}</h3>
-                            {item.description && <p>{item.description}</p>}
-                            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                {formatPrice(item.price, menu.currency, theme)}
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    const MagazineLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.magazineRow}`}>
-            <div className={styles.magazineContent}>
-                <div className={styles.categoryTitleWrap}>
-                    <h2 style={{ color: theme.primary }}>{cat.name}</h2>
-                    {cat.description && <p className={styles.categoryDesc}>{cat.description}</p>}
-                </div>
-
-                <div className={styles.magazineList}>
-                    {catItems.map((item) => (
-                        <div key={item.id} className={styles.magazineItem}>
-                            <div className={styles.magazineItemHeader}>
-                                <h3 style={{ color: theme.primary }}>
-                                    {item.name}
-                                    {item.is_featured && <span className={styles.magazineBadge}>★ Featured</span>}
-                                </h3>
-                                <div className={styles.magazineDots} />
-                                {formatPrice(item.price, menu.currency, theme)}
-                            </div>
-                            {item.description && <p className={styles.magazineDesc}>{item.description}</p>}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {(cat.image_url || catItems[0]?.image_url) && (
-                <div className={styles.magazineImageWrap}>
-                    <img
-                        src={cat.image_url || catItems[0]?.image_url}
-                        alt={cat.name}
-                        className={styles.magazineFeatureImage}
-                    />
-                </div>
-            )}
-        </section>
-    );
-
-    // Poster Layout - Clean 2-column grid with circular food images (Like Image 0)
-    const PosterLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.posterSection}`}>
-            <h2 className={styles.posterCategoryTitle} style={{ color: theme.primary }}>{cat.name}</h2>
-            <div className={styles.posterGrid}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.posterItem}>
-                        <div className={styles.posterItemText}>
-                            <h3 style={{ color: theme.primary }}>
-                                {item.name}
-                                {item.is_featured && <span className={styles.posterBadge}>Chef's Choice</span>}
-                            </h3>
-                            {formatPrice(item.price, menu.currency, theme)}
-                            {item.description && <p>{item.description}</p>}
-                        </div>
-                        {item.image_url && (
-                            <div className={styles.posterImage}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Chalkboard Layout - Dark elegant with golden accents (Like Image 1)
-    const ChalkboardLayout = ({ cat, catItems }) => {
-        // Get up to 3 images for the side display
-        const displayImages = catItems.filter(item => item.image_url).slice(0, 3);
-
-        return (
-            <section key={cat.id} id={cat.id} className={styles.chalkboardSection}>
-                <h2 className={styles.chalkboardTitle} style={{ color: theme.accent }}>{cat.name}</h2>
-                <div className={styles.chalkboardContent}>
-                    <div className={styles.chalkboardList}>
-                        {catItems.map((item) => (
-                            <div key={item.id} className={styles.chalkboardItem}>
-                                <span style={{ color: theme.primary }}>
-                                    {item.name}
-                                    {item.is_featured && <span className={styles.chalkboardBadge}>★ Featured</span>}
-                                </span>
-                                <span className={styles.chalkboardDash}>—</span>
-                                {formatPrice(item.price, menu.currency, theme)}
-                            </div>
-                        ))}
-                    </div>
-                    {displayImages.length > 0 && (
-                        <div className={styles.chalkboardImages}>
-                            {displayImages.map((item) => (
-                                <div key={item.id} className={styles.chalkboardImage}>
-                                    <img src={item.image_url} alt={item.name} />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </section>
-        );
-    };
-
-    // Foodtruck Layout - Compact 2-column with small circular icons
-    const FoodtruckLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={styles.foodtruckSection}>
-            <h2 className={styles.foodtruckTitle} style={{ borderColor: theme.accent }}>{cat.name}</h2>
-            <div className={styles.foodtruckList}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.foodtruckItem}>
-                        {item.image_url && (
-                            <div className={styles.foodtruckIcon}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                        <div className={styles.foodtruckInfo}>
-                            <h3 style={{ color: theme.accent }}>
-                                {item.name}
-                                {item.is_featured && <span className={styles.foodtruckBadge}>NEW</span>}
-                            </h3>
-                            {item.description && <p>{item.description}</p>}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Premium Layout - Dark luxury with gold-ringed circular images
-    const PremiumLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={styles.premiumSection}>
-            <h2 className={styles.premiumTitle} style={{ color: theme.accent }}>{cat.name}</h2>
-            <div className={styles.premiumGrid}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.premiumCard}>
-                        {item.is_featured && <div className={styles.premiumBadge}>Chef's Choice</div>}
-                        {item.image_url && (
-                            <div className={styles.premiumImageWrap} style={{ borderColor: theme.accent }}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                        <h3 style={{ color: theme.primary }}>{item.name}</h3>
-                        {formatPrice(item.price, menu.currency, theme)}
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Elegant Layout - Classic serif typography with bordered items
-    const ElegantLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.elegantSection}`}>
-            <h2 className={styles.elegantTitle} style={{ color: theme.primary, borderColor: theme.accent }}>{cat.name}</h2>
-            <div className={styles.elegantList}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.elegantItem} style={{ borderColor: `${theme.accent}30` }}>
-                        <div className={styles.elegantItemContent}>
-                            <h3 style={{ color: theme.primary }}>{item.name}</h3>
-                            {item.description && <p>{item.description}</p>}
-                        </div>
-                        <div className={styles.elegantItemRight}>
-                            {formatPrice(item.price, menu.currency, theme)}
-                            {item.is_featured && (
-                                <div className={styles.badge}>Chef's Choice</div>
-                            )}
-                            {item.image_url && (
-                                <div className={styles.elegantThumb}>
-                                    <img src={item.image_url} alt={item.name} />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Cards Layout - Full image cards in a clean grid
-    const CardsLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.cardsSection}`}>
-            <h2 style={{ color: theme.primary }}>{cat.name}</h2>
-            <div className={styles.cardsGrid}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.cardItem}>
-                        {item.image_url && (
-                            <div className={styles.cardImage}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                        <div className={styles.cardContent}>
-                            <h3 style={{ color: theme.primary }}>
-                                {item.name}
-                                {item.is_featured && <span className={styles.cardBadge}>★</span>}
-                            </h3>
-                            {item.description && <p>{item.description}</p>}
-                            {formatPrice(item.price, menu.currency, theme)}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Vintage Layout - Decorative ornaments and classic styling
-    const VintageLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.vintageSection}`}>
-            <div className={styles.vintageHeader}>
-                <span className={styles.vintageOrnament}>❦</span>
-                <h2 style={{ color: theme.primary }}>{cat.name}</h2>
-                <span className={styles.vintageOrnament}>❦</span>
-            </div>
-            <div className={styles.vintageList}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.vintageItem}>
-                        <div className={styles.vintageItemName}>
-                            <span style={{ color: theme.primary }}>
-                                {item.name}
-                                {item.is_featured && <span className={styles.vintageFeatured}> (Chef's Choice)</span>}
-                            </span>
-                            <span className={styles.vintageDots} style={{ borderColor: theme.accent }}></span>
-                            {formatPrice(item.price, menu.currency, theme)}
-                        </div>
-                        {item.description && <p className={styles.vintageDesc}>{item.description}</p>}
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Minimal Layout - Clean list, no images, pure text
-    const MinimalLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.minimalSection}`}>
-            <h2 className={styles.minimalTitle} style={{ color: theme.primary }}>{cat.name}</h2>
-            <div className={styles.minimalList}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.minimalItem}>
-                        <div className={styles.minimalLeft}>
-                            <h3 style={{ color: theme.primary }}>
-                                {item.name}
-                                {item.is_featured && <span className={styles.minimalBadge}>Chef's Choice</span>}
-                            </h3>
-                            {item.description && <p>{item.description}</p>}
-                        </div>
-                        {formatPrice(item.price, menu.currency, theme)}
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Bold Layout - Large text, vibrant colors, full bleed images
-    const BoldLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.boldSection}`}>
-            <h2 className={styles.boldTitle} style={{ color: theme.accent }}>{cat.name}</h2>
-            <div className={styles.boldGrid}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.boldCard} style={{ borderColor: theme.accent }}>
-                        {item.image_url && (
-                            <div className={styles.boldImage}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                        <div className={styles.boldContent}>
-                            <h3 style={{ color: theme.primary }}>
-                                {item.name}
-                                {item.is_featured && <span className={styles.boldBadge}>MUST TRY</span>}
-                            </h3>
-                            {formatPrice(item.price, menu.currency, theme)}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Neon Layout - Glowing effects and cyber aesthetic
-    const NeonLayout = ({ cat, catItems }) => (
-        <section key={cat.id} id={cat.id} className={`${styles.category} ${styles.neonSection}`}>
-            <h2 className={styles.neonTitle} style={{ color: theme.accent, textShadow: `0 0 20px ${theme.accent}` }}>{cat.name}</h2>
-            <div className={styles.neonGrid}>
-                {catItems.map((item) => (
-                    <div key={item.id} className={styles.neonCard} style={{ borderColor: `${theme.accent}50` }}>
-                        {item.image_url && (
-                            <div className={styles.neonImage}>
-                                <img src={item.image_url} alt={item.name} />
-                            </div>
-                        )}
-                        <div className={styles.neonContent}>
-                            <h3 style={{ color: theme.primary }}>{item.name}</h3>
-                            {item.description && <p>{item.description}</p>}
-                            <div className={styles.neonPrice} style={{ color: theme.accent }}>{formatPrice(item.price, menu.currency, theme)}</div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-
-    // Layout selector function
-    const renderLayout = (cat, catItems) => {
-        switch (theme.layout) {
-            case 'magazine': return <MagazineLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'poster': return <PosterLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'chalkboard': return <ChalkboardLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'foodtruck': return <FoodtruckLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'premium': return <PremiumLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'elegant': return <ElegantLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'cards': return <CardsLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'vintage': return <VintageLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'minimal': return <MinimalLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'bold': return <BoldLayout key={cat.id} cat={cat} catItems={catItems} />;
-            case 'neon': return <NeonLayout key={cat.id} cat={cat} catItems={catItems} />;
-            default: return <ModernGridLayout key={cat.id} cat={cat} catItems={catItems} />;
-        }
-    };
-
     return (
         <div className={styles.page} style={pageStyle}>
             {/* Smooth Background */}
@@ -543,7 +204,7 @@ export default async function PublicMenuPage({ params }) {
                 pointerEvents: 'none'
             }} />
 
-            {/* Mobile Hamburger Menu */}
+            {/* Mobile Horizontal Pill Nav (OddMenu only) or Hamburger (Others) */}
             <MobileMenuNav
                 categories={categories}
                 theme={theme}
@@ -577,64 +238,62 @@ export default async function PublicMenuPage({ params }) {
                 </div>
             )}
 
-            {/* High Impact Hero Section */}
-            <section className={styles.hero} style={!isOwnerSubscribed ? { filter: 'blur(8px)', pointerEvents: 'none' } : {}}>
-                <div className={styles.heroBg}>
-                    <img
-                        src={menu.theme?.hero_image || "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop"}
-                        alt="Restaurant Ambience"
-                    />
-                </div>
-                <div className={styles.heroOverlay} />
-                <div className={styles.heroContent}>
-                    <div className={styles.brandCard}>
-                        {menu.logo_url && (
-                            <img src={menu.logo_url} alt={menu.name} className={styles.heroLogo} />
-                        )}
-                        <h1>{menu.name}</h1>
-                        <div className={styles.brandSlogan}>EST. {new Date(menu.created_at).getFullYear()} • Premium Cuisine</div>
-                        <div style={{ width: '60px', height: '4px', background: theme.accent, borderRadius: '2px', marginTop: '0.5rem' }} />
+            {/* High Impact Hero Section (Hidden for OddMenu) */}
+            {theme.layout !== 'oddmenu' && (
+                <section className={styles.hero} style={!isOwnerSubscribed ? { filter: 'blur(8px)', pointerEvents: 'none' } : {}}>
+                    <div className={styles.heroBg}>
+                        <img
+                            src={menu.theme?.hero_image || "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop"}
+                            alt="Restaurant Ambience"
+                        />
                     </div>
-                </div>
-                <div className={styles.scrollIndicator}>
-                    <span>Discover Menu</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
-                    </svg>
-                </div>
-            </section>
-
-            {/* Smart Sticky Nav */}
-            <nav className={styles.categoryNav} style={!isOwnerSubscribed ? { filter: 'blur(8px)', pointerEvents: 'none' } : {}}>
-                {categories.map((cat) => (
-                    <a
-                        key={cat.id}
-                        href={`#${cat.id}`}
-                        className={styles.categoryLink}
-                        style={{
-                            backgroundColor: 'transparent',
-                            color: theme.primary,
-                            border: `1px solid ${theme.accent}33`
-                        }}
-                    >
-                        {cat.name}
-                    </a>
-                ))}
-            </nav>
-
-            {/* Main Menu Experience */}
-            <main className={styles.content} style={!isOwnerSubscribed ? { filter: 'blur(8px)', pointerEvents: 'none' } : {}}>
-                {categories.map((cat) => {
-                    const catItems = items.filter(item => item.category_id === cat.id);
-                    return renderLayout(cat, catItems);
-                })}
-
-                {categories.length === 0 && (
-                    <div className={styles.empty}>
-                        <p>This menu is exceptionally curated. Please check back soon!</p>
+                    <div className={styles.heroOverlay} />
+                    <div className={styles.heroContent}>
+                        <div className={styles.brandCard}>
+                            {menu.logo_url && (
+                                <img src={menu.logo_url} alt={menu.name} className={styles.heroLogo} />
+                            )}
+                            <h1>{menu.name}</h1>
+                            <div className={styles.brandSlogan}>EST. {new Date(menu.created_at).getFullYear()} • Premium Cuisine</div>
+                            <div style={{ width: '60px', height: '4px', background: theme.accent, borderRadius: '2px', marginTop: '0.5rem' }} />
+                        </div>
                     </div>
-                )}
-            </main>
+                    <div className={styles.scrollIndicator}>
+                        <span>Discover Menu</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+                        </svg>
+                    </div>
+                </section>
+            )}
+
+            {/* Smart Sticky Nav (Hidden for OddMenu) */}
+            {theme.layout !== 'oddmenu' && (
+                <nav className={styles.categoryNav} style={!isOwnerSubscribed ? { filter: 'blur(8px)', pointerEvents: 'none' } : {}}>
+                    {categories.map((cat) => (
+                        <a
+                            key={cat.id}
+                            href={`#${cat.id}`}
+                            className={styles.categoryLink}
+                            style={{
+                                backgroundColor: 'transparent',
+                                color: theme.primary,
+                                border: `1px solid ${theme.accent}33`
+                            }}
+                        >
+                            {cat.name}
+                        </a>
+                    ))}
+                </nav>
+            )}
+
+            {/* Main Menu Experience via MenuClient */}
+            <MenuClient
+                menu={menu}
+                categories={categories}
+                items={items}
+                theme={theme}
+            />
 
             {/* Modern Footer */}
             <footer className={styles.footer} style={!isOwnerSubscribed ? { filter: 'blur(8px)', pointerEvents: 'none' } : {}}>
@@ -643,4 +302,6 @@ export default async function PublicMenuPage({ params }) {
             </footer>
         </div>
     );
+
 }
+

@@ -32,6 +32,32 @@ export default function MobileMenuNav({ categories, theme, menuName, logo_url })
     };
 
     const hasLogo = logo_url && typeof logo_url === 'string' && logo_url.length > 5;
+    const isOddMenu = theme.layout === 'oddmenu';
+
+    if (isOddMenu) {
+        return (
+            <nav
+                className={styles.oddCategoryNav}
+                style={{
+                    backgroundColor: theme.bg,
+                    borderBottom: '1px solid rgba(0,0,0,0.05)'
+                }}
+            >
+                {categories.map((cat) => (
+                    <button
+                        key={cat.id}
+                        onClick={() => handleNavClick(cat.id)}
+                        className={styles.oddCategoryPill}
+                        style={{
+                            color: theme.primary,
+                        }}
+                    >
+                        {cat.name}
+                    </button>
+                ))}
+            </nav>
+        );
+    }
 
     return (
         <>
@@ -109,3 +135,4 @@ export default function MobileMenuNav({ categories, theme, menuName, logo_url })
         </>
     );
 }
+
