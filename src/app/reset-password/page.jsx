@@ -12,67 +12,54 @@ function ResetPasswordForm() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [initializing, setInitializing] = useState(true);
+    const [sessionReady, setSessionReady] = useState(false);
     const router = useRouter();
     const supabase = getSupabaseClient();
 
-    // Initialize session from URL code (runs once on mount)
+    // Exchange code for session in background - show form immediately
     useEffect(() => {
         let isMounted = true;
 
-        const initSession = async () => {
+        const exchangeCode = async () => {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
 
-                // Check for error in URL (Supabase sends error when link expires)
+                // Check for error in URL
                 const urlError = urlParams.get('error');
                 if (urlError === 'access_denied') {
-                    const errorDescription = urlParams.get('error_description');
                     if (isMounted) {
-                        setError(decodeURIComponent(errorDescription || 'Reset link has expired. Please request a new one.'));
-                        setInitializing(false);
+                        const desc = urlParams.get('error_description');
+                        setError(decodeURIComponent(desc || 'Reset link has expired.'));
                     }
                     window.history.replaceState(null, '', window.location.pathname);
                     return;
                 }
 
-                // Exchange PKCE code for session
+                // Exchange PKCE code for session in background
                 const code = urlParams.get('code');
                 if (code) {
-                    const { error } = await supabase.auth.exchangeCodeForSession(code);
-                    if (isMounted && error) {
-                        setError('Reset link has expired. Please request a new one.');
-                    }
+                    await supabase.auth.exchangeCodeForSession(code);
                     window.history.replaceState(null, '', window.location.pathname);
                 }
+
+                if (isMounted) setSessionReady(true);
             } catch (err) {
-                // Silence abort errors during navigation
-                if (err?.name === 'AbortError' || err?.message?.includes('aborted')) {
-                    return;
-                }
-                console.error('Init error:', err);
-            } finally {
-                if (isMounted) {
-                    setInitializing(false);
-                }
+                // Ignore errors - will show when user submits
+                if (isMounted) setSessionReady(true);
             }
         };
 
-        initSession();
+        exchangeCode();
 
-        return () => {
-            isMounted = false;
-        };
+        return () => { isMounted = false; };
     }, [supabase.auth]);
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
-        // Validation
         if (password.length < 6) {
-            setError('Password must be at least 6 characters long.');
+            setError('Password must be at least 6 characters.');
             return;
         }
 
@@ -84,48 +71,30 @@ function ResetPasswordForm() {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.updateUser({
-                password: password
-            });
+            const { error } = await supabase.auth.updateUser({ password });
 
             if (error) {
-                if (error.message.includes('session') || error.message.includes('logged in')) {
-                    setError('Reset link has expired. Please request a new password reset.');
-                } else {
-                    setError(error.message || 'Failed to reset password. Please try again.');
-                }
+                setError(error.message?.includes('session')
+                    ? 'Session expired. Please request a new reset link.'
+                    : error.message || 'Failed to reset password.');
                 setLoading(false);
                 return;
             }
 
             setSuccess(true);
-
-            // Redirect to login after 2 seconds
-            setTimeout(() => {
-                router.push('/login');
-            }, 2000);
+            setTimeout(() => router.push('/login'), 2000);
         } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
+            setError('An error occurred. Please try again.');
             setLoading(false);
         }
     };
 
-    // Brief loading while exchanging code
-    if (initializing) {
-        return (
-            <div className={styles.authCard}>
-                <div className={styles.spinner} style={{ margin: '40px auto' }} />
-            </div>
-        );
-    }
-
-    // Show success message
     if (success) {
         return (
             <div className={styles.authCard}>
                 <Link href="/" className={styles.authLogo}>
                     <div className={styles.logoIcon}>
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg viewBox="0 0 24 24" fill="none">
                             <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
                             <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
                             <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
@@ -134,7 +103,6 @@ function ResetPasswordForm() {
                     </div>
                     <span>OneKit</span>
                 </Link>
-
                 <div className={styles.authSuccess}>
                     <svg viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
@@ -142,7 +110,6 @@ function ResetPasswordForm() {
                     </svg>
                     Password reset successfully!
                 </div>
-
                 <p className={styles.authSubtitle} style={{ textAlign: 'center', marginTop: '16px' }}>
                     Redirecting to login...
                 </p>
@@ -150,12 +117,12 @@ function ResetPasswordForm() {
         );
     }
 
+    // ALWAYS show the form - no spinner, no verification message
     return (
         <div className={styles.authCard}>
-            {/* Logo */}
             <Link href="/" className={styles.authLogo}>
                 <div className={styles.logoIcon}>
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" fill="none">
                         <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
                         <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
                         <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
@@ -166,7 +133,7 @@ function ResetPasswordForm() {
             </Link>
 
             <h1 className={styles.authTitle}>Reset Password</h1>
-            <p className={styles.authSubtitle}>Enter your new password below</p>
+            <p className={styles.authSubtitle}>Enter your new password</p>
 
             {error && (
                 <div className={styles.authError}>
@@ -209,16 +176,9 @@ function ResetPasswordForm() {
                     />
                 </div>
 
-                <button
-                    type="submit"
-                    className={styles.authSubmit}
-                    disabled={loading}
-                >
+                <button type="submit" className={styles.authSubmit} disabled={loading}>
                     {loading ? (
-                        <>
-                            <span className={styles.spinner} />
-                            Resetting...
-                        </>
+                        <><span className={styles.spinner} /> Resetting...</>
                     ) : (
                         'Reset Password'
                     )}
@@ -226,7 +186,8 @@ function ResetPasswordForm() {
             </form>
 
             <p className={styles.authSwitch}>
-                Remember your password?{' '}
+                <Link href="/forgot-password">Request new reset link</Link>
+                {' • '}
                 <Link href="/login">Sign in</Link>
             </p>
         </div>
@@ -239,9 +200,8 @@ export default function ResetPasswordPage() {
             <div className={styles.authBackground}>
                 <div className={styles.authGradient} />
             </div>
-
             <div className={styles.authContainer}>
-                <Suspense fallback={<div className={styles.authCard}><div className={styles.spinner} /></div>}>
+                <Suspense fallback={<div className={styles.authCard}><div className={styles.spinner} style={{ margin: '40px auto' }} /></div>}>
                     <ResetPasswordForm />
                 </Suspense>
             </div>
