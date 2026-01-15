@@ -120,16 +120,32 @@ export function AuthProvider({ children }) {
         return null;
     }, [user, fetchProfile]);
 
+    const signOut = useCallback(async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            setUser(null);
+            setProfile(null);
+            // Redirect to login
+            window.location.href = '/login';
+            return { error: null };
+        } catch (error) {
+            return { error };
+        }
+    }, []);
+
+
     // Memoize the context value to prevent unnecessary re-renders
     const value = useMemo(() => ({
         user,
         profile,
         loading,
+        signOut,
         updateProfile,
         refreshProfile,
         isAdmin: profile?.role === 'admin' || profile?.role === 'super_admin',
         isSuperAdmin: profile?.role === 'super_admin',
-    }), [user, profile, loading, updateProfile, refreshProfile]);
+    }), [user, profile, loading, signOut, updateProfile, refreshProfile]);
 
     return (
         <AuthContext.Provider value={value}>
