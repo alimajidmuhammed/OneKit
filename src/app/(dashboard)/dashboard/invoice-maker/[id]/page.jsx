@@ -37,7 +37,6 @@ import {
     Layout,
     Type
 } from 'lucide-react';
-import InvoicePreview from '@/components/invoice/InvoicePreview';
 import styles from './invoice-editor.module.css';
 
 const TEMPLATES = [
