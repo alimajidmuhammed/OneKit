@@ -120,12 +120,12 @@ export const APP_CONFIG = {
         days: 2, // 2-day trial for all paid services
     },
 
-    // Pricing (in IQD)
+    // Pricing (in IQD) - Yearly only
     pricing: {
         currency: 'IQD',
-        monthly: 15000,
-        yearly: 150000,
-        yearlyDiscount: '17%',
+        qr_yearly: 10000,
+        menu_yearly: 25000,
+        // CV Maker, Invoice Maker, Business Card Maker are FREE
     },
 
     // Social links

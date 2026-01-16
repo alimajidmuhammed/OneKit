@@ -37,14 +37,35 @@ export default function CVMakerPage() {
     const [deleteId, setDeleteId] = useState(null);
 
     const handleCreate = async () => {
-        if (!newCVName.trim()) return;
-        const { data, error } = await createCV(newCVName, selectedTemplate);
-        if (!error && data) {
-            setShowCreateModal(false);
-            setNewCVName('');
-            setSelectedTemplate('professional');
-            // Redirect to editor
-            window.location.href = `/dashboard/cv-maker/${data.id}`;
+        if (!newCVName.trim()) {
+            alert('Please enter a CV name');
+            return;
+        }
+
+        try {
+            console.log('Creating CV with name:', newCVName, 'template:', selectedTemplate);
+            const { data, error } = await createCV(newCVName, selectedTemplate);
+
+            if (error) {
+                console.error('CV creation error:', error);
+                alert(`Failed to create CV: ${error}`);
+                return;
+            }
+
+            if (data) {
+                console.log('CV created successfully:', data);
+                setShowCreateModal(false);
+                setNewCVName('');
+                setSelectedTemplate('professional');
+                // Redirect to editor
+                window.location.href = `/dashboard/cv-maker/${data.id}`;
+            } else {
+                console.error('No data returned from createCV');
+                alert('Failed to create CV: No data returned');
+            }
+        } catch (err) {
+            console.error('Unexpected error creating CV:', err);
+            alert(`Unexpected error: ${err.message}`);
         }
     };
 

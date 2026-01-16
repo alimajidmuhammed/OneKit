@@ -82,18 +82,19 @@ export default function ServiceCard({ service, showStatus = false, customPriceLa
 
     return (
         <Link href={cardLink} className={`${styles.card} ${colorClasses[service.color] || colorClasses.primary}`}>
-            {service.image && (
-                <div className={styles.imageContainer}>
-                    <img src={service.image} alt={service.name} className={styles.image} loading="eager" />
-                    {customPriceLabel ? (
-                        <span className={styles.priceBadge}>{customPriceLabel}</span>
-                    ) : service.isFree ? (
-                        <span className={styles.freeBadge}>Free</span>
-                    ) : service.priceLabel ? (
-                        <span className={styles.priceBadge}>{service.priceLabel}</span>
-                    ) : null}
+            {/* Icon display instead of image */}
+            <div className={styles.iconContainer}>
+                <div className={styles.iconCircle}>
+                    <ServiceIcon type={service.icon} />
                 </div>
-            )}
+                {customPriceLabel ? (
+                    <span className={styles.priceBadge}>{customPriceLabel}</span>
+                ) : service.isFree ? (
+                    <span className={styles.freeBadge}>Free</span>
+                ) : service.priceLabel ? (
+                    <span className={styles.priceBadge}>{service.priceLabel}</span>
+                ) : null}
+            </div>
 
             <div className={styles.content}>
                 <span className={styles.category}>{service.category || 'Tool'}</span>

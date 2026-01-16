@@ -40,24 +40,46 @@
     --card-accent: var(--warning-600);
 }
 
-/* Image Section */
-.imageContainer {
+/* Icon Section */
+.iconContainer {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    background: var(--neutral-100);
+    background: linear-gradient(135deg, var(--card-accent), var(--card-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.1;
 }
 
-.image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.iconCircle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-slow);
+}
+
+.iconCircle svg {
+    width: 64px;
+    height: 64px;
+    color: white;
+    opacity: 0.9;
     transition: transform var(--transition-slow);
 }
 
-.card:hover .image {
+.card:hover .iconCircle {
     transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.card:hover .iconCircle svg {
+    transform: rotate(5deg) scale(1.05);
 }
 
 .freeBadge,
