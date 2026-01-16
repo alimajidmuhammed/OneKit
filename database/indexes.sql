@@ -81,18 +81,6 @@ CREATE INDEX IF NOT EXISTS idx_business_cards_user_id
 ON business_cards(user_id);
 
 -- ============================================
--- Analytics Performance Indexes
--- ============================================
-
--- Index for page visits analytics
-CREATE INDEX IF NOT EXISTS idx_page_visits_service_type 
-ON page_visits(service_type, visited_at DESC);
-
--- Index for page visits by slug
-CREATE INDEX IF NOT EXISTS idx_page_visits_page_slug 
-ON page_visits(page_slug, visited_at DESC);
-
--- ============================================
 -- Completion Message
 -- ============================================
 
@@ -100,4 +88,3 @@ ON page_visits(page_slug, visited_at DESC);
 -- Expected improvements:
 -- - Menu page load: 40-60% faster
 -- - Dashboard queries: 30-50% faster
--- - Admin analytics: 60-80% faster
