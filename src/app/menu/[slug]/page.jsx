@@ -60,7 +60,7 @@ async function getMenu(slug) {
 
     const { data: menu } = await supabase
         .from('menus')
-        .select('*')
+        .select('id, user_id, name, slug, template_id, currency, logo_url, theme, is_published, created_at, view_count')
         .eq('slug', slug)
         .eq('is_published', true)
         .single();
@@ -69,14 +69,14 @@ async function getMenu(slug) {
 
     const { data: categories } = await supabase
         .from('menu_categories')
-        .select('*')
+        .select('id, menu_id, name, description, image_url, is_visible, sort_order')
         .eq('menu_id', menu.id)
         .eq('is_visible', true)
         .order('sort_order');
 
     const { data: items } = await supabase
         .from('menu_items')
-        .select('*')
+        .select('id, menu_id, category_id, name, description, price, image_url, is_featured, is_available, sort_order')
         .eq('menu_id', menu.id)
         .eq('is_available', true)
         .order('sort_order');

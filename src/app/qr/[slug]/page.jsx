@@ -42,7 +42,7 @@ async function getQRCode(slug) {
 
     const { data: qr } = await supabase
         .from('qr_codes')
-        .select('*')
+        .select('id, user_id, title, qr_type, qr_data, qr_style, is_published, created_at')
         .eq('slug', slug)
         .eq('is_active', true)
         .single();

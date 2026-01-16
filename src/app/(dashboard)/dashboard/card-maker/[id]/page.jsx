@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect, use, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBusinessCard } from '@/lib/hooks/useBusinessCard';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useSubscription } from '@/lib/hooks/useSubscription';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
+import { CARD_TEMPLATES, CORNER_STYLES, ORIENTATION_STYLES, FONT_STYLES, generateCardCss, ICON_OPTIONS } from '@/components/card/CardTemplates';
 import {
-    User, Mail, Phone, Globe, MapPin,
-    Linkedin, Instagram, Twitter, Github,
-    Briefcase, Building, Info, Plus,
-    Palette, Type, Share2, Layers,
+    Type, Share2, Layers,
     Check, X, ChevronRight, Download, Save, RefreshCw, Layout,
     Upload, Trash2, Languages
 } from 'lucide-react';
@@ -533,6 +532,7 @@ export default function BusinessCardEditor({ params }) {
             }
 
             // Capture the visible card at its natural size with high-res scaling
+            const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(cardFace, {
                 scale: 2,
                 useCORS: true,

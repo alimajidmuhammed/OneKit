@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useCV } from '@/lib/hooks/useCV';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import styles from './editor.module.css';
 
 
@@ -645,6 +643,8 @@ export default function CVEditorPage({ params }) {
                 }
             }));
 
+            // Dynamic import for better performance
+            const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(element, {
                 scale: 2,
                 useCORS: true,
@@ -654,6 +654,8 @@ export default function CVEditorPage({ params }) {
                 width: 794,
                 height: element.scrollHeight
             });
+
+            const jsPDF = (await import('jspdf')).default;
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = 210;
             const pdfHeight = 297;
@@ -700,6 +702,8 @@ export default function CVEditorPage({ params }) {
                 }
             }));
 
+            // Dynamic import for better performance
+            const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(element, {
                 scale: 2,
                 useCORS: true,

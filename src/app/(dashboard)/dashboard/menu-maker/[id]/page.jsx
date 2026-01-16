@@ -8,7 +8,6 @@ import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { useSubscription } from '@/lib/hooks/useSubscription';
 import { formatCurrency, getWhatsAppLink } from '@/lib/utils/helpers';
 import { APP_CONFIG } from '@/lib/utils/constants';
-import html2canvas from 'html2canvas';
 import PhotoStudio from '@/components/menu/PhotoStudio';
 import styles from './editor.module.css';
 
@@ -162,6 +161,7 @@ export default function MenuEditorPage({ params }) {
             // Wait a tiny bit for any layout/image updates
             await new Promise(r => setTimeout(r, 100));
 
+            const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(qrCardRef.current, {
                 useCORS: true,
                 scale: 3, // Higher resolution

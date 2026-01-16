@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, use, useCallback, useRef } from 'react';
+import { useState, useEffect, use, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useInvoice } from '@/lib/hooks/useInvoice';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useSubscription } from '@/lib/hooks/useSubscription';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
-import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import {
@@ -37,6 +37,7 @@ import {
     Layout,
     Type
 } from 'lucide-react';
+import InvoicePreview from '@/components/invoice/InvoicePreview';
 import styles from './invoice-editor.module.css';
 
 const TEMPLATES = [
@@ -188,6 +189,7 @@ export default function InvoiceEditorPage({ params }) {
         setDownloading(true);
         try {
             await document.fonts.ready;
+            const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(exportRef.current, {
                 useCORS: true,
                 scale: 3,
@@ -214,6 +216,7 @@ export default function InvoiceEditorPage({ params }) {
         setDownloading(true);
         try {
             await document.fonts.ready;
+            const html2canvas = (await import('html2canvas')).default;
             const canvas = await html2canvas(exportRef.current, {
                 useCORS: true,
                 scale: 2,
