@@ -1,5 +1,6 @@
 -- OneKit Performance Optimization: Database Indexes
 -- Apply these indexes to improve query performance
+-- Safe to run multiple times (uses IF NOT EXISTS)
 
 -- ============================================
 -- Menu Performance Indexes
@@ -59,9 +60,25 @@ ON qr_codes(user_id, is_active);
 -- CV Maker Performance Indexes
 -- ============================================
 
--- Index for user's CVs
-CREATE INDEX IF NOT EXISTS idx_cvs_user_id 
-ON cvs(user_id);
+-- Index for user's CV documents
+CREATE INDEX IF NOT EXISTS idx_cv_documents_user_id 
+ON cv_documents(user_id);
+
+-- ============================================
+-- Invoice Maker Performance Indexes
+-- ============================================
+
+-- Index for user's invoices
+CREATE INDEX IF NOT EXISTS idx_invoices_user_id 
+ON invoices(user_id);
+
+-- ============================================
+-- Business Card Maker Performance Indexes
+-- ============================================
+
+-- Index for user's business cards
+CREATE INDEX IF NOT EXISTS idx_business_cards_user_id 
+ON business_cards(user_id);
 
 -- ============================================
 -- Analytics Performance Indexes
@@ -76,12 +93,10 @@ CREATE INDEX IF NOT EXISTS idx_page_visits_page_slug
 ON page_visits(page_slug, visited_at DESC);
 
 -- ============================================
--- Apply All Indexes
+-- Completion Message
 -- ============================================
 
--- Run this script in your Supabase SQL Editor
--- Indexes are created with IF NOT EXISTS, so it's safe to run multiple times
-
+-- All indexes created successfully!
 -- Expected improvements:
 -- - Menu page load: 40-60% faster
 -- - Dashboard queries: 30-50% faster
