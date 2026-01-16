@@ -6,14 +6,11 @@ import { useBusinessCard } from '@/lib/hooks/useBusinessCard';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useSubscription } from '@/lib/hooks/useSubscription';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
-import { CARD_TEMPLATES, CORNER_STYLES, ORIENTATION_STYLES, FONT_STYLES, generateCardCss, ICON_OPTIONS } from '@/components/card/CardTemplates';
 import {
     Type, Share2, Layers,
     Check, X, ChevronRight, Download, Save, RefreshCw, Layout,
     Upload, Trash2, Languages
 } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { QRCodeSVG } from 'qrcode.react';
 import styles from './editor.module.css';
 
