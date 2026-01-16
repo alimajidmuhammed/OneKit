@@ -616,6 +616,47 @@ export default function CVEditorPage({ params }) {
         };
     }, [isDragging, handlePhotoMouseMove, handlePhotoMouseUp]);
 
+    // Touch event handlers for mobile
+    const handlePhotoTouchStart = (e) => {
+        if (!cv?.personal_info?.photo) return;
+        e.preventDefault(); // Prevent scrolling
+        const touch = e.touches[0];
+        setIsDragging(true);
+        setDragStart({ x: touch.clientX - studioPhotoPosition.x, y: touch.clientY - studioPhotoPosition.y });
+    };
+
+    const handlePhotoTouchMove = useCallback((e) => {
+        if (!isDragging) return;
+        e.preventDefault(); // Prevent scrolling
+        const touch = e.touches[0];
+        setStudioPhotoPosition({ x: touch.clientX - dragStart.x, y: touch.clientY - dragStart.y });
+    }, [isDragging, dragStart]);
+
+    const handlePhotoTouchEnd = useCallback(() => setIsDragging(false), []);
+
+    useEffect(() => {
+        if (isDragging) {
+            window.addEventListener('touchmove', handlePhotoTouchMove, { passive: false });
+            window.addEventListener('touchend', handlePhotoTouchEnd);
+        }
+        return () => {
+            window.removeEventListener('touchmove', handlePhotoTouchMove);
+            window.removeEventListener('touchend', handlePhotoTouchEnd);
+        };
+    }, [isDragging, handlePhotoTouchMove, handlePhotoTouchEnd]);
+
+    // Prevent body scroll when photo studio is open
+    useEffect(() => {
+        if (isPhotoStudioOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isPhotoStudioOpen]);
+
     const downloadAsPDF = async () => {
         if (!exportRef.current) return;
         setExporting(true);
@@ -1476,9 +1517,11 @@ export default function CVEditorPage({ params }) {
                                         border: '8px solid #f1f5f9',
                                         boxShadow: 'inset 0 4px 6px 0 rgba(0,0,0,0.1)',
                                         position: 'relative',
-                                        cursor: isDragging ? 'grabbing' : 'grab'
+                                        cursor: isDragging ? 'grabbing' : 'grab',
+                                        touchAction: 'none'
                                     }}
                                     onMouseDown={handlePhotoMouseDown}
+                                    onTouchStart={handlePhotoTouchStart}
                                 >
                                     <img
                                         src={cv.personal_info.photo}
