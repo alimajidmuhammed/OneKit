@@ -33,9 +33,9 @@ WHERE is_available = true;
 -- Auth & User Performance Indexes
 -- ============================================
 
--- Index for profile lookups
-CREATE INDEX IF NOT EXISTS idx_profiles_user_id 
-ON profiles(user_id);
+-- Index for profile lookups (profiles table uses 'id' as primary key)
+CREATE INDEX IF NOT EXISTS idx_profiles_id 
+ON profiles(id);
 
 -- Index for active subscriptions
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_active 
