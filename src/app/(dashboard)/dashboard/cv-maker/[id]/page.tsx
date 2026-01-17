@@ -982,10 +982,10 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                     onDrop={(e) => handleDrop(e, s.id)}
                                     onDragEnd={handleDragEnd}
                                     className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl transition-all font-semibold text-[10px] md:text-xs cursor-grab active:cursor-grabbing border ${activeSection === s.id
-                                            ? 'bg-neutral-900 border-neutral-900 text-white shadow-md transform scale-105 z-10'
-                                            : draggedSection === s.id
-                                                ? 'bg-primary-50 border-primary-200 border-dashed opacity-50'
-                                                : 'bg-transparent border-transparent text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
+                                        ? 'bg-neutral-900 border-neutral-900 text-white shadow-md transform scale-105 z-10'
+                                        : draggedSection === s.id
+                                            ? 'bg-primary-50 border-primary-200 border-dashed opacity-50'
+                                            : 'bg-transparent border-transparent text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
                                         }`}
                                 >
                                     <span className={`text-lg md:text-xl transition-opacity ${activeSection === s.id ? 'opacity-100' : 'opacity-70'}`}>{s.icon}</span>
@@ -997,110 +997,131 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
                     {/* Section Editors */}
                     {activeSection === 'personal' && (
-                        <div className={styles.formSection}>
-                            <h2 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '1.1rem' }}>👤</span> Personal Information
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <h2 className="text-lg font-bold text-neutral-900 mb-6 flex items-center gap-2">
+                                <Icons.User size={20} className="text-primary-600" />
+                                Personal Information
                             </h2>
-                            <div className={styles.photoUpload} style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '0.25rem' }}>Profile Photo</label>
 
-                                {/* Upload Error Message */}
+                            <div className="mb-8 p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-3">Profile Photo</label>
+
                                 {photoUploadError && (
-                                    <div style={{ padding: '8px 12px', borderRadius: '8px', background: '#fef2f2', border: '1px solid #fca5a5', color: '#dc2626', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span>⚠️</span>
+                                    <div className="p-3 mb-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs flex items-center gap-2 animate-in zoom-in-95 duration-200">
+                                        <Icons.AlertCircle size={14} />
                                         <span>{photoUploadError}</span>
-                                        <button onClick={() => setPhotoUploadError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626' }}>✕</button>
+                                        <button onClick={() => setPhotoUploadError(null)} className="ml-auto hover:text-red-800 transition-colors">
+                                            <Icons.X size={14} />
+                                        </button>
                                     </div>
                                 )}
 
-                                <div className={styles.photoContainer} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    {/* Show photo if exists OR upload preview during upload */}
+                                <div className="flex items-center gap-4">
                                     {(cv.personal_info?.photo || photoUploadPreview) ? (
                                         <>
                                             <div
-                                                className={styles.photoPreview}
                                                 onClick={() => !isUploadingPhoto && setIsPhotoStudioOpen(true)}
-                                                style={{
-                                                    width: '80px',
-                                                    height: '80px',
-                                                    borderRadius: '50%',
-                                                    overflow: 'hidden',
-                                                    cursor: isUploadingPhoto ? 'not-allowed' : 'pointer',
-                                                    border: '3px solid white',
-                                                    boxShadow: '0 2px 4px -1px rgba(0,0,0,0.1)',
-                                                    position: 'relative'
-                                                }}
+                                                className={`group relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md cursor-pointer transition-transform hover:scale-105 active:scale-95 ${isUploadingPhoto ? 'opacity-50 grayscale' : ''}`}
                                             >
                                                 <img
                                                     src={photoUploadPreview || cv.personal_info.photo}
                                                     alt="Profile"
                                                     style={photoStyle}
+                                                    className="w-full h-full object-cover"
                                                     crossOrigin="anonymous"
                                                 />
                                                 {isUploadingPhoto ? (
-                                                    <div className={styles.photoEditOverlay} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                                                        <Icons.spinner />
-                                                        <span style={{ fontSize: '10px' }}>Uploading...</span>
+                                                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white gap-1">
+                                                        <Icons.spinner size={16} className="animate-spin" />
+                                                        <span className="text-[8px] font-bold">UPLOADING</span>
                                                     </div>
                                                 ) : (
-                                                    <div className={styles.photoEditOverlay} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}>
-                                                        <span style={{ fontSize: '10px' }}>Edit</span>
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <span className="text-[10px] font-bold">EDIT</span>
                                                     </div>
                                                 )}
                                             </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                            <div className="flex flex-col gap-2">
                                                 <button
                                                     onClick={() => setIsPhotoStudioOpen(true)}
                                                     disabled={isUploadingPhoto}
-                                                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', fontSize: '12px', fontWeight: '500', cursor: isUploadingPhoto ? 'not-allowed' : 'pointer', opacity: isUploadingPhoto ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                    className="px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-[11px] font-bold text-neutral-700 hover:bg-neutral-50 transition-all flex items-center gap-2 shadow-sm"
                                                 >
-                                                    ✏️ Edit
+                                                    ✏️ Edit Photo
                                                 </button>
                                                 <button
                                                     onClick={removePhoto}
                                                     disabled={isUploadingPhoto}
-                                                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #fca5a5', background: '#fef2f2', color: '#dc2626', fontSize: '12px', fontWeight: '500', cursor: isUploadingPhoto ? 'not-allowed' : 'pointer', opacity: isUploadingPhoto ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                    className="px-3 py-1.5 bg-red-50 border border-red-100 rounded-lg text-[11px] font-bold text-red-600 hover:bg-red-100 transition-all flex items-center gap-2"
                                                 >
                                                     🗑️ Remove
                                                 </button>
                                             </div>
                                         </>
                                     ) : (
-                                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f8fafc', border: '2px dashed #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', position: 'relative' }}>
-                                            <Icons.upload />
-                                            <span style={{ fontSize: '9px', color: '#64748b', marginTop: '2px' }}>Upload</span>
-                                            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                                        <div className="relative w-20 h-20 rounded-full bg-neutral-100 border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center text-neutral-400 group hover:border-primary-400 hover:bg-primary-50 transition-all cursor-pointer overflow-hidden">
+                                            <Icons.upload size={20} className="group-hover:text-primary-500 transition-colors" />
+                                            <span className="text-[9px] font-bold mt-1 group-hover:text-primary-600">UPLOAD</span>
+                                            <input type="file" accept="image/*" onChange={handlePhotoUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            <div className={styles.formGrid} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.75rem' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Full Name</label>
-                                    <input style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="John Doe" value={cv.personal_info?.fullName || ''} onChange={e => updatePersonalInfo('fullName', e.target.value)} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div className="md:col-span-2">
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Full Name</label>
+                                    <input
+                                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                        placeholder="John Doe"
+                                        value={cv.personal_info?.fullName || ''}
+                                        onChange={e => updatePersonalInfo('fullName', e.target.value)}
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Job Title</label>
+                                    <input
+                                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                        placeholder="Software Engineer"
+                                        value={cv.personal_info?.jobTitle || ''}
+                                        onChange={e => updatePersonalInfo('jobTitle', e.target.value)}
+                                    />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Job Title</label>
-                                    <input style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="Software Engineer" value={cv.personal_info?.jobTitle || ''} onChange={e => updatePersonalInfo('jobTitle', e.target.value)} />
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Email</label>
+                                    <input
+                                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                        placeholder="john@example.com"
+                                        value={cv.personal_info?.email || ''}
+                                        onChange={e => updatePersonalInfo('email', e.target.value)}
+                                    />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Location</label>
-                                    <input style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="City, Country" value={cv.personal_info?.location || ''} onChange={e => updatePersonalInfo('location', e.target.value)} />
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Phone</label>
+                                    <input
+                                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                        placeholder="+1 234..."
+                                        value={cv.personal_info?.phone || ''}
+                                        onChange={e => updatePersonalInfo('phone', e.target.value)}
+                                    />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '4px' }}>Email</label>
-                                    <input style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="john@example.com" value={cv.personal_info?.email || ''} onChange={e => updatePersonalInfo('email', e.target.value)} />
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Location</label>
+                                    <input
+                                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                        placeholder="City, Country"
+                                        value={cv.personal_info?.location || ''}
+                                        onChange={e => updatePersonalInfo('location', e.target.value)}
+                                    />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '2px' }}>Phone</label>
-                                        <input style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }} placeholder="+1 234..." value={cv.personal_info?.phone || ''} onChange={e => updatePersonalInfo('phone', e.target.value)} />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '2px' }}>LinkedIn</label>
-                                        <input style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }} placeholder="linkedin..." value={cv.personal_info?.linkedin || ''} onChange={e => updatePersonalInfo('linkedin', e.target.value)} />
-                                    </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">LinkedIn</label>
+                                    <input
+                                        className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                        placeholder="linkedin.com/in/..."
+                                        value={cv.personal_info?.linkedin || ''}
+                                        onChange={e => updatePersonalInfo('linkedin', e.target.value)}
+                                    />
                                 </div>
                             </div>
                         </div>
