@@ -874,9 +874,9 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
 
     return (
-        <div className={styles.editor}>
+        <div className="min-h-screen bg-slate-50 flex flex-col overflow-x-hidden w-full font-sans antialiased">
             {/* Hidden Export Wrapper */}
-            <div className={styles.exportWrapper}>
+            <div className="absolute -top-[9999px] -left-[9999px] w-0 h-0 overflow-hidden">
                 <CVContent
                     cv={cv}
                     currentTemplate={currentTemplate}
@@ -888,110 +888,87 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
             </div>
 
             {/* Header / Top Bar */}
-            <header className={styles.header}>
-                <button className={styles.backBtn} onClick={() => router.push('/dashboard/cv-maker')}>
-                    <Icons.back />
-                    <span>Back</span>
+            <header className="flex items-center justify-between gap-4 px-4 md:px-6 py-3 bg-white border-b border-neutral-100 sticky top-0 z-[100] shadow-sm">
+                <button
+                    className="flex items-center gap-2 px-3 py-2 bg-neutral-50 text-neutral-600 hover:bg-neutral-100 rounded-xl transition-colors text-sm font-medium"
+                    onClick={() => router.push('/dashboard/cv-maker')}
+                >
+                    <Icons.back size={18} />
+                    <span className="hidden sm:inline">Back</span>
                 </button>
 
-                <div className={styles.headerActions}>
+                <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                     {/* Template Switcher (Mobile & Desktop) */}
                     <button
-                        className={styles.themeBtn}
+                        className="flex items-center gap-2 px-3 py-2 bg-neutral-50 text-neutral-900 border border-neutral-100 rounded-xl hover:bg-neutral-100 transition-colors text-xs md:text-sm font-bold shadow-sm"
                         onClick={() => setShowTemplates(true)}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            padding: '8px 12px',
-                            borderRadius: '10px',
-                            border: 'none',
-                            background: '#f5f5f5',
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            color: '#333',
-                            cursor: 'pointer'
-                        }}
                     >
-                        <span>🎨</span>
+                        <span className="text-lg md:text-xl">🎨</span>
+                        <span className="hidden sm:inline">Templates</span>
                     </button>
 
                     {/* Mobile Toggle */}
-                    <div className={styles.mobileToggle}>
+                    <div className="flex bg-neutral-100 p-1 rounded-xl border border-neutral-200 shadow-inner lg:hidden">
                         <button
-                            className={`${styles.toggleBtn} ${mobileView === 'edit' ? styles.toggleActive : ''}`}
+                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mobileView === 'edit' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'}`}
                             onClick={() => setMobileView('edit')}
                         >
                             Edit
                         </button>
                         <button
-                            className={`${styles.toggleBtn} ${mobileView === 'preview' ? styles.toggleActive : ''}`}
+                            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mobileView === 'preview' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'}`}
                             onClick={() => setMobileView('preview')}
                         >
                             Preview
                         </button>
                     </div>
 
-                    <div style={{ height: '24px', width: '1px', background: '#e2e8f0', margin: '0 8px' }} />
+                    <div className="hidden sm:block h-6 w-px bg-neutral-200 mx-1" />
 
-                    <div className={styles.exportDropdown} style={{ position: 'relative' }}>
-                        <button className={styles.downloadBtn} onClick={() => setShowExportMenu(!showExportMenu)}>
-                            {exporting ? <Icons.spinner /> : <Icons.download />}
-                            <span>Download</span>
+                    <div className="relative">
+                        <button
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all font-bold text-xs md:text-sm shadow-md hover:shadow-lg disabled:opacity-50"
+                            onClick={() => setShowExportMenu(!showExportMenu)}
+                        >
+                            {exporting ? <Icons.spinner size={18} className="animate-spin" /> : <Icons.download size={18} />}
+                            <span className="hidden sm:inline">Download</span>
                         </button>
 
                         {showExportMenu && (
-                            <div className={styles.exportMenu} style={{ position: 'absolute', top: '100%', right: 0, background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 50, minWidth: '160px', marginTop: '8px' }}>
-                                <button onClick={downloadAsPDF} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '12px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '14px' }}>
-                                    <Icons.pdf />
+                            <div className="absolute top-full right-0 mt-3 bg-white border border-neutral-100 rounded-2xl shadow-2xl z-50 min-width-[180px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                <button onClick={downloadAsPDF} className="flex items-center gap-3 w-full px-5 py-3 hover:bg-neutral-50 transition-colors text-left text-sm font-semibold text-neutral-700">
+                                    <Icons.pdf size={18} className="text-red-500" />
                                     <span>Download PDF</span>
                                 </button>
-                                <button onClick={downloadAsJPG} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '12px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '14px' }}>
-                                    <Icons.jpg />
+                                <button onClick={downloadAsJPG} className="flex items-center gap-3 w-full px-5 py-3 hover:bg-neutral-50 transition-colors text-left text-sm font-semibold text-neutral-700">
+                                    <Icons.jpg size={18} className="text-blue-500" />
                                     <span>Download JPG</span>
                                 </button>
-                                <div style={{ borderTop: '1px solid #e2e8f0', margin: '4px 0' }} />
+                                <div className="h-px bg-neutral-100 mx-3 my-1" />
                                 <PDFDownloadButton
                                     document={<CVPDF cv={cv} />}
                                     fileName={`cv-${cv.personalInfo?.fullName?.replace(/\s+/g, '-') || 'resume'}.pdf`}
                                     label="HQ Text-Searchable PDF"
-                                    className={styles.hqPdfBtn}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '12px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '14px', color: '#3b82f6' }}
+                                    className="flex items-center gap-3 w-full px-5 py-3 hover:bg-neutral-50 transition-colors text-left text-sm font-semibold text-primary-600"
                                 />
                             </div>
                         )}
                     </div>
 
-                    <div className={styles.saveStatus} style={{ display: 'none' }}>
-                        {saving ? 'Saving...' : hasChanges ? 'Unsaved' : 'Saved'}
-                    </div>
-
                     <button
                         onClick={handleSave}
                         disabled={saving || !hasChanges}
-                        style={{
-                            background: '#1a1a1a',
-                            color: 'white',
-                            border: 'none',
-                            padding: '8px 16px',
-                            borderRadius: '10px',
-                            fontWeight: '600',
-                            fontSize: '13px',
-                            cursor: 'pointer',
-                            opacity: (saving || !hasChanges) ? 0.5 : 1,
-                            flexShrink: 0
-                        }}
+                        className="px-6 py-2 bg-neutral-900 hover:bg-black text-white rounded-xl transition-all font-bold text-xs md:text-sm shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center min-w-[80px]"
                     >
-                        {saving ? '...' : 'Save'}
+                        {saving ? <Icons.spinner size={18} className="animate-spin" /> : 'Save'}
                     </button>
                 </div>
-
             </header>
 
             {/* Main Workspace Grid */}
-            <div className={styles.container}>
+            <div className="grid grid-cols-1 lg:grid-cols-[480px_1fr] gap-0 lg:gap-8 p-4 lg:p-8 max-w-[1800px] mx-auto w-full flex-1">
                 {/* Form Side */}
-                <div className={`${styles.formSide} ${mobileView === 'preview' ? styles.hideMobile : ''}`}>
+                <div className={`flex flex-col gap-6 lg:h-[calc(100vh-160px)] lg:overflow-y-auto lg:pr-2 scrollbar-thin transition-all duration-300 ${mobileView === 'preview' ? 'hidden lg:flex' : 'flex'}`}>
 
                     {/* Navigation Tabs */}
                     <div style={{
