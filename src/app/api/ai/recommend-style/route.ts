@@ -1,9 +1,45 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit, RATE_LIMITS, getRateLimitHeaders } from '@/lib/utils/rateLimit';
 
-export async function POST(req) {
+interface TemplateOption {
+    id: string;
+    description: string;
+}
+
+interface RecommendStyleRequest {
+    jobTitle?: string;
+    keywords?: string;
+    experience?: string;
+    availableTemplates: TemplateOption[];
+}
+
+interface StyleRecommendation {
+    templateId: string;
+    primaryColor: string;
+    accentColor: string;
+    rationale: string;
+}
+
+interface RecommendStyleResponse extends Partial<StyleRecommendation> {
+    error?: string;
+}
+
+interface GeminiModel {
+    name: string;
+    supportedGenerationMethods: string[];
+}
+
+interface GeminiModelsResponse {
+    models: GeminiModel[];
+}
+
+/**
+ * POST /api/ai/recommend-style
+ * Recommend CV template style and colors using Gemini AI
+ */
+export async function POST(req: NextRequest): Promise<NextResponse<RecommendStyleResponse>> {
     try {
         // SECURITY: Authenticate user to prevent API abuse
         const supabase = await createClient();
@@ -25,8 +61,8 @@ export async function POST(req) {
             );
         }
 
-
-        const { jobTitle, keywords, experience, availableTemplates } = await req.json();
+        const body: RecommendStyleRequest = await req.json();
+        const { jobTitle, keywords, experience, availableTemplates } = body;
 
         if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
             return NextResponse.json(
@@ -34,7 +70,6 @@ export async function POST(req) {
                 { status: 500 }
             );
         }
-
 
         const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
         const genAI = new GoogleGenerativeAI(apiKey);
@@ -63,10 +98,10 @@ export async function POST(req) {
     `;
 
         // 1. Get available models
-        let candidateModels = ["gemini-1.5-flash", "gemini-pro", "gemini-2.0-flash-exp"];
+        let candidateModels: string[] = ["gemini-1.5-flash", "gemini-pro", "gemini-2.0-flash-exp"];
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-            const data = await response.json();
+            const data: GeminiModelsResponse = await response.json();
             candidateModels = data.models
                 .filter(m => m.supportedGenerationMethods.includes("generateContent"))
                 .map(m => m.name.replace("models/", ""));
@@ -75,23 +110,24 @@ export async function POST(req) {
         }
 
         // 2. Try generation
-        let recommendation = null;
+        let recommendation: StyleRecommendation | null = null;
         let lastError = "";
 
         for (const modelName of candidateModels) {
             try {
-                const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
+                const model: GenerativeModel = genAI.getGenerativeModel({ model: modelName });
                 const result = await model.generateContent(prompt);
                 const text = result.response.text().trim();
 
                 // Clean the text in case AI added markdown blocks
                 const jsonMatch = text.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
-                    recommendation = JSON.parse(jsonMatch[0]);
+                    recommendation = JSON.parse(jsonMatch[0]) as StyleRecommendation;
                     break;
                 }
             } catch (err) {
-                lastError = err.message;
+                const error = err instanceof Error ? err.message : 'Unknown error';
+                lastError = error;
                 continue;
             }
         }
@@ -103,8 +139,9 @@ export async function POST(req) {
         return NextResponse.json(recommendation);
     } catch (error) {
         console.error("AI Style Error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to recommend style";
         return NextResponse.json(
-            { error: error.message || "Failed to recommend style" },
+            { error: errorMessage },
             { status: 500 }
         );
     }

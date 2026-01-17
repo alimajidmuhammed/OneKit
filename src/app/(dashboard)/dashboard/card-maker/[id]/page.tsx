@@ -9,12 +9,11 @@ import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import {
     Type, Share2, Layers,
     Check, X, ChevronRight, Download, Save, RefreshCw, Layout,
-    Upload, Trash2, Languages, Plus, Info,
+    Upload, Trash2, Languages, Plus, Info, ChevronLeft, Loader2, Palette, Eye, Settings, QrCode,
     User, Mail, Phone, Globe, MapPin, Linkedin, Instagram, Twitter, Github,
-    Briefcase, Building
+    Briefcase, Building, PenLine, RotateCcw
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import styles from './editor.module.css';
 import jsPDF from 'jspdf';
 import { BusinessCardPDF } from '@/components/pdf/BusinessCardPDF';
 import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
@@ -198,16 +197,41 @@ const CardFace = ({ side, card, template, exportMode = false }) => {
 
     return (
         <div
-            className={`${styles.cardFace} ${!exportMode ? (isFront ? styles.faceFront : styles.faceBack) : ''} ${isGlass ? styles.glassEffect : ''} ${isTech ? styles.techGrid : ''} ${pattern === 'geometric' ? styles.geometricPattern : ''} ${pattern === 'islamic' ? styles.islamicPattern : ''} ${isRTL ? styles.rtl : ''}`}
+            className={`absolute w-full h-full rounded-[20px] shadow-2xl overflow-hidden bg-white ${isRTL ? 'rtl text-right' : ''}`}
             style={{
                 ...bgStyle,
                 color: textColor,
                 border: isMinimal ? '1px solid #e2e8f0' : (isGlass ? '1px solid rgba(255,255,255,0.2)' : 'none'),
                 padding: '0',
-                fontFamily: fonts.en, // Default
-                transform: exportMode ? 'none' : undefined, // Force flat on export
-                backfaceVisibility: exportMode ? 'visible' : undefined
+                fontFamily: fonts.en,
+                backfaceVisibility: exportMode ? 'visible' : 'hidden',
+                WebkitBackfaceVisibility: exportMode ? 'visible' : 'hidden',
+                transformStyle: 'preserve-3d',
+                transform: exportMode ? 'none' : (isFront ? 'translateZ(1px)' : 'rotateY(180deg) translateZ(1px)'),
+                ...(isGlass && {
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                }),
+                ...(isTech && {
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0)',
+                    backgroundSize: '20px 20px'
+                }),
+                ...(pattern === 'geometric' && {
+                    backgroundImage: `linear-gradient(30deg, #ffffff11 12%, transparent 12.5%, transparent 87%, #ffffff11 87.5%, #ffffff11),
+                        linear-gradient(150deg, #ffffff11 12%, transparent 12.5%, transparent 87%, #ffffff11 87.5%, #ffffff11),
+                        linear-gradient(30deg, #ffffff11 12%, transparent 12.5%, transparent 87%, #ffffff11 87.5%, #ffffff11),
+                        linear-gradient(150deg, #ffffff11 12%, transparent 12.5%, transparent 87%, #ffffff11 87.5%, #ffffff11),
+                        linear-gradient(60deg, #ffffff11 25%, transparent 25.5%, transparent 75%, #ffffff11 75%, #ffffff11),
+                        linear-gradient(60deg, #ffffff11 25%, transparent 25.5%, transparent 75%, #ffffff11 75%, #ffffff11)`,
+                    backgroundSize: '80px 140px'
+                }),
+                ...(pattern === 'islamic' && {
+                    backgroundImage: `radial-gradient(circle at center, transparent 0%, transparent 100%),
+                        url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4h2c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                })
             }}
+            data-card-face={side}
         >
             {isFront ? (
                 <div style={{ padding: '40px', height: '100%', position: 'relative', display: 'flex', flexDirection: isVertical ? 'column' : 'column', justifyContent: 'space-between' }}>
@@ -526,7 +550,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
 
             // Find the actual card face element from the preview flipper
             const flipper = previewRef.current;
-            const cardFace = flipper.querySelector(`.${styles.cardFace}`);
+            const cardFace = flipper.querySelector(`[data-card-face="${isFlipped ? 'back' : 'front'}"]`);
 
             if (!cardFace) {
                 console.error('Could not find card face element');
@@ -560,26 +584,31 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
         }
     };
 
-    if (loading) return <div className={styles.loading}>Loading Editor...</div>;
+    if (loading) return (
+        <div className="flex items-center justify-center h-screen bg-neutral-900 text-white gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+            <span>Loading Editor...</span>
+        </div>
+    );
     if (!card) return null;
 
     const currentTemplate = CARD_TEMPLATES.find(t => t.id === card.template_id) || CARD_TEMPLATES[0];
 
     return (
-        <div className={styles.editor}>
+        <div className="grid lg:grid-cols-[400px_1fr] h-[calc(100vh-64px)] bg-neutral-900 text-white overflow-hidden">
 
             {/* Sidebar Controls */}
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarHeader}>
-                    <h2>Design Editor</h2>
-                    <p>{card.name}</p>
+            <aside className="bg-neutral-800 border-r border-neutral-700 flex flex-col overflow-y-auto">
+                <div className="p-6 border-b border-neutral-700">
+                    <h2 className="text-lg font-bold mb-1">Design Editor</h2>
+                    <p className="text-sm text-neutral-400">{card.name}</p>
                 </div>
 
-                <div className={styles.sectionTabs}>
+                <div className="flex flex-wrap gap-2 p-4 bg-neutral-900">
                     {SECTIONS.map(s => (
                         <button
                             key={s.id}
-                            className={`${styles.tabBtn} ${activeSection === s.id ? styles.tabActive : ''}`}
+                            className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${activeSection === s.id ? 'bg-neutral-700 text-white' : 'text-neutral-400 hover:bg-neutral-700/50'}`}
                             onClick={() => setActiveSection(s.id)}
                         >
                             {s.label}
@@ -587,15 +616,15 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                     ))}
                 </div>
 
-                <div className={styles.controls}>
+                <div className="flex-1 p-6">
                     {activeSection === 'branding' && (
-                        <div className={styles.formSection}>
-                            <label className={styles.sectionLabel}>Select Template</label>
-                            <div className={styles.templateGrid}>
+                        <div>
+                            <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Select Template</label>
+                            <div className="grid grid-cols-2 gap-3 mt-4">
                                 {CARD_TEMPLATES.map(t => (
                                     <div
                                         key={t.id}
-                                        className={`${styles.templateOption} ${card.template_id === t.id ? styles.templateActive : ''}`}
+                                        className={`p-3 bg-neutral-900 border rounded-xl cursor-pointer transition-all flex flex-col items-center gap-2 ${card.template_id === t.id ? 'border-primary-500 bg-neutral-800' : 'border-neutral-700 hover:border-neutral-600'}`}
                                         onClick={() => {
                                             setCard(prev => ({
                                                 ...prev,
@@ -613,27 +642,27 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                             setHasChanges(true);
                                         }}
                                     >
-                                        <div className={styles.templatePreview} style={{ background: t.primary }}>
+                                        <div className="w-[60px] h-[34px] rounded flex items-center justify-center shadow" style={{ background: t.primary }}>
                                             <div style={{ width: '20px', height: '2px', background: t.accent }} />
                                         </div>
-                                        <span>{t.name}</span>
+                                        <span className={`text-[11px] font-semibold ${card.template_id === t.id ? 'text-white' : 'text-neutral-400'}`}>{t.name}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            <label className={styles.sectionLabel}>Logo & Branding</label>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '16px' }}>Upload a high-res logo for a crisp look (Max 5MB, No Compression).</p>
+                            <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2 mt-6">Logo & Branding</label>
+                            <p className="text-[11px] text-neutral-400 mb-4">Upload a high-res logo for a crisp look (Max 5MB, No Compression).</p>
 
-                            <div className={styles.logoUpload}>
+                            <div className="flex flex-col gap-4 mb-6">
                                 <div
-                                    className={styles.logoPreview}
+                                    className="w-full aspect-video bg-neutral-900 border-2 border-dashed border-neutral-700 rounded-xl flex items-center justify-center overflow-hidden relative cursor-pointer hover:border-primary-500 hover:bg-neutral-800 transition-all"
                                     onClick={() => document.getElementById('logoInput').click()}
                                 >
                                     {card.content.design.logoUrl ? (
                                         <>
-                                            <img src={card.content.design.logoUrl} alt="Logo Preview" />
+                                            <img src={card.content.design.logoUrl} alt="Logo Preview" className="max-w-[80%] max-h-[80%] object-contain" />
                                             <button
-                                                className={styles.removeLogo}
+                                                className="absolute top-2 right-2 bg-black/50 border-none text-white p-1 rounded-full cursor-pointer z-10 hover:bg-red-500"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     updateContent({ design: { ...card.content.design, logoUrl: '' } });
@@ -643,9 +672,9 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                             </button>
                                         </>
                                     ) : (
-                                        <div style={{ textAlign: 'center', opacity: 0.5 }}>
-                                            <Upload size={24} style={{ margin: '0 auto 8px' }} />
-                                            <p style={{ fontSize: '11px' }}>{uploadingLogo ? 'Optimizing...' : 'Click to Upload'}</p>
+                                        <div className="text-center opacity-50">
+                                            <Upload size={24} className="mx-auto mb-2" />
+                                            <p className="text-[11px]">{uploadingLogo ? 'Optimizing...' : 'Click to Upload'}</p>
                                         </div>
                                     )}
                                 </div>
@@ -670,11 +699,11 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                             </div>
 
                             {card.content.design.logoUrl && (
-                                <div className={styles.transformControls}>
-                                    <div className={styles.transformGroup}>
-                                        <div className={styles.transformHeader}>
+                                <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700 mt-4">
+                                    <div className="mb-4">
+                                        <div className="flex justify-between items-center mb-2 text-[11px] text-neutral-400">
                                             <label>Logo Size</label>
-                                            <span>{card.content.design.logoSize || 100}%</span>
+                                            <span className="text-white font-semibold">{card.content.design.logoSize || 100}%</span>
                                         </div>
                                         <input
                                             type="range"
@@ -682,12 +711,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                             max="600"
                                             value={card.content.design.logoSize || 100}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, logoSize: parseInt(e.target.value) } })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
-                                    <div className={styles.transformGroup}>
-                                        <div className={styles.transformHeader}>
+                                    <div className="mb-4">
+                                        <div className="flex justify-between items-center mb-2 text-[11px] text-neutral-400">
                                             <label>Nudging X</label>
-                                            <span>{card.content.design.logoX || 0}px</span>
+                                            <span className="text-white font-semibold">{card.content.design.logoX || 0}px</span>
                                         </div>
                                         <input
                                             type="range"
@@ -695,12 +725,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                             max="200"
                                             value={card.content.design.logoX || 0}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, logoX: parseInt(e.target.value) } })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
-                                    <div className={styles.transformGroup}>
-                                        <div className={styles.transformHeader}>
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2 text-[11px] text-neutral-400">
                                             <label>Nudging Y</label>
-                                            <span>{card.content.design.logoY || 0}px</span>
+                                            <span className="text-white font-semibold">{card.content.design.logoY || 0}px</span>
                                         </div>
                                         <input
                                             type="range"
@@ -708,47 +739,48 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                             max="200"
                                             value={card.content.design.logoY || 0}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, logoY: parseInt(e.target.value) } })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
                                 </div>
                             )}
 
-                            <div style={{ marginTop: '24px' }}>
-                                <label className={styles.sectionLabel}>Branding & Colors</label>
-                                <div className={styles.colorGrid}>
-                                    <div className={styles.colorPicker}>
-                                        <label>Primary</label>
+                            <div className="mt-6">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Branding & Colors</label>
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs text-neutral-400">Primary</label>
                                         <input
                                             type="color"
-                                            className={styles.colorInput}
+                                            className="w-full h-11 p-0.5 bg-neutral-900 border border-neutral-700 rounded-lg cursor-pointer"
                                             value={card.content.design.primaryColor || currentTemplate.primary}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, primaryColor: e.target.value } })}
                                         />
                                     </div>
-                                    <div className={styles.colorPicker}>
-                                        <label>Accent</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs text-neutral-400">Accent</label>
                                         <input
                                             type="color"
-                                            className={styles.colorInput}
+                                            className="w-full h-11 p-0.5 bg-neutral-900 border border-neutral-700 rounded-lg cursor-pointer"
                                             value={card.content.design.accentColor || currentTemplate.accent}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, accentColor: e.target.value } })}
                                         />
                                     </div>
-                                    <div className={styles.colorPicker}>
-                                        <label>Text</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs text-neutral-400">Text</label>
                                         <input
                                             type="color"
-                                            className={styles.colorInput}
+                                            className="w-full h-11 p-0.5 bg-neutral-900 border border-neutral-700 rounded-lg cursor-pointer"
                                             value={card.content.design.textColor || currentTemplate.text}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, textColor: e.target.value } })}
                                         />
                                     </div>
                                     {card.content.design.isGradient && (
-                                        <div className={styles.colorPicker}>
-                                            <label>Second Color</label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-xs text-neutral-400">Second Color</label>
                                             <input
                                                 type="color"
-                                                className={styles.colorInput}
+                                                className="w-full h-11 p-0.5 bg-neutral-900 border border-neutral-700 rounded-lg cursor-pointer"
                                                 value={card.content.design.secondaryColor}
                                                 onChange={(e) => updateContent({ design: { ...card.content.design, secondaryColor: e.target.value } })}
                                             />
@@ -757,7 +789,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                 </div>
 
                                 <button
-                                    className={styles.gradientLink}
+                                    className="flex items-center gap-2 text-xs text-primary-400 cursor-pointer mt-2 font-semibold hover:text-primary-300"
                                     onClick={() => updateContent({ design: { ...card.content.design, isGradient: !card.content.design.isGradient } })}
                                 >
                                     {card.content.design.isGradient ? <X size={14} /> : <Plus size={14} />}
@@ -765,14 +797,15 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                 </button>
 
                                 {card.content.design.isGradient && (
-                                    <div className={styles.formGroup} style={{ marginTop: '16px' }}>
-                                        <label>Gradient Angle: {card.content.design.gradientAngle}°</label>
+                                    <div className="mb-5 mt-4">
+                                        <label className="block text-xs font-semibold text-neutral-400 mb-2">Gradient Angle: {card.content.design.gradientAngle}°</label>
                                         <input
                                             type="range"
                                             min="0"
                                             max="360"
                                             value={card.content.design.gradientAngle}
                                             onChange={(e) => updateContent({ design: { ...card.content.design, gradientAngle: parseInt(e.target.value) } })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
                                 )}
@@ -781,13 +814,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                     )}
 
                     {activeSection === 'fonts' && (
-                        <div className={styles.formSection}>
-                            <label className={styles.sectionLabel}>Typography</label>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '24px' }}>Choose custom fonts for each language.</p>
+                        <div>
+                            <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Typography</label>
+                            <p className="text-[11px] text-neutral-400 mb-6">Choose custom fonts for each language.</p>
 
                             {['english', 'arabic', 'kurdish'].map(lang => (
-                                <div key={lang} className={styles.formGroup} style={{ marginBottom: '24px' }}>
-                                    <label style={{ textTransform: 'capitalize' }}>{lang} Font</label>
+                                <div key={lang} className="mb-6">
+                                    <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">{lang} Font</label>
                                     <select
                                         value={card.content.design.fonts[lang === 'english' ? 'en' : (lang === 'arabic' ? 'ar' : 'ku')]}
                                         onChange={(e) => updateContent({
@@ -799,7 +832,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                 }
                                             }
                                         })}
-                                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: 'white', padding: '10px', borderRadius: '8px' }}
+                                        className="w-full bg-neutral-900 border border-neutral-700 text-white p-3 rounded-lg focus:outline-none focus:border-primary-500"
                                     >
                                         {FONTS[lang].map(f => (
                                             <option key={f.value} value={f.value}>{f.name}</option>
@@ -810,11 +843,11 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                         </div>
                     )}
                     {activeSection === 'visibility' && (
-                        <div className={styles.formSection}>
-                            <label className={styles.sectionLabel}>Component Visibility</label>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '24px' }}>Control where each element appears on your card.</p>
+                        <div>
+                            <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Component Visibility</label>
+                            <p className="text-[11px] text-neutral-400 mb-6">Control where each element appears on your card.</p>
 
-                            <div className={styles.visibilityGrid}>
+                            <div className="grid gap-3">
                                 {[
                                     { id: 'fullName', label: 'Full Name' },
                                     { id: 'jobTitle', label: 'Job Title' },
@@ -826,13 +859,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                     { id: 'website', label: 'Website' },
                                     { id: 'location', label: 'Location' }
                                 ].map(item => (
-                                    <div key={item.id} className={styles.visibilityItem}>
-                                        <label>{item.label}</label>
-                                        <div className={styles.visibilityToggles}>
+                                    <div key={item.id} className="bg-neutral-800 p-3 rounded-lg border border-neutral-700">
+                                        <label className="block text-xs font-semibold text-white mb-2">{item.label}</label>
+                                        <div className="flex gap-2">
                                             {['front', 'back', 'both', 'none'].map(mode => (
                                                 <button
                                                     key={mode}
-                                                    className={`${styles.visibilityBtn} ${card.content.design.visibility[item.id] === mode ? styles.visibilityBtnActive : ''}`}
+                                                    className={`flex-1 py-1.5 text-[10px] bg-neutral-900 border rounded capitalize transition-colors ${card.content.design.visibility[item.id] === mode ? 'bg-primary-500 border-primary-400 text-white' : 'border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}
                                                     onClick={() => updateContent({
                                                         design: {
                                                             ...card.content.design,
@@ -851,38 +884,42 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                     )}
 
                     {activeSection === 'general' && (
-                        <div className={styles.formSection}>
-                            <div className={styles.formGroup}>
-                                <label>Full Name</label>
+                        <div>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Full Name</label>
                                 <input
                                     type="text"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.fullName}
                                     placeholder="e.g. John Doe"
                                     onChange={(e) => updateContent({ fullName: e.target.value })}
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Job Title</label>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Job Title</label>
                                 <input
                                     type="text"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.jobTitle}
                                     placeholder="e.g. Senior Developer"
                                     onChange={(e) => updateContent({ jobTitle: e.target.value })}
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Company Name</label>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Company Name</label>
                                 <input
                                     type="text"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.companyName}
                                     placeholder="e.g. OneKit Studio"
                                     onChange={(e) => updateContent({ companyName: e.target.value })}
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Location</label>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Location</label>
                                 <input
                                     type="text"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.location}
                                     placeholder="e.g. London, UK"
                                     onChange={(e) => updateContent({ location: e.target.value })}
@@ -891,23 +928,23 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                         </div>
                     )}
                     {activeSection === 'toolkit' && (
-                        <div className={styles.formSection}>
-                            <label className={styles.sectionLabel}>Icon Toolkit</label>
-                            <p style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '24px' }}>Choose professional icons for your contact details.</p>
+                        <div>
+                            <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Icon Toolkit</label>
+                            <p className="text-[11px] text-neutral-400 mb-6">Choose professional icons for your contact details.</p>
 
                             {['email', 'phone', 'website', 'location'].map(field => (
-                                <div key={field} style={{ marginBottom: '32px' }}>
-                                    <label style={{ fontSize: '12px', color: 'white', textTransform: 'capitalize', fontWeight: '700', display: 'block', marginBottom: '12px' }}>
+                                <div key={field} className="mb-8">
+                                    <label className="text-xs font-bold text-white capitalize block mb-3">
                                         {field} Icon
                                     </label>
-                                    <div className={styles.iconGrid}>
+                                    <div className="grid grid-cols-4 gap-2 p-2 bg-neutral-900 rounded-lg max-h-[200px] overflow-y-auto">
                                         {Object.keys(ICON_MAP).map(iconName => {
                                             const Icon = ICON_MAP[iconName];
                                             return (
                                                 <button
                                                     key={iconName}
                                                     title={iconName}
-                                                    className={`${styles.iconOption} ${card.content.design.icons[field] === iconName ? styles.iconActive : ''}`}
+                                                    className={`aspect-square flex items-center justify-center text-lg bg-neutral-800 border rounded-lg cursor-pointer transition-all ${card.content.design.icons[field] === iconName ? 'bg-primary-900 text-primary-400 border-primary-500' : 'border-transparent hover:bg-neutral-700 hover:border-primary-500'}`}
                                                     onClick={() => updateContent({
                                                         design: {
                                                             ...card.content.design,
@@ -926,12 +963,12 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                     )}
 
                     {activeSection === 'qr' && (
-                        <div className={styles.formSection}>
-                            <label className={styles.sectionLabel}>QR Code Settings</label>
+                        <div>
+                            <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">QR Code Settings</label>
 
                             {/* Enable Toggle */}
-                            <div className={styles.formGroup}>
-                                <label>
+                            <div className="mb-5">
+                                <label className="flex items-center gap-2 text-sm text-white cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={card.content.design?.qr?.enabled || false}
@@ -944,7 +981,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                 }
                                             }
                                         })}
-                                        style={{ marginRight: '8px' }}
+                                        className="accent-primary-500"
                                     />
                                     Enable QR Code
                                 </label>
@@ -953,10 +990,11 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                             {card.content.design?.qr?.enabled && (
                                 <>
                                     {/* QR Value */}
-                                    <div className={styles.formGroup}>
-                                        <label>QR Code Content (URL or Text)</label>
+                                    <div className="mb-5">
+                                        <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">QR Code Content (URL or Text)</label>
                                         <input
                                             type="text"
+                                            className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                             value={card.content.design.qr.value || ''}
                                             onChange={(e) => updateContent({
                                                 design: {
@@ -969,8 +1007,8 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                     </div>
 
                                     {/* Size Slider */}
-                                    <div className={styles.formGroup}>
-                                        <label>Size: {card.content.design.qr.size || 80}px</label>
+                                    <div className="mb-5">
+                                        <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Size: {card.content.design.qr.size || 80}px</label>
                                         <input
                                             type="range"
                                             min="40"
@@ -982,12 +1020,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                     qr: { ...card.content.design.qr, size: parseInt(e.target.value) }
                                                 }
                                             })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
 
                                     {/* X Position */}
-                                    <div className={styles.formGroup}>
-                                        <label>Horizontal Position: {card.content.design.qr.x || 0}px</label>
+                                    <div className="mb-5">
+                                        <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Horizontal Position: {card.content.design.qr.x || 0}px</label>
                                         <input
                                             type="range"
                                             min="-250"
@@ -999,12 +1038,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                     qr: { ...card.content.design.qr, x: parseInt(e.target.value) }
                                                 }
                                             })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
 
                                     {/* Y Position */}
-                                    <div className={styles.formGroup}>
-                                        <label>Vertical Position: {card.content.design.qr.y || 0}px</label>
+                                    <div className="mb-5">
+                                        <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Vertical Position: {card.content.design.qr.y || 0}px</label>
                                         <input
                                             type="range"
                                             min="-250"
@@ -1016,12 +1056,13 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                     qr: { ...card.content.design.qr, y: parseInt(e.target.value) }
                                                 }
                                             })}
+                                            className="w-full accent-primary-500"
                                         />
                                     </div>
 
                                     {/* Border Style */}
-                                    <div className={styles.formGroup}>
-                                        <label>Border Style</label>
+                                    <div className="mb-5">
+                                        <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Border Style</label>
                                         <select
                                             value={card.content.design.qr.borderStyle || 'none'}
                                             onChange={(e) => updateContent({
@@ -1030,6 +1071,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                     qr: { ...card.content.design.qr, borderStyle: e.target.value }
                                                 }
                                             })}
+                                            className="w-full bg-neutral-900 border border-neutral-700 text-white p-3 rounded-lg focus:outline-none focus:border-primary-500"
                                         >
                                             <option value="none">None</option>
                                             <option value="solid">Solid</option>
@@ -1041,10 +1083,11 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                     {card.content.design.qr.borderStyle !== 'none' && (
                                         <>
                                             {/* Border Color */}
-                                            <div className={styles.formGroup}>
-                                                <label>Border Color</label>
+                                            <div className="mb-5">
+                                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Border Color</label>
                                                 <input
                                                     type="color"
+                                                    className="w-full h-11 p-0.5 bg-neutral-900 border border-neutral-700 rounded-lg cursor-pointer"
                                                     value={card.content.design.qr.borderColor || '#000000'}
                                                     onChange={(e) => updateContent({
                                                         design: {
@@ -1056,8 +1099,8 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                             </div>
 
                                             {/* Border Width */}
-                                            <div className={styles.formGroup}>
-                                                <label>Border Width: {card.content.design.qr.borderWidth || 2}px</label>
+                                            <div className="mb-5">
+                                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Border Width: {card.content.design.qr.borderWidth || 2}px</label>
                                                 <input
                                                     type="range"
                                                     min="0"
@@ -1069,6 +1112,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                                             qr: { ...card.content.design.qr, borderWidth: parseInt(e.target.value) }
                                                         }
                                                     })}
+                                                    className="w-full accent-primary-500"
                                                 />
                                             </div>
                                         </>
@@ -1079,35 +1123,39 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                     )}
 
                     {activeSection === 'social' && (
-                        <div className={styles.formSection}>
-                            <div className={styles.formGroup}>
-                                <label>Email Address</label>
+                        <div>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Email Address</label>
                                 <input
                                     type="email"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.email}
                                     onChange={(e) => updateContent({ email: e.target.value })}
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Phone Number</label>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Phone Number</label>
                                 <input
                                     type="tel"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.phone}
                                     onChange={(e) => updateContent({ phone: e.target.value })}
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>Website</label>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Website</label>
                                 <input
                                     type="url"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.website}
                                     onChange={(e) => updateContent({ website: e.target.value })}
                                 />
                             </div>
-                            <div className={styles.formGroup}>
-                                <label>LinkedIn URL</label>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">LinkedIn URL</label>
                                 <input
                                     type="text"
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     value={card.content.socials.linkedin}
                                     onChange={(e) => updateContent({ socials: { ...card.content.socials, linkedin: e.target.value } })}
                                 />
@@ -1116,11 +1164,12 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                     )}
 
                     {activeSection === 'content' && (
-                        <div className={styles.formSection}>
-                            <div className={styles.formGroup}>
-                                <label>Biography / Notes</label>
+                        <div>
+                            <div className="mb-5">
+                                <label className="block text-xs font-semibold text-neutral-400 uppercase mb-2">Biography / Notes</label>
                                 <textarea
                                     rows={4}
+                                    className="w-full p-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 resize-none"
                                     value={card.content.notes}
                                     onChange={(e) => updateContent({ notes: e.target.value })}
                                     placeholder="Brief background or tagline..."
@@ -1132,43 +1181,61 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
             </aside>
 
             {/* Preview Workspace */}
-            <main className={styles.workspace}>
-                <div className={styles.toolbar}>
-                    <button className={styles.toolBtn} onClick={() => setIsFlipped(!isFlipped)}>
-                        Flip Card
+            <main className="p-10 flex flex-col items-center justify-center bg-[radial-gradient(circle_at_center,#1e293b_0%,#0f172a_100%)] relative overflow-hidden">
+                <div className="absolute top-6 right-6 flex gap-3 z-10">
+                    <button
+                        className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur border border-white/10 rounded-full text-white text-sm font-semibold cursor-pointer transition-colors hover:bg-white/20"
+                        onClick={() => setIsFlipped(!isFlipped)}
+                    >
+                        <RotateCcw size={16} /> Flip Card
                     </button>
-                    <button className={`${styles.toolBtn} ${styles.saveBtn}`} onClick={handleSave} disabled={saving || !hasChanges}>
-                        {saving ? 'Saving...' : 'Save Design'}
+                    <button
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full text-white text-sm font-semibold cursor-pointer transition-colors hover:from-primary-600 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleSave}
+                        disabled={saving || !hasChanges}
+                    >
+                        <Save size={16} /> {saving ? 'Saving...' : 'Save Design'}
                     </button>
                 </div>
 
-                <div className={styles.previewArea}>
-                    <div ref={previewRef} className={`${styles.cardFlipper} ${isFlipped ? styles.isFlipped : ''}`}>
+                <div className="w-full max-w-[700px] aspect-[1.75/1] relative mx-auto" style={{ perspective: '2000px' }}>
+                    <div
+                        ref={previewRef}
+                        className="w-full h-full relative transition-transform duration-500"
+                        style={{
+                            transformStyle: 'preserve-3d',
+                            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+                        }}
+                    >
                         <CardFace side="front" card={card} template={currentTemplate} />
                         <CardFace side="back" card={card} template={currentTemplate} />
                     </div>
                 </div>
 
-                <div className={styles.viewToggle}>
-                    <div className={styles.exportTools} style={{ marginRight: 'auto', display: 'flex', gap: '8px' }}>
+                <div className="mt-10 flex bg-neutral-800 p-1 rounded-full">
+                    <div className="mr-auto flex gap-2">
                         <PDFDownloadButton
                             document={<BusinessCardPDF card={card} />}
                             fileName={`business-card-${card.name?.replace(/\s+/g, '-') || 'new'}.pdf`}
-                            className={styles.toolBtn}
+                            className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur border border-white/10 rounded-full text-white text-sm font-semibold cursor-pointer transition-colors hover:bg-white/20"
                             label="HQ"
                         />
-                        <button className={styles.toolBtn} onClick={() => handleExport('jpg')} disabled={exporting}>
-                            {exporting ? '...' : 'JPG'}
+                        <button
+                            className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur border border-white/10 rounded-full text-white text-sm font-semibold cursor-pointer transition-colors hover:bg-white/20 disabled:opacity-50"
+                            onClick={() => handleExport('jpg')}
+                            disabled={exporting}
+                        >
+                            <Download size={14} /> {exporting ? '...' : 'JPG'}
                         </button>
                     </div>
                     <button
-                        className={`${styles.toggleOption} ${!isFlipped ? styles.activeToggle : ''}`}
+                        className={`px-6 py-2 border-none bg-none rounded-full text-sm font-semibold cursor-pointer transition-colors ${!isFlipped ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white' : 'text-neutral-400'}`}
                         onClick={() => setIsFlipped(false)}
                     >
                         Front
                     </button>
                     <button
-                        className={`${styles.toggleOption} ${isFlipped ? styles.activeToggle : ''}`}
+                        className={`px-6 py-2 border-none bg-none rounded-full text-sm font-semibold cursor-pointer transition-colors ${isFlipped ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white' : 'text-neutral-400'}`}
                         onClick={() => setIsFlipped(true)}
                     >
                         Back
@@ -1178,3 +1245,4 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
         </div>
     );
 }
+

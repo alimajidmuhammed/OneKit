@@ -38,9 +38,12 @@ import {
     FileText,
     ChevronLeft,
     Layout,
-    Type
+    Type,
+    Check,
+    Loader2,
+    X,
+    Save
 } from 'lucide-react';
-import styles from './invoice-editor.module.css';
 
 const TEMPLATES = [
     { id: 'classic', name: 'Classic', icon: '📄' },
@@ -705,196 +708,319 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
     const labels = { ...DEFAULT_LABELS, ...(data.labels || {}) };
 
     // Shared Content Component for both Preview and Export
-    const InvoiceContent = ({ data, labels, template_id, isExport = false, contentRef }) => (
-        <div
-            className={`${styles.receipt} ${styles[`template-${template_id}`]} ${styles[`size-${data.page_size || 'A4'}`]} ${styles[`orient-${data.orientation || 'portrait'}`]} ${isExport ? styles.exportItem : ''}`}
-            style={{
-                '--primary-color': data.primary_color || '#1e3a8a',
-                ...(isExport ? { transform: 'none', margin: 0 } : {})
-            }}
-            ref={contentRef}
-        >
-            {/* Header */}
-            <div className={styles.receiptHeader}>
-                <div className={styles.headerLeft}>
-                    <div className={styles.headerIcons}>
-                        <span>{labels.header_visa}</span>
-                        <span>{labels.header_edu}</span>
-                        <span>{labels.header_law}</span>
+    const InvoiceContent = ({ data, labels, template_id, isExport = false, contentRef }) => {
+        const primaryColor = data.primary_color || '#1e3a8a';
+
+        // Base Scale mapping
+        const scaleMap = {
+            'A4': 1,
+            'A5': 0.8,
+            'A6': 0.65,
+            'Letter': 1,
+            'Legal': 1,
+            'DL': 0.55
+        };
+        const baseScale = scaleMap[data.page_size || 'A4'] || 1;
+
+        // Size & Orientation mapping
+        const sizes = {
+            'A4': { p: [794, 1123], l: [1123, 794] },
+            'A5': { p: [559, 794], l: [794, 559] },
+            'A6': { p: [397, 559], l: [559, 397] },
+            'Letter': { p: [816, 1056], l: [1056, 816] },
+            'Legal': { p: [816, 1344], l: [1344, 816] },
+            'DL': { p: [416, 831], l: [831, 416] }
+        };
+
+        const currentSize = sizes[data.page_size || 'A4']?.[data.orientation === 'landscape' ? 'l' : 'p'] || [794, 1123];
+        const [width, height] = currentSize;
+
+        // Dynamic spacing based on size/orientation
+        const isSmall = data.page_size === 'A5' || data.page_size === 'A6' || data.orientation === 'landscape';
+        const isVerySmall = (data.page_size === 'A5' && data.orientation === 'landscape') || data.page_size === 'A6';
+
+        const spacing = {
+            headerV: (isVerySmall ? 10 : isSmall ? 15 : 30) * baseScale,
+            sectionV: (isVerySmall ? 15 : isSmall ? 20 : 30) * baseScale,
+            footerV: (isVerySmall ? 8 : isSmall ? 10 : 20) * baseScale,
+            signatureV: (isVerySmall ? 15 : isSmall ? 20 : 40) * baseScale,
+            infoRowV: (isVerySmall ? 10 : isSmall ? 15 : 30) * baseScale,
+        };
+
+        return (
+            <div
+                className={`bg-white relative text-neutral-900 overflow-hidden flex flex-col shadow-2xl ${isExport ? '' : ''}`}
+                style={{
+                    width: `${width}px`,
+                    height: `${height}px`,
+                    fontFamily: "'Noto Kufi Arabic', 'Inter', sans-serif",
+                    '--primary': primaryColor
+                } as any}
+                ref={contentRef}
+            >
+                {/* Header Section */}
+                {template_id === 'minimal' ? (
+                    <div className="flex flex-col items-start w-full px-10 pt-10 pb-5 mb-8" style={{ borderBottom: `${2 * baseScale}px solid ${primaryColor}` }}>
+                        <div className="bg-black text-white p-2 rounded mb-4" style={{ width: `${50 * baseScale}px`, height: `${50 * baseScale}px` }}>
+                            {data.logo_url ? <img src={data.logo_url} className="w-full h-full object-contain" /> : <span style={{ fontSize: `${24 * baseScale}px` }}>🪁</span>}
+                        </div>
+                        <h1 className="font-black text-black" style={{ fontSize: `${28 * baseScale}px` }}>{labels.company_name_en}</h1>
+                        <div className="flex justify-between items-baseline w-full mt-2">
+                            <div className="flex gap-2 text-black font-black" style={{ fontSize: `${18 * baseScale}px` }}>
+                                <span>{labels.company_prefix_ku}</span>
+                                <span>{labels.company_name_ku}</span>
+                            </div>
+                        </div>
+                    </div>
+                ) : template_id === 'modern' ? (
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5 px-10 text-white" style={{ padding: `${40 * baseScale}px`, background: `linear-gradient(135deg, ${primaryColor} 0%, #1e293b 100%)` }}>
+                        <div className="opacity-80 leading-tight" style={{ fontSize: `${10 * baseScale}px` }}>
+                            <div>{labels.header_visa}</div>
+                            <div>{labels.header_edu}</div>
+                            <div>{labels.header_law}</div>
+                        </div>
+                        <div className="flex flex-col items-center px-8 border-x border-white/10">
+                            <div className="bg-white rounded-full overflow-hidden border-4 border-white/10 mb-2" style={{ width: `${80 * baseScale}px`, height: `${80 * baseScale}px` }}>
+                                {data.logo_url ? <img src={data.logo_url} className="w-full h-full object-contain" /> : <div className="flex items-center justify-center h-full text-black" style={{ fontSize: `${32 * baseScale}px` }}>🪁</div>}
+                            </div>
+                            <div className="font-bold tracking-widest text-[#38bdf8]" style={{ fontSize: `${18 * baseScale}px` }}>{labels.company_name_en}</div>
+                        </div>
+                        <div className="text-right font-black" style={{ fontSize: `${20 * baseScale}px` }}>
+                            {labels.company_prefix_ku} {labels.company_name_ku}
+                        </div>
+                    </div>
+                ) : template_id === 'corporate' ? (
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-8 px-10 border-b-2 border-neutral-100" style={{ paddingTop: `${40 * baseScale}px`, paddingBottom: `${40 * baseScale}px`, borderTop: `${20 * baseScale}px solid ${primaryColor}` }}>
+                        <div className="font-bold text-blue-500 leading-tight" style={{ fontSize: `${12 * baseScale}px` }}>
+                            <div>{labels.header_visa}</div>
+                            <div>{labels.header_edu}</div>
+                            <div>{labels.header_law}</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="bg-neutral-100 rounded-lg overflow-hidden mb-2" style={{ width: `${60 * baseScale}px`, height: `${60 * baseScale}px` }}>
+                                {data.logo_url ? <img src={data.logo_url} className="w-full h-full object-contain" /> : <div className="flex items-center justify-center h-full" style={{ fontSize: `${24 * baseScale}px` }}>🪁</div>}
+                            </div>
+                            <div className="font-black" style={{ fontSize: `${28 * baseScale}px`, color: primaryColor }}>{labels.company_name_en}</div>
+                        </div>
+                        <div className="text-right font-black" style={{ fontSize: `${20 * baseScale}px`, color: primaryColor }}>
+                            {labels.company_prefix_ku} {labels.company_name_ku}
+                        </div>
+                    </div>
+                ) : template_id === 'luxury' ? (
+                    <div className="flex flex-col items-center text-center px-10 mx-14 border-b border-double border-[#d4af37]" style={{ paddingTop: `${60 * baseScale}px`, paddingBottom: `${60 * baseScale}px`, background: '#fffcf5' }}>
+                        <div className="bg-white rounded-full border-2 overflow-hidden mb-4" style={{ width: `${90 * baseScale}px`, height: `${90 * baseScale}px`, borderColor: primaryColor }}>
+                            {data.logo_url ? <img src={data.logo_url} className="w-full h-full object-contain" /> : <div className="flex items-center justify-center h-full" style={{ fontSize: `${32 * baseScale}px` }}>💎</div>}
+                        </div>
+                        <h1 className="font-serif uppercase tracking-[6px]" style={{ fontSize: `${42 * baseScale}px`, color: primaryColor }}>{labels.company_name_en}</h1>
+                        <div className="font-black mt-2" style={{ fontSize: `${24 * baseScale}px`, color: primaryColor }}>
+                            {labels.company_prefix_ku} {labels.company_name_ku}
+                        </div>
+                    </div>
+                ) : (
+                    /* Classic & Compact Header */
+                    <div
+                        className={`flex justify-between items-center px-10 text-white ${template_id === 'compact' ? 'h-[60px]' : ''}`}
+                        style={{
+                            paddingTop: `${(template_id === 'compact' ? 10 : 30) * baseScale}px`,
+                            paddingBottom: `${(template_id === 'compact' ? 10 : 30) * baseScale}px`,
+                            background: primaryColor,
+                            borderBottom: template_id === 'compact' ? 'none' : `${5 * baseScale}px solid #facc15`
+                        }}
+                    >
+                        <div className="flex flex-col gap-1 leading-tight" style={{ fontSize: `${11 * baseScale}px` }}>
+                            <div>{labels.header_visa}</div>
+                            <div>{labels.header_edu}</div>
+                            <div>{labels.header_law}</div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="bg-white rounded-full overflow-hidden flex items-center justify-center" style={{ width: `${(template_id === 'compact' ? 35 : 60) * baseScale}px`, height: `${(template_id === 'compact' ? 35 : 60) * baseScale}px` }}>
+                                {data.logo_url ? <img src={data.logo_url} className="w-full h-full object-contain" /> : <span style={{ fontSize: `${(template_id === 'compact' ? 18 : 32) * baseScale}px` }}>🪁</span>}
+                            </div>
+                            <div className="font-black uppercase mt-1" style={{ fontSize: `${(template_id === 'compact' ? 14 : 20) * baseScale}px` }}>{labels.company_name_en}</div>
+                        </div>
+                        <div className="text-right text-[#facc15] font-black leading-tight" style={{ fontSize: `${(template_id === 'compact' ? 14 : 24) * baseScale}px` }}>
+                            <div style={{ fontSize: `${14 * baseScale}px`, color: '#facc15' }}>{labels.company_prefix_ku}</div>
+                            <div className="text-white">{labels.company_name_ku}</div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Info Row (Receipt No, Date, Amounts) */}
+                <div className={`flex justify-between w-full px-10 gap-10 mt-5 ${template_id === 'minimal' ? 'px-0 mb-10' : ''}`} style={{ paddingTop: spacing.infoRowV }}>
+                    <div className="flex-1 flex flex-col gap-5">
+                        <div className="flex items-end gap-3 font-semibold w-full" style={{ fontSize: `${14 * baseScale}px` }}>
+                            <span className="text-neutral-500 min-w-fit">{labels.label_no_en}</span>
+                            <span className="flex-1 border-b border-neutral-300 text-red-500 font-bold pb-1 px-2" style={{ fontSize: `${16 * baseScale}px` }}>{data.receipt_no}</span>
+                            <span className="min-w-fit">{labels.label_no_ku}</span>
+                        </div>
+                        <div className="flex items-end gap-3 font-semibold w-full" style={{ fontSize: `${14 * baseScale}px` }}>
+                            <span className="text-neutral-500 min-w-fit">{labels.label_date_en}</span>
+                            <span className="flex-1 border-b border-neutral-300 text-red-500 font-bold pb-1 px-2" style={{ fontSize: `${16 * baseScale}px` }}>{data.date ? data.date.replace(/-/g, ' / ') : '202  /  / '}</span>
+                            <span className="min-w-fit">{labels.label_date_ku}</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-3 flex-shrink-0">
+                        <div className={`flex border-2 rounded overflow-hidden ${template_id === 'minimal' ? 'border' : ''}`} style={{ borderColor: primaryColor, width: `${(template_id === 'compact' ? 160 : 240) * baseScale}px` }}>
+                            <span className="flex-1 bg-white p-2 font-black text-center" style={{ fontSize: `${(template_id === 'compact' ? 14 : 18) * baseScale}px` }}>{data.amount_usd}</span>
+                            <span className="bg-neutral-100 flex items-center justify-center font-black" style={{ width: `${(template_id === 'compact' ? 60 : 100) * baseScale}px`, fontSize: `${(template_id === 'compact' ? 11 : 14) * baseScale}px` }}>{labels.label_usd_ku}</span>
+                        </div>
+                        <div className={`flex border-2 rounded overflow-hidden ${template_id === 'minimal' ? 'border' : ''}`} style={{ borderColor: primaryColor, width: `${(template_id === 'compact' ? 160 : 240) * baseScale}px` }}>
+                            <span className="flex-1 bg-white p-2 font-black text-center" style={{ fontSize: `${(template_id === 'compact' ? 14 : 18) * baseScale}px` }}>{data.amount_iqd}</span>
+                            <span className="bg-neutral-100 flex items-center justify-center font-black" style={{ width: `${(template_id === 'compact' ? 60 : 100) * baseScale}px`, fontSize: `${(template_id === 'compact' ? 11 : 14) * baseScale}px` }}>{labels.label_iqd_ku}</span>
+                        </div>
                     </div>
                 </div>
-                <div className={styles.headerCenter}>
-                    <div className={styles.logoCircle}>
-                        {data.logo_url ? (
-                            <img src={data.logo_url} alt="Logo" className={styles.uploadedLogo} />
-                        ) : (
-                            <div className={styles.logoIcon}>🪁</div>
+
+                {/* Body Content */}
+                <div className={`flex flex-col flex-1 w-full px-10 mt-8 gap-8 ${template_id === 'minimal' ? 'px-0' : ''}`} style={{ paddingTop: spacing.sectionV }}>
+                    <div className="flex items-end gap-3 w-full">
+                        <span className="min-w-fit font-bold" style={{ fontSize: `${14 * baseScale}px` }}>{labels.label_received_en}</span>
+                        <div className={`flex-1 font-bold pb-1 px-2 ${template_id === 'minimal' ? 'border-b border-primary-500' : 'border-b-2 border-dotted border-neutral-400'}`} style={{ fontSize: `${18 * baseScale}px` }}>{data.received_from}</div>
+                        <span className="min-w-fit font-bold" style={{ fontSize: `${14 * baseScale}px` }}>{labels.label_received_ku}</span>
+                    </div>
+                    <div className="flex items-end gap-3 w-full">
+                        <span className="min-w-fit font-bold" style={{ fontSize: `${14 * baseScale}px` }}>{labels.label_sum_en}</span>
+                        <div className={`flex-1 font-bold pb-1 px-2 ${template_id === 'minimal' ? 'border-b border-primary-500' : 'border-b-2 border-dotted border-neutral-400'}`} style={{ fontSize: `${18 * baseScale}px` }}>{data.sum_of}</div>
+                        <span className="min-w-fit font-bold" style={{ fontSize: `${14 * baseScale}px` }}>{labels.label_sum_ku}</span>
+                    </div>
+                    {data.details && (
+                        <div className="flex items-end gap-3 w-full">
+                            <span className="min-w-fit font-bold" style={{ fontSize: `${14 * baseScale}px` }}>{labels.label_details_en}</span>
+                            <div className={`flex-1 font-bold pb-1 px-2 ${template_id === 'minimal' ? 'border-b border-primary-500' : 'border-b-2 border-dotted border-neutral-400'}`} style={{ fontSize: `${18 * baseScale}px` }}>{data.details}</div>
+                            <span className="min-w-fit font-bold" style={{ fontSize: `${14 * baseScale}px` }}>{labels.label_details_ku}</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Signatures */}
+                <div className={`flex justify-between w-full px-10 mt-auto ${template_id === 'minimal' ? 'px-0 py-10' : ''}`} style={{ paddingTop: spacing.signatureV, paddingBottom: spacing.signatureV }}>
+                    <div className="text-center" style={{ width: `${220 * baseScale}px` }}>
+                        <div className="mb-2 border-b-2" style={{ height: `${(isSmall ? 30 : 50) * baseScale}px`, borderBottomColor: primaryColor }}></div>
+                        <span className="font-black uppercase tracking-wider" style={{ fontSize: `${13 * baseScale}px` }}>{labels.label_buyer_ku}</span>
+                    </div>
+                    <div className="text-center" style={{ width: `${220 * baseScale}px` }}>
+                        <div className="mb-2 border-b-2" style={{ height: `${(isSmall ? 30 : 50) * baseScale}px`, borderBottomColor: primaryColor }}></div>
+                        <span className="font-black uppercase tracking-wider" style={{ fontSize: `${13 * baseScale}px` }}>{labels.label_accountant_ku}</span>
+                    </div>
+                </div>
+
+                {/* Social Footer */}
+                {(data.social_links?.facebook || data.social_links?.instagram || data.social_links?.snapchat || data.social_links?.tiktok) && (
+                    <div className={`flex justify-center border-t border-neutral-100 w-full px-10 ${template_id === 'modern' ? 'bg-neutral-50' : ''}`} style={{ paddingTop: spacing.footerV, paddingBottom: spacing.footerV, gap: `${30 * baseScale}px` }}>
+                        {data.social_links?.facebook && (
+                            <div className="flex items-center gap-2 font-bold text-neutral-600" style={{ fontSize: `${12 * baseScale}px` }}>
+                                <Facebook size={14 * baseScale} />
+                                <span>{data.social_links.facebook}</span>
+                            </div>
+                        )}
+                        {data.social_links?.instagram && (
+                            <div className="flex items-center gap-2 font-bold text-neutral-600" style={{ fontSize: `${12 * baseScale}px` }}>
+                                <Instagram size={14 * baseScale} />
+                                <span>{data.social_links.instagram}</span>
+                            </div>
+                        )}
+                        {data.social_links?.snapchat && (
+                            <div className="flex items-center gap-2 font-bold text-neutral-600" style={{ fontSize: `${12 * baseScale}px` }}>
+                                <Snapchat size={14 * baseScale} />
+                                <span>{data.social_links.snapchat}</span>
+                            </div>
+                        )}
+                        {data.social_links?.tiktok && (
+                            <div className="flex items-center gap-2 font-bold text-neutral-600" style={{ fontSize: `${12 * baseScale}px` }}>
+                                <Music2 size={14 * baseScale} />
+                                <span>{data.social_links.tiktok}</span>
+                            </div>
                         )}
                     </div>
-                    <div className={styles.companyNameEn}>{labels.company_name_en}</div>
-                </div>
-                <div className={styles.headerRight}>
-                    <div className={styles.kurdishName}>
-                        {labels.company_prefix_ku}
-                        <span>{labels.company_name_ku}</span>
-                    </div>
-                </div>
-            </div>
+                )}
 
-            {/* Top Info Row */}
-            <div className={styles.receiptInfoRow}>
-                <div className={styles.infoLeft}>
-                    <div className={styles.infoField}>
-                        <span>{labels.label_no_en}</span>
-                        <span className={styles.fieldValue}>{data.receipt_no}</span>
-                        <span className={styles.fieldLabelAr}>{labels.label_no_ku}</span>
-                    </div>
-                    <div className={styles.infoField}>
-                        <span>{labels.label_date_en}</span>
-                        <span className={styles.fieldValue}>{data.date ? data.date.replace(/-/g, ' / ') : '202  /  / '}</span>
-                        <span className={styles.fieldLabelAr}>{labels.label_date_ku}</span>
-                    </div>
-                </div>
-                <div className={styles.infoRight}>
-                    <div className={styles.currencyBoxes}>
-                        <div className={styles.currencyBox}>
-                            <span className={styles.boxValue}>{data.amount_usd}</span>
-                            <span className={styles.boxLabel}>{labels.label_usd_ku}</span>
-                        </div>
-                        <div className={styles.currencyBox}>
-                            <span className={styles.boxValue}>{data.amount_iqd}</span>
-                            <span className={styles.boxLabel}>{labels.label_iqd_ku}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Body */}
-            <div className={styles.receiptBody}>
-                <div className={styles.dottedLineGroup}>
-                    <span className={styles.lineLabel}>{labels.label_received_en}</span>
-                    <div className={styles.dottedLine}>{data.received_from}</div>
-                    <span className={styles.lineLabelAr}>{labels.label_received_ku}</span>
-                </div>
-                <div className={styles.dottedLineGroup}>
-                    <span className={styles.lineLabel}>{labels.label_sum_en}</span>
-                    <div className={styles.dottedLine}>{data.sum_of}</div>
-                    <span className={styles.lineLabelAr}>{labels.label_sum_ku}</span>
-                </div>
-                {data.details && (
-                    <div className={styles.dottedLineGroup}>
-                        <span className={styles.lineLabel}>{labels.label_details_en}</span>
-                        <div className={styles.dottedLine}>{data.details}</div>
-                        <span className={styles.lineLabelAr}>{labels.label_details_ku}</span>
+                {/* Bottom Contact Bar */}
+                {(data.contact_info?.phone || data.contact_info?.email || data.contact_info?.address) && (
+                    <div
+                        className={`flex justify-between items-center px-10 w-full font-bold ${template_id === 'classic' ? 'text-white' : template_id === 'modern' ? 'bg-[#0f172a] text-white' : template_id === 'minimal' ? 'border-t-2 border-black mt-5 py-4 text-black' : ''}`}
+                        style={{
+                            paddingTop: spacing.footerV,
+                            paddingBottom: spacing.footerV,
+                            fontSize: `${11 * baseScale}px`,
+                            background: template_id === 'classic' ? primaryColor : undefined,
+                            borderColor: template_id === 'minimal' ? primaryColor : undefined
+                        }}
+                    >
+                        {data.contact_info?.phone && <div className="flex items-center gap-1.5"><Phone size={12 * baseScale} /> {data.contact_info.phone}</div>}
+                        {data.contact_info?.email && <div className="flex items-center gap-1.5"><Mail size={12 * baseScale} /> {data.contact_info.email}</div>}
+                        {data.contact_info?.address && <div className="flex items-center gap-1.5"><MapPin size={12 * baseScale} /> {data.contact_info.address}</div>}
                     </div>
                 )}
             </div>
-
-            {/* Signatures */}
-            <div className={styles.signatures}>
-                <div className={styles.sigBox}>
-                    <div className={styles.sigLine}></div>
-                    <span>{labels.label_buyer_ku}</span>
-                </div>
-                <div className={styles.sigBox}>
-                    <div className={styles.sigLine}></div>
-                    <span>{labels.label_accountant_ku}</span>
-                </div>
-            </div>
-
-            {/* Social Footer */}
-            {(data.social_links?.facebook || data.social_links?.instagram || data.social_links?.snapchat || data.social_links?.tiktok) && (
-                <div className={styles.socialFooter}>
-                    {data.social_links?.facebook && (
-                        <div className={styles.socialItem}>
-                            <Facebook size={14} className={styles.socialIcon} />
-                            <span>{data.social_links.facebook}</span>
-                        </div>
-                    )}
-                    {data.social_links?.instagram && (
-                        <div className={styles.socialItem}>
-                            <Instagram size={14} className={styles.socialIcon} />
-                            <span>{data.social_links.instagram}</span>
-                        </div>
-                    )}
-                    {data.social_links?.snapchat && (
-                        <div className={styles.socialItem}>
-                            <Snapchat size={14} className={styles.socialIcon} />
-                            <span>{data.social_links.snapchat}</span>
-                        </div>
-                    )}
-                    {data.social_links?.tiktok && (
-                        <div className={styles.socialItem}>
-                            <Music2 size={14} className={styles.socialIcon} />
-                            <span>{data.social_links.tiktok}</span>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* Bottom Bar */}
-            {(data.contact_info?.phone || data.contact_info?.email || data.contact_info?.address) && (
-                <div className={styles.bottomBar}>
-                    {data.contact_info?.phone && (
-                        <div className={styles.contactItem}>
-                            <Phone size={12} /> {data.contact_info.phone}
-                        </div>
-                    )}
-                    {data.contact_info?.email && (
-                        <div className={styles.contactItem}>
-                            <Mail size={12} /> {data.contact_info.email}
-                        </div>
-                    )}
-                    {data.contact_info?.address && (
-                        <div className={styles.contactItem}>
-                            <MapPin size={12} /> {data.contact_info.address}
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
-    );
+        );
+    };
 
     return (
 
-        <div className={styles.editor}>
-            <div className={styles.topBar}>
-                <button onClick={() => router.push('/dashboard/invoice-maker')} className={styles.backBtn}>
+        <div className="min-h-screen bg-neutral-50 flex flex-col">
+            {/* Top Bar */}
+            <div className="sticky top-0 z-[100] flex items-center justify-between gap-4 px-4 py-3 bg-white border-b border-neutral-200">
+                <button
+                    onClick={() => router.push('/dashboard/invoice-maker')}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-neutral-600 hover:bg-neutral-50 rounded-xl border border-neutral-200 transition-all active:scale-95"
+                >
                     <ChevronLeft size={18} />
                     Back
                 </button>
-                <h1>{invoice.name}</h1>
-                <div className={styles.actions}>
-                    <div className={styles.mobileToggle}>
+                <h1 className="flex-1 text-lg font-black text-neutral-900 truncate">
+                    {invoice.name}
+                </h1>
+                <div className="flex items-center gap-4">
+                    {/* Mobile View Toggle */}
+                    <div className="lg:hidden flex bg-neutral-100 p-1 rounded-xl border border-neutral-200">
                         <button
-                            className={`${styles.toggleBtn} ${mobileView === 'edit' ? styles.toggleActive : ''}`}
+                            className={`px-4 py-1.5 text-xs font-black rounded-lg transition-all ${mobileView === 'edit' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500'}`}
                             onClick={() => setMobileView('edit')}
                         >
                             Edit
                         </button>
                         <button
-                            className={`${styles.toggleBtn} ${mobileView === 'preview' ? styles.toggleActive : ''}`}
+                            className={`px-4 py-1.5 text-xs font-black rounded-lg transition-all ${mobileView === 'preview' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500'}`}
                             onClick={() => setMobileView('preview')}
                         >
                             Preview
                         </button>
                     </div>
-                    <span className={styles.saveStatus}>
-                        {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved ✓' : ''}
+
+                    <span className="text-xs font-black text-primary-600">
+                        {saveStatus === 'saving' ? (
+                            <span className="flex items-center gap-2">
+                                <Loader2 size={12} className="animate-spin" />
+                                Saving...
+                            </span>
+                        ) : saveStatus === 'saved' ? (
+                            <span className="flex items-center gap- gap-1">
+                                <Check size={12} />
+                                Saved
+                            </span>
+                        ) : ''}
                     </span>
-                    <button onClick={downloadDocx} className={styles.docxBtn}>
+
+                    <button
+                        onClick={downloadDocx}
+                        className="hidden sm:flex items-center gap-2 px-6 py-2 bg-white text-neutral-900 border border-neutral-200 rounded-xl text-sm font-black hover:bg-neutral-50 hover:border-primary-500 transition-all active:scale-95"
+                    >
                         <FileText size={18} />
                         DOCX
                     </button>
                     <PDFDownloadButton
                         document={<InvoicePDF invoice={invoice} labels={labels} brandColor={brandColor} />}
                         fileName={`invoice-${invoice.invoice_id || 'new'}.pdf`}
-                        className={styles.pdfBtn}
+                        className="hidden md:flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-xl text-sm font-black hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all active:scale-95"
                         label="HQ PDF"
                     />
-                    <button onClick={downloadInvoice} disabled={downloading} className={styles.downloadBtn}>
+                    <button
+                        onClick={downloadInvoice}
+                        disabled={downloading}
+                        className="flex items-center gap-2 px-6 py-2 bg-primary-600 text-white rounded-xl text-sm font-black hover:bg-primary-700 shadow-lg shadow-primary-600/20 transition-all active:scale-95 disabled:opacity-50"
+                    >
                         {downloading ? (
-                            'Preparing...'
+                            <Loader2 size={18} className="animate-spin" />
                         ) : (
                             <>
                                 <Download size={18} />
@@ -905,430 +1031,532 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                 </div>
             </div>
 
-            <div className={styles.container}>
+            <div className="container mx-auto px-4 py-8 max-w-[1800px] flex-1 grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-8">
                 {/* Form Side */}
-                <div className={`${styles.formSide} ${mobileView !== 'edit' ? styles.mobileHidden : ''}`}>
-                    <section className={styles.formSection}>
-                        <div className={styles.sectionHeader}>
-                            <Layout size={18} />
-                            <h3>Layout & Size</h3>
+                <div className={`flex flex-col gap-6 h-[calc(100vh-160px)] overflow-y-auto pr-2 custom-scrollbar ${mobileView !== 'edit' ? 'hidden lg:flex' : 'flex'}`}>
+                    {/* Layout & Size */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <Layout size={20} className="text-primary-500" />
+                            <h3 className="text-sm font-black uppercase tracking-wider">Layout & Size</h3>
                         </div>
-                        <div className={styles.field}>
-                            <label>Template Style</label>
-                            <div className={styles.templateSwitcher}>
-                                {TEMPLATES.map(t => (
-                                    <button
-                                        key={t.id}
-                                        className={`${styles.templateOption} ${invoice.template_id === t.id ? styles.templateActive : ''}`}
-                                        onClick={() => {
-                                            setInvoice(prev => ({ ...prev, template_id: t.id }));
-                                            setHasChanges(true);
-                                        }}
-                                    >
-                                        <span>{t.icon}</span>
-                                        {t.name}
-                                    </button>
-                                ))}
+
+                        <div className="space-y-6">
+                            <div className="flex flex-col gap-3">
+                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Template Style</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {TEMPLATES.map(t => (
+                                        <button
+                                            key={t.id}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${invoice.template_id === t.id ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-500 hover:border-neutral-300'}`}
+                                            onClick={() => {
+                                                setInvoice(prev => ({ ...prev, template_id: t.id }));
+                                                setHasChanges(true);
+                                            }}
+                                        >
+                                            <span className="text-2xl">{t.icon}</span>
+                                            <span className="text-[11px] font-black">{t.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                        <div className={styles.field}>
-                            <label>Page Size</label>
-                            <div className={styles.sizeSwitcher}>
-                                {SIZES.map(s => (
-                                    <button
-                                        key={s.id}
-                                        className={`${styles.sizeOption} ${data.page_size === s.id ? styles.sizeActive : ''}`}
-                                        onClick={() => updateField('page_size', s.id)}
-                                    >
-                                        <span className={styles.sizeName}>{s.id}</span>
-                                        <span className={styles.sizeDesc}>{s.desc}</span>
-                                    </button>
-                                ))}
+
+                            <div className="flex flex-col gap-3">
+                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Page Size</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {SIZES.map(s => (
+                                        <button
+                                            key={s.id}
+                                            className={`flex flex-col items-center gap-1 p-3 rounded-2xl border transition-all ${data.page_size === s.id ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-500 hover:border-neutral-300'}`}
+                                            onClick={() => updateField('page_size', s.id)}
+                                        >
+                                            <span className="text-sm font-black">{s.id}</span>
+                                            <span className="text-[10px] font-bold opacity-60 uppercase">{s.desc}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                        <div className={styles.field}>
-                            <label>Orientation</label>
-                            <div className={styles.sizeSwitcher}>
-                                {ORIENTATIONS.map(orient => (
-                                    <div
-                                        key={orient.id}
-                                        className={`${styles.sizeOption} ${data.orientation === orient.id ? styles.sizeActive : ''}`}
-                                        onClick={() => updateField('orientation', orient.id)}
-                                    >
-                                        <span>{orient.icon}</span>
-                                        <span className={styles.sizeName}>{orient.name}</span>
+
+                            <div className="flex flex-col gap-3">
+                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Orientation</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {ORIENTATIONS.map(orient => (
+                                        <button
+                                            key={orient.id}
+                                            className={`flex flex-col items-center gap-1 p-3 rounded-2xl border transition-all ${data.orientation === orient.id ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-500 hover:border-neutral-300'}`}
+                                            onClick={() => updateField('orientation', orient.id)}
+                                        >
+                                            <span className="text-xl">{orient.icon}</span>
+                                            <span className="text-sm font-black">{orient.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Primary Brand Color</label>
+                                <div className="flex items-center gap-3 p-3 bg-neutral-50 border border-neutral-100 rounded-2xl group hover:border-primary-300 transition-all">
+                                    <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-neutral-200">
+                                        <input
+                                            type="color"
+                                            value={data.primary_color || '#1e3a8a'}
+                                            onChange={e => updateField('primary_color', e.target.value)}
+                                            className="absolute inset-0 w-full h-full cursor-pointer scale-150"
+                                        />
                                     </div>
-                                ))}
+                                    <input
+                                        type="text"
+                                        value={data.primary_color || '#1e3a8a'}
+                                        onChange={e => updateField('primary_color', e.target.value)}
+                                        className="flex-1 bg-transparent border-none text-sm font-black text-neutral-900 focus:ring-0 uppercase font-mono"
+                                    />
+                                </div>
                             </div>
                         </div>
+                    </section>
 
-                        <div className={styles.field} style={{ marginTop: 'var(--space-4)' }}>
-                            <label>Primary Brand Color</label>
-                            <div className={styles.colorPickerContainer}>
-                                <input
-                                    type="color"
-                                    value={data.primary_color || '#1e3a8a'}
-                                    onChange={e => updateField('primary_color', e.target.value)}
-                                    className={styles.colorPicker}
-                                />
+                    {/* Labels & Text */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <Type size={20} className="text-primary-500" />
+                            <h3 className="text-sm font-black uppercase tracking-wider">Labels & Text</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Name (EN)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold placeholder:text-neutral-300 focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.company_name_en ?? ''}
+                                        onChange={e => updateField('labels.company_name_en', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.company_name_en}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Name (KU)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold placeholder:text-neutral-300 focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.company_name_ku ?? ''}
+                                        onChange={e => updateField('labels.company_name_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.company_name_ku}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Header Left 1</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.header_visa ?? ''}
+                                        onChange={e => updateField('labels.header_visa', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.header_visa}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Header Left 2</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.header_edu ?? ''}
+                                        onChange={e => updateField('labels.header_edu', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.header_edu}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Header Left 3</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.header_law ?? ''}
+                                        onChange={e => updateField('labels.header_law', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.header_law}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Prefix (KU)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.company_prefix_ku ?? ''}
+                                        onChange={e => updateField('labels.company_prefix_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.company_prefix_ku}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">USD Label</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.label_usd_ku ?? ''}
+                                        onChange={e => updateField('labels.label_usd_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_usd_ku}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">IQD Label</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.label_iqd_ku ?? ''}
+                                        onChange={e => updateField('labels.label_iqd_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_iqd_ku}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Received From (EN)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.label_received_en ?? ''}
+                                        onChange={e => updateField('labels.label_received_en', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_received_en}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Received From (KU)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.label_received_ku ?? ''}
+                                        onChange={e => updateField('labels.label_received_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_received_ku}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Sum Of Label (EN)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.label_sum_en ?? ''}
+                                        onChange={e => updateField('labels.label_sum_en', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_sum_en}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Sum Of Label (KU)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.label_sum_ku ?? ''}
+                                        onChange={e => updateField('labels.label_sum_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_sum_ku}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Details Label (EN)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.labels?.label_details_en ?? ''}
+                                        onChange={e => updateField('labels.label_details_en', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_details_en}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Details Label (KU)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.label_details_ku ?? ''}
+                                        onChange={e => updateField('labels.label_details_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_details_ku}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Buyer Signature Label</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.label_buyer_ku ?? ''}
+                                        onChange={e => updateField('labels.label_buyer_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_buyer_ku}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2 uppercase tracking-wider">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Accountant Signature Label</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.labels?.label_accountant_ku ?? ''}
+                                        onChange={e => updateField('labels.label_accountant_ku', e.target.value)}
+                                        placeholder={DEFAULT_LABELS.label_accountant_ku}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Logo & Branding */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <Plus size={20} className="text-primary-500" />
+                            <h3 className="text-sm font-black uppercase tracking-wider">Logo & Branding</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Logo</label>
+                                <div className="relative group">
+                                    {data.logo_url ? (
+                                        <div className="relative h-32 rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-50">
+                                            <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain p-4" />
+                                            <button
+                                                className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity active:scale-95"
+                                                onClick={() => updateField('logo_url', '')}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="relative flex flex-col items-center justify-center gap-3 p-8 bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-2xl hover:bg-neutral-100 hover:border-primary-300 transition-all cursor-pointer">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    try {
+                                                        const publicUrl = await uploadImage(file, { folder: 'invoice-logos', type: 'logo' });
+                                                        if (publicUrl) {
+                                                            updateField('logo_url', publicUrl);
+                                                        }
+                                                    } catch (err) {
+                                                        console.error('Logo upload failed:', err);
+                                                    }
+                                                }}
+                                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                            />
+                                            <Download className="text-neutral-300 group-hover:text-primary-500 transition-colors" size={32} />
+                                            <span className="text-xs font-bold text-neutral-500">Upload Logo</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Basic Info */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <FileText size={20} className="text-primary-500" />
+                            <h3 className="text-sm font-black uppercase tracking-wider">Basic Info</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Receipt No / ژمارە</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.receipt_no || ''}
+                                        onChange={e => updateField('receipt_no', e.target.value)}
+                                        placeholder="001"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Date / بەروار</label>
+                                    <input
+                                        type="date"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.date || ''}
+                                        onChange={e => updateField('date', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Amounts */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <span className="text-xl">💰</span>
+                            <h3 className="text-sm font-black uppercase tracking-wider">Amounts</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">USD Amount</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.amount_usd || ''}
+                                        onChange={e => updateField('amount_usd', e.target.value)}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">IQD Amount</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                        value={data.amount_iqd || ''}
+                                        onChange={e => updateField('amount_iqd', e.target.value)}
+                                        placeholder="0"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Content */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <Type size={20} className="text-primary-500" />
+                            <h3 className="text-sm font-black uppercase tracking-wider">Content</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex flex-col gap-2 text-right">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Received From / وەرگیرا لە</label>
                                 <input
                                     type="text"
-                                    value={data.primary_color || '#1e3a8a'}
-                                    onChange={e => updateField('primary_color', e.target.value)}
-                                    className={styles.colorInput}
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                    value={data.received_from || ''}
+                                    onChange={e => updateField('received_from', e.target.value)}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2 text-right">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Sum Of / بڕی</label>
+                                <input
+                                    type="text"
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
+                                    value={data.sum_of || ''}
+                                    onChange={e => updateField('sum_of', e.target.value)}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2 text-right">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Details / تێبینی</label>
+                                <textarea
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none resize-none text-right"
+                                    value={data.details || ''}
+                                    onChange={e => updateField('details', e.target.value)}
+                                    rows={3}
                                 />
                             </div>
                         </div>
                     </section>
 
-                    <section className={styles.formSection}>
-                        <div className={styles.sectionHeader}>
-                            <Type size={18} />
-                            <h3>Labels & Text</h3>
-                        </div>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Company Name (EN)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.company_name_en ?? ''}
-                                    onChange={e => updateField('labels.company_name_en', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.company_name_en}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Company Name (KU)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.company_name_ku ?? ''}
-                                    onChange={e => updateField('labels.company_name_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.company_name_ku}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Header Left 1</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.header_visa ?? ''}
-                                    onChange={e => updateField('labels.header_visa', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.header_visa}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Header Left 2</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.header_edu ?? ''}
-                                    onChange={e => updateField('labels.header_edu', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.header_edu}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Header Left 3</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.header_law ?? ''}
-                                    onChange={e => updateField('labels.header_law', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.header_law}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Company Prefix (KU)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.company_prefix_ku ?? ''}
-                                    onChange={e => updateField('labels.company_prefix_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.company_prefix_ku}
-                                />
-                            </div>
+                    {/* Contact & Socials */}
+                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm mb-8">
+                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
+                            <Phone size={20} className="text-primary-500" />
+                            <h3 className="text-sm font-black uppercase tracking-wider">Contact & Socials</h3>
                         </div>
 
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>USD Label</label>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Phone</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.contact_info?.phone || ''}
+                                        onChange={e => updateField('contact_info.phone', e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Email</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.contact_info?.email || ''}
+                                        onChange={e => updateField('contact_info.email', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Address</label>
                                 <input
                                     type="text"
-                                    value={data.labels?.label_usd_ku ?? ''}
-                                    onChange={e => updateField('labels.label_usd_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_usd_ku}
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                    value={data.contact_info?.address || ''}
+                                    onChange={e => updateField('contact_info.address', e.target.value)}
                                 />
                             </div>
-                            <div className={styles.field}>
-                                <label>IQD Label</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_iqd_ku ?? ''}
-                                    onChange={e => updateField('labels.label_iqd_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_iqd_ku}
-                                />
-                            </div>
-                        </div>
 
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Received From Label (EN)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_received_en ?? ''}
-                                    onChange={e => updateField('labels.label_received_en', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_received_en}
-                                />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Facebook</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.social_links?.facebook || ''}
+                                        onChange={e => updateField('social_links.facebook', e.target.value)}
+                                        placeholder="@username"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Instagram</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.social_links?.instagram || ''}
+                                        onChange={e => updateField('social_links.instagram', e.target.value)}
+                                        placeholder="@username"
+                                    />
+                                </div>
                             </div>
-                            <div className={styles.field}>
-                                <label>Received From Label (KU)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_received_ku ?? ''}
-                                    onChange={e => updateField('labels.label_received_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_received_ku}
-                                />
-                            </div>
-                        </div>
 
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Sum Of Label (EN)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_sum_en ?? ''}
-                                    onChange={e => updateField('labels.label_sum_en', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_sum_en}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Sum Of Label (KU)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_sum_ku ?? ''}
-                                    onChange={e => updateField('labels.label_sum_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_sum_ku}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Details Label (EN)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_details_en ?? ''}
-                                    onChange={e => updateField('labels.label_details_en', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_details_en}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Details Label (KU)</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_details_ku ?? ''}
-                                    onChange={e => updateField('labels.label_details_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_details_ku}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Buyer Signature Label</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_buyer_ku ?? ''}
-                                    onChange={e => updateField('labels.label_buyer_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_buyer_ku}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Accountant Signature Label</label>
-                                <input
-                                    type="text"
-                                    value={data.labels?.label_accountant_ku ?? ''}
-                                    onChange={e => updateField('labels.label_accountant_ku', e.target.value)}
-                                    placeholder={DEFAULT_LABELS.label_accountant_ku}
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className={styles.formSection}>
-                        <h3>Logo & Branding</h3>
-                        <div className={styles.field}>
-                            <label>Company Logo</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (!file) return;
-                                    try {
-                                        const publicUrl = await uploadImage(file, { folder: 'invoice-logos', type: 'logo' });
-                                        if (publicUrl) {
-                                            updateField('logo_url', publicUrl);
-                                        }
-                                    } catch (err) {
-                                        console.error('Logo upload failed:', err);
-                                    }
-                                }}
-                            />
-                        </div>
-                    </section>
-
-                    <section className={styles.formSection}>
-                        <h3>Basic Info</h3>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Receipt No / ژمارە</label>
-                                <input
-                                    type="text"
-                                    value={data.receipt_no || ''}
-                                    onChange={e => updateField('receipt_no', e.target.value)}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Date / بەروار</label>
-                                <input
-                                    type="date"
-                                    value={data.date || ''}
-                                    onChange={e => updateField('date', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className={styles.formSection}>
-                        <h3>Amounts</h3>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>USD Amount</label>
-                                <input
-                                    type="text"
-                                    value={data.amount_usd || ''}
-                                    onChange={e => updateField('amount_usd', e.target.value)}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>IQD Amount</label>
-                                <input
-                                    type="text"
-                                    value={data.amount_iqd || ''}
-                                    onChange={e => updateField('amount_iqd', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className={styles.formSection}>
-                        <h3>Content</h3>
-                        <div className={styles.field}>
-                            <label>Received From / وەرگیرا لە</label>
-                            <input
-                                type="text"
-                                value={data.received_from || ''}
-                                onChange={e => updateField('received_from', e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.field}>
-                            <label>Sum Of / بڕی</label>
-                            <input
-                                type="text"
-                                value={data.sum_of || ''}
-                                onChange={e => updateField('sum_of', e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.field}>
-                            <label>Details / تێبینی</label>
-                            <textarea
-                                value={data.details || ''}
-                                onChange={e => updateField('details', e.target.value)}
-                                rows={3}
-                            />
-                        </div>
-                    </section>
-
-                    <section className={styles.formSection}>
-                        <h3>Contact & Socials</h3>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Phone</label>
-                                <input
-                                    type="text"
-                                    value={data.contact_info?.phone || ''}
-                                    onChange={e => updateField('contact_info.phone', e.target.value)}
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Email</label>
-                                <input
-                                    type="text"
-                                    value={data.contact_info?.email || ''}
-                                    onChange={e => updateField('contact_info.email', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.field}>
-                            <label>Address</label>
-                            <input
-                                type="text"
-                                value={data.contact_info?.address || ''}
-                                onChange={e => updateField('contact_info.address', e.target.value)}
-                            />
-                        </div>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Facebook</label>
-                                <input
-                                    type="text"
-                                    value={data.social_links?.facebook || ''}
-                                    onChange={e => updateField('social_links.facebook', e.target.value)}
-                                    placeholder="@username"
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>Instagram</label>
-                                <input
-                                    type="text"
-                                    value={data.social_links?.instagram || ''}
-                                    onChange={e => updateField('social_links.instagram', e.target.value)}
-                                    placeholder="@username"
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.grid}>
-                            <div className={styles.field}>
-                                <label>Snapchat</label>
-                                <input
-                                    type="text"
-                                    value={data.social_links?.snapchat || ''}
-                                    onChange={e => updateField('social_links.snapchat', e.target.value)}
-                                    placeholder="@username"
-                                />
-                            </div>
-                            <div className={styles.field}>
-                                <label>TikTok</label>
-                                <input
-                                    type="text"
-                                    value={data.social_links?.tiktok || ''}
-                                    onChange={e => updateField('social_links.tiktok', e.target.value)}
-                                    placeholder="@username"
-                                />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Snapchat</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.social_links?.snapchat || ''}
+                                        onChange={e => updateField('social_links.snapchat', e.target.value)}
+                                        placeholder="@username"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">TikTok</label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                        value={data.social_links?.tiktok || ''}
+                                        onChange={e => updateField('social_links.tiktok', e.target.value)}
+                                        placeholder="@username"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </section>
                 </div>
 
-
-
-
                 {/* Preview Side */}
-                <div className={`${styles.previewSide} ${mobileView !== 'preview' ? styles.mobileHidden : ''}`} ref={containerRef}>
+                <div
+                    className={`bg-neutral-100 rounded-[2.5rem] border border-neutral-200 shadow-inner overflow-hidden flex flex-col items-center justify-start p-4 sm:p-8 min-h-[600px] lg:h-[calc(100vh-160px)] sticky top-32 ${mobileView !== 'preview' ? 'hidden lg:flex' : 'flex'}`}
+                    ref={containerRef}
+                >
                     <div
-                        className={styles.previewContainer}
+                        className="bg-white shadow-2xl origin-top transition-transform duration-300 ease-out"
                         style={{
                             transform: `scale(${previewScale})`,
-                            transformOrigin: 'top center'
                         }}
                     >
                         <InvoiceContent data={data} labels={labels} template_id={invoice.template_id} contentRef={previewRef} />
@@ -1336,8 +1564,10 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                 </div>
             </div>
 
-            <div className={styles.exportWrapper}>
-                <InvoiceContent data={data} labels={labels} template_id={invoice.template_id} isExport={true} contentRef={exportRef} />
+            <div className="fixed inset-0 pointer-events-none opacity-0 overflow-hidden flex items-start justify-center">
+                <div className="bg-white">
+                    <InvoiceContent data={data} labels={labels} template_id={invoice.template_id} isExport={true} contentRef={exportRef} />
+                </div>
             </div>
         </div>
     );

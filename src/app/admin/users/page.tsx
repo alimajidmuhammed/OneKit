@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { formatDate, getInitials } from '@/lib/utils/helpers';
-import styles from './users.module.css';
+import { Search, Edit3, XCircle, CheckCircle2, Users, X, Loader2 } from 'lucide-react';
 
 export default function UsersPage() {
     const { users, loading, fetchUsers, updateUserRole, toggleUserStatus } = useAdmin();
@@ -35,39 +35,44 @@ export default function UsersPage() {
         await toggleUserStatus(userId, !currentStatus);
     };
 
+    const getRoleBadgeClass = (role) => {
+        switch (role) {
+            case 'super_admin': return 'bg-purple-500/10 text-purple-400';
+            case 'admin': return 'bg-blue-500/10 text-blue-400';
+            default: return 'bg-neutral-700 text-neutral-400';
+        }
+    };
+
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
+        <div className="p-4 sm:p-8 max-w-[1400px]">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1>User Management</h1>
-                    <p>Manage all registered users and their roles</p>
+                    <h1 className="text-2xl font-bold text-white mb-2">User Management</h1>
+                    <p className="text-neutral-400">Manage all registered users and their roles</p>
                 </div>
-                <div className={styles.stats}>
-                    <div className={styles.statBadge}>
-                        <span>{users.length}</span> Total Users
-                    </div>
+                <div className="px-4 py-2 bg-primary-500/10 text-primary-400 rounded-full text-sm font-medium">
+                    <span className="font-bold">{users.length}</span> Total Users
                 </div>
             </div>
 
             {/* Filters */}
-            <div className={styles.filters}>
-                <div className={styles.searchBox}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-                        <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
                     <input
                         type="text"
                         placeholder="Search users..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-neutral-900 border border-neutral-800 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500 transition-colors"
                     />
                 </div>
 
                 <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                    className={styles.filterSelect}
+                    className="px-4 py-3 bg-neutral-900 border border-neutral-800 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
                 >
                     <option value="all">All Roles</option>
                     <option value="user">User</option>
@@ -77,178 +82,153 @@ export default function UsersPage() {
             </div>
 
             {/* Users Table */}
-            <div className={styles.tableContainer}>
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
                 {loading ? (
-                    <div className={styles.loading}>
-                        <div className={styles.spinner} />
+                    <div className="flex justify-center p-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
                     </div>
                 ) : filteredUsers.length > 0 ? (
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Joined</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredUsers.map((user) => (
-                                <tr key={user.id}>
-                                    <td>
-                                        <div className={styles.userCell}>
-                                            <div className={styles.avatar}>
-                                                {user.avatar_url ? (
-                                                    <img src={user.avatar_url} alt={user.full_name} />
-                                                ) : (
-                                                    <span>{getInitials(user.full_name || user.email)}</span>
-                                                )}
-                                            </div>
-                                            <div className={styles.userInfo}>
-                                                <span className={styles.userName}>{user.full_name || 'No name'}</span>
-                                                <span className={styles.userEmail}>{user.email}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className={`${styles.roleBadge} ${styles[`role_${user.role}`]}`}>
-                                            {user.role?.replace('_', ' ')}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span className={`${styles.statusBadge} ${user.is_active ? styles.statusActive : styles.statusInactive}`}>
-                                            {user.is_active ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </td>
-                                    <td className={styles.dateCell}>
-                                        {formatDate(user.created_at)}
-                                    </td>
-                                    <td>
-                                        <div className={styles.actions}>
-                                            <button
-                                                className={styles.actionBtn}
-                                                onClick={() => {
-                                                    setSelectedUser(user);
-                                                    setShowModal(true);
-                                                }}
-                                                title="Edit Role"
-                                            >
-                                                <svg viewBox="0 0 24 24" fill="none">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                </svg>
-                                            </button>
-                                            <button
-                                                className={`${styles.actionBtn} ${user.is_active ? styles.actionBtnDanger : styles.actionBtnSuccess}`}
-                                                onClick={() => handleStatusToggle(user.id, user.is_active)}
-                                                title={user.is_active ? 'Deactivate' : 'Activate'}
-                                            >
-                                                {user.is_active ? (
-                                                    <svg viewBox="0 0 24 24" fill="none">
-                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                                        <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                    </svg>
-                                                ) : (
-                                                    <svg viewBox="0 0 24 24" fill="none">
-                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                    </svg>
-                                                )}
-                                            </button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-neutral-800/50">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">User</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Role</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Status</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Joined</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-800">
+                                {filteredUsers.map((user) => (
+                                    <tr key={user.id} className="hover:bg-neutral-800/30 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-semibold text-sm overflow-hidden flex-shrink-0">
+                                                    {user.avatar_url ? (
+                                                        <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span>{getInitials(user.full_name || user.email)}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="font-medium text-white truncate">{user.full_name || 'No name'}</span>
+                                                    <span className="text-sm text-neutral-500 truncate">{user.email}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${getRoleBadgeClass(user.role)}`}>
+                                                {user.role?.replace('_', ' ')}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${user.is_active
+                                                    ? 'bg-green-500/10 text-green-400'
+                                                    : 'bg-red-500/10 text-red-400'
+                                                }`}>
+                                                {user.is_active ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-neutral-400">
+                                            {formatDate(user.created_at)}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors"
+                                                    onClick={() => {
+                                                        setSelectedUser(user);
+                                                        setShowModal(true);
+                                                    }}
+                                                    title="Edit Role"
+                                                >
+                                                    <Edit3 size={16} />
+                                                </button>
+                                                <button
+                                                    className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${user.is_active
+                                                            ? 'text-neutral-400 hover:bg-red-500/10 hover:text-red-400'
+                                                            : 'text-neutral-400 hover:bg-green-500/10 hover:text-green-400'
+                                                        }`}
+                                                    onClick={() => handleStatusToggle(user.id, user.is_active)}
+                                                    title={user.is_active ? 'Deactivate' : 'Activate'}
+                                                >
+                                                    {user.is_active ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
-                    <div className={styles.emptyState}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2" />
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                        </svg>
-                        <h3>No users found</h3>
-                        <p>Try adjusting your search or filters</p>
+                    <div className="py-16 text-center">
+                        <Users className="w-12 h-12 mx-auto text-neutral-600 mb-4" />
+                        <h3 className="text-lg font-semibold text-white mb-2">No users found</h3>
+                        <p className="text-neutral-500">Try adjusting your search or filters</p>
                     </div>
                 )}
             </div>
 
             {/* Edit Role Modal */}
             {showModal && selectedUser && (
-                <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
-                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h2>Edit User Role</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                </svg>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+                    <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+                            <h2 className="text-lg font-semibold text-white">Edit User Role</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors" onClick={() => setShowModal(false)}>
+                                <X size={20} />
                             </button>
                         </div>
 
-                        <div className={styles.modalBody}>
-                            <div className={styles.userPreview}>
-                                <div className={styles.avatar}>
-                                    <span>{getInitials(selectedUser.full_name || selectedUser.email)}</span>
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 p-4 bg-neutral-800/50 rounded-xl mb-6">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-semibold">
+                                    {getInitials(selectedUser.full_name || selectedUser.email)}
                                 </div>
-                                <div>
-                                    <span className={styles.userName}>{selectedUser.full_name || 'No name'}</span>
-                                    <span className={styles.userEmail}>{selectedUser.email}</span>
+                                <div className="flex flex-col">
+                                    <span className="font-medium text-white">{selectedUser.full_name || 'No name'}</span>
+                                    <span className="text-sm text-neutral-500">{selectedUser.email}</span>
                                 </div>
                             </div>
 
-                            <div className={styles.roleOptions}>
-                                <label className={styles.roleOption}>
-                                    <input
-                                        type="radio"
-                                        name="role"
-                                        value="user"
-                                        checked={selectedUser.role === 'user'}
-                                        onChange={() => setSelectedUser({ ...selectedUser, role: 'user' })}
-                                    />
-                                    <div className={styles.roleOptionContent}>
-                                        <span className={styles.roleOptionTitle}>User</span>
-                                        <span className={styles.roleOptionDesc}>Standard user with access to subscribed services</span>
-                                    </div>
-                                </label>
-
-                                <label className={styles.roleOption}>
-                                    <input
-                                        type="radio"
-                                        name="role"
-                                        value="admin"
-                                        checked={selectedUser.role === 'admin'}
-                                        onChange={() => setSelectedUser({ ...selectedUser, role: 'admin' })}
-                                    />
-                                    <div className={styles.roleOptionContent}>
-                                        <span className={styles.roleOptionTitle}>Admin</span>
-                                        <span className={styles.roleOptionDesc}>Can manage users, subscriptions, and payments</span>
-                                    </div>
-                                </label>
-
-                                <label className={styles.roleOption}>
-                                    <input
-                                        type="radio"
-                                        name="role"
-                                        value="super_admin"
-                                        checked={selectedUser.role === 'super_admin'}
-                                        onChange={() => setSelectedUser({ ...selectedUser, role: 'super_admin' })}
-                                    />
-                                    <div className={styles.roleOptionContent}>
-                                        <span className={styles.roleOptionTitle}>Super Admin</span>
-                                        <span className={styles.roleOptionDesc}>Full access to all features and settings</span>
-                                    </div>
-                                </label>
+                            <div className="space-y-3">
+                                {['user', 'admin', 'super_admin'].map((role) => (
+                                    <label key={role} className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${selectedUser.role === role
+                                            ? 'border-primary-500 bg-primary-500/5'
+                                            : 'border-neutral-800 hover:border-neutral-700'
+                                        }`}>
+                                        <input
+                                            type="radio"
+                                            name="role"
+                                            value={role}
+                                            checked={selectedUser.role === role}
+                                            onChange={() => setSelectedUser({ ...selectedUser, role })}
+                                            className="mt-1 accent-primary-500"
+                                        />
+                                        <div className="flex flex-col">
+                                            <span className="font-medium text-white capitalize">{role.replace('_', ' ')}</span>
+                                            <span className="text-sm text-neutral-500">
+                                                {role === 'user' && 'Standard user with access to subscribed services'}
+                                                {role === 'admin' && 'Can manage users, subscriptions, and payments'}
+                                                {role === 'super_admin' && 'Full access to all features and settings'}
+                                            </span>
+                                        </div>
+                                    </label>
+                                ))}
                             </div>
                         </div>
 
-                        <div className={styles.modalFooter}>
-                            <button className={styles.cancelBtn} onClick={() => setShowModal(false)}>
+                        <div className="flex gap-3 px-6 py-4 border-t border-neutral-800">
+                            <button
+                                className="flex-1 px-4 py-3 bg-neutral-800 text-white rounded-lg font-medium hover:bg-neutral-700 transition-colors"
+                                onClick={() => setShowModal(false)}
+                            >
                                 Cancel
                             </button>
                             <button
-                                className={styles.saveBtn}
+                                className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
                                 onClick={() => handleRoleChange(selectedUser.id, selectedUser.role)}
                             >
                                 Save Changes

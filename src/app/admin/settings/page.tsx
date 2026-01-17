@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { APP_CONFIG } from '@/lib/utils/constants';
-import styles from './settings.module.css';
+import { CheckCircle, Loader2 } from 'lucide-react';
 
 export default function AdminSettingsPage() {
     const [settings, setSettings] = useState({
@@ -20,7 +20,6 @@ export default function AdminSettingsPage() {
 
     const handleSave = async () => {
         setLoading(true);
-        // Simulate save
         await new Promise(resolve => setTimeout(resolve, 1000));
         setSuccess(true);
         setLoading(false);
@@ -28,136 +27,143 @@ export default function AdminSettingsPage() {
     };
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
-                <h1>Settings</h1>
-                <p>Configure your platform settings</p>
+        <div className="p-4 sm:p-8 max-w-[1000px]">
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-2xl font-bold text-white mb-2">Settings</h1>
+                <p className="text-neutral-400">Configure your platform settings</p>
             </div>
 
-            <div className={styles.content}>
+            <div className="space-y-6">
                 {success && (
-                    <div className={styles.successMessage}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                            <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
+                    <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded-xl text-green-400">
+                        <CheckCircle size={20} />
                         Settings saved successfully!
                     </div>
                 )}
 
                 {/* General Settings */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>General</h2>
-                        <p>Basic platform information</p>
+                <section className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-neutral-800">
+                        <h2 className="text-lg font-semibold text-white">General</h2>
+                        <p className="text-sm text-neutral-400">Basic platform information</p>
                     </div>
 
-                    <div className={styles.formGrid}>
-                        <div className={styles.formGroup}>
-                            <label>Site Name</label>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Site Name</label>
                             <input
                                 type="text"
                                 value={settings.siteName}
                                 onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                             />
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Tagline</label>
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Tagline</label>
                             <input
                                 type="text"
                                 value={settings.tagline}
                                 onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                             />
                         </div>
                     </div>
                 </section>
 
                 {/* WhatsApp Settings */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>WhatsApp Integration</h2>
-                        <p>Configure WhatsApp for payment communication</p>
+                <section className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-neutral-800">
+                        <h2 className="text-lg font-semibold text-white">WhatsApp Integration</h2>
+                        <p className="text-sm text-neutral-400">Configure WhatsApp for payment communication</p>
                     </div>
 
-                    <div className={styles.formGrid}>
-                        <div className={styles.formGroup}>
-                            <label>WhatsApp Number</label>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">WhatsApp Number</label>
                             <input
                                 type="text"
                                 value={settings.whatsappNumber}
                                 onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                                 placeholder="+964XXXXXXXXXX"
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500"
                             />
-                            <span className={styles.formHelper}>Include country code (e.g., +964)</span>
+                            <span className="text-xs text-neutral-500 mt-1 block">Include country code (e.g., +964)</span>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Default Message</label>
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Default Message</label>
                             <textarea
                                 value={settings.defaultMessage}
                                 onChange={(e) => setSettings({ ...settings, defaultMessage: e.target.value })}
                                 rows={3}
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 resize-none"
                             />
                         </div>
                     </div>
                 </section>
 
                 {/* Pricing Settings */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Pricing</h2>
-                        <p>Default pricing for services</p>
+                <section className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-neutral-800">
+                        <h2 className="text-lg font-semibold text-white">Pricing</h2>
+                        <p className="text-sm text-neutral-400">Default pricing for services</p>
                     </div>
 
-                    <div className={styles.formGrid}>
-                        <div className={styles.formGroup}>
-                            <label>Currency</label>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Currency</label>
                             <select
                                 value={settings.currency}
                                 onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
                             >
                                 <option value="IQD">IQD - Iraqi Dinar</option>
                                 <option value="USD">USD - US Dollar</option>
                             </select>
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Monthly Price (Default)</label>
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Monthly Price (Default)</label>
                             <input
                                 type="number"
                                 value={settings.monthlyPrice}
                                 onChange={(e) => setSettings({ ...settings, monthlyPrice: Number(e.target.value) })}
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                             />
                         </div>
 
-                        <div className={styles.formGroup}>
-                            <label>Yearly Price (Default)</label>
+                        <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Yearly Price (Default)</label>
                             <input
                                 type="number"
                                 value={settings.yearlyPrice}
                                 onChange={(e) => setSettings({ ...settings, yearlyPrice: Number(e.target.value) })}
+                                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                             />
                         </div>
                     </div>
                 </section>
 
                 {/* Database Info */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Database</h2>
-                        <p>Supabase connection information</p>
+                <section className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-neutral-800">
+                        <h2 className="text-lg font-semibold text-white">Database</h2>
+                        <p className="text-sm text-neutral-400">Supabase connection information</p>
                     </div>
 
-                    <div className={styles.infoGrid}>
-                        <div className={styles.infoItem}>
-                            <span className={styles.infoLabel}>Project URL</span>
-                            <code className={styles.infoValue}>{process.env.NEXT_PUBLIC_SUPABASE_URL || 'Not configured'}</code>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <span className="text-sm text-neutral-500 block mb-1">Project URL</span>
+                            <code className="block px-3 py-2 bg-neutral-800 rounded text-sm text-neutral-300 overflow-x-auto">
+                                {process.env.NEXT_PUBLIC_SUPABASE_URL || 'Not configured'}
+                            </code>
                         </div>
-                        <div className={styles.infoItem}>
-                            <span className={styles.infoLabel}>Status</span>
-                            <span className={`${styles.statusBadge} ${styles.statusConnected}`}>
-                                <span className={styles.statusDot}></span>
+                        <div>
+                            <span className="text-sm text-neutral-500 block mb-1">Status</span>
+                            <span className="inline-flex items-center gap-2 px-3 py-2 bg-green-500/10 text-green-400 rounded-lg text-sm">
+                                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                                 Connected
                             </span>
                         </div>
@@ -165,12 +171,13 @@ export default function AdminSettingsPage() {
                 </section>
 
                 {/* Actions */}
-                <div className={styles.actions}>
+                <div className="flex justify-end">
                     <button
-                        className={styles.saveBtn}
+                        className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                         onClick={handleSave}
                         disabled={loading}
                     >
+                        {loading && <Loader2 size={18} className="animate-spin" />}
                         {loading ? 'Saving...' : 'Save Settings'}
                     </button>
                 </div>

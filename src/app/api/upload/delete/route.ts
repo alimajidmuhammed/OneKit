@@ -1,21 +1,28 @@
-'use server';
-
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { deleteFromR2, extractObjectKey } from '@/lib/storage/r2';
 
+interface DeleteRequest {
+    url: string;
+}
+
+interface DeleteResponse {
+    success?: boolean;
+    error?: string;
+}
+
 /**
- * DELETE /api/upload
+ * DELETE /api/upload/delete
  * Delete an image from R2 storage
  */
-export async function DELETE(request) {
+export async function DELETE(request: NextRequest): Promise<NextResponse<DeleteResponse>> {
     try {
         // Get the authenticated user
         const cookieStore = await cookies();
         const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
                 cookies: {
                     getAll() {
@@ -35,9 +42,9 @@ export async function DELETE(request) {
         }
 
         // Get the URL to delete from request body
-        const { url } = await request.json();
+        const body: DeleteRequest = await request.json();
 
-        if (!url) {
+        if (!body.url) {
             return NextResponse.json(
                 { error: 'Missing URL' },
                 { status: 400 }
@@ -45,7 +52,7 @@ export async function DELETE(request) {
         }
 
         // Extract the object key from the URL
-        const objectKey = extractObjectKey(url);
+        const objectKey = extractObjectKey(body.url);
 
         if (!objectKey) {
             return NextResponse.json(

@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { formatDate, formatCurrency, getDaysRemaining, getInitials } from '@/lib/utils/helpers';
-import styles from './subscriptions.module.css';
+import { Search, Plus, X, Users, XCircle, Loader2 } from 'lucide-react';
 
 export default function SubscriptionsPage() {
     const {
@@ -20,7 +20,6 @@ export default function SubscriptionsPage() {
     } = useAdmin();
 
     const [services, setServices] = useState([]);
-    const [viewMode, setViewMode] = useState('users'); // 'users' or 'subscriptions'
     const [dateFilter, setDateFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
@@ -29,7 +28,6 @@ export default function SubscriptionsPage() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [processing, setProcessing] = useState(false);
 
-    // Create/Extend form state
     const [formData, setFormData] = useState({
         service_id: '',
         plan_type: 'monthly',
@@ -49,7 +47,6 @@ export default function SubscriptionsPage() {
         setServices(data || []);
     };
 
-    // Build user subscription map
     const userSubscriptionMap = useMemo(() => {
         const map = {};
         subscriptions.forEach(sub => {
@@ -61,7 +58,6 @@ export default function SubscriptionsPage() {
         return map;
     }, [subscriptions]);
 
-    // Get user subscription status summary
     const getUserStatus = (userId) => {
         const userSubs = userSubscriptionMap[userId] || [];
         if (userSubs.length === 0) return { status: 'no_subscription', label: 'No Subscription', color: 'neutral' };
@@ -71,7 +67,6 @@ export default function SubscriptionsPage() {
         const pendingSubs = userSubs.filter(s => s.status === 'pending');
 
         if (activeSubs.length > 0) {
-            // Check for trial (less than 7 days remaining could indicate trial)
             const nearestExpiry = activeSubs
                 .filter(s => s.expires_at)
                 .sort((a, b) => new Date(a.expires_at) - new Date(b.expires_at))[0];
@@ -89,14 +84,12 @@ export default function SubscriptionsPage() {
         return { status: 'inactive', label: 'Inactive', color: 'neutral' };
     };
 
-    // Filter users
     const filteredUsers = useMemo(() => {
         const now = new Date();
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
         return users.filter(user => {
-            // Date filter (by user registration date)
             let matchesDate = true;
             if (dateFilter === '7days') {
                 matchesDate = new Date(user.created_at) >= sevenDaysAgo;
@@ -104,7 +97,6 @@ export default function SubscriptionsPage() {
                 matchesDate = new Date(user.created_at) >= thirtyDaysAgo;
             }
 
-            // Search filter
             const matchesSearch =
                 user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 user.email?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -119,7 +111,6 @@ export default function SubscriptionsPage() {
         return date.toISOString().slice(0, 16);
     };
 
-    // Calculate default expiry based on plan type
     const getDefaultExpiry = (planType) => {
         const now = new Date();
         switch (planType) {
@@ -133,7 +124,7 @@ export default function SubscriptionsPage() {
                 now.setDate(now.getDate() + 7);
                 break;
             case 'lifetime':
-                return ''; // No expiry for lifetime
+                return '';
             default:
                 now.setMonth(now.getMonth() + 1);
         }
@@ -178,7 +169,7 @@ export default function SubscriptionsPage() {
             plan_type: formData.plan_type,
             status: formData.status,
             starts_at: formData.starts_at ? new Date(formData.starts_at).toISOString() : new Date().toISOString(),
-            expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : (formData.plan_type === 'lifetime' ? null : null),
+            expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
         });
 
         if (error) {
@@ -199,7 +190,7 @@ export default function SubscriptionsPage() {
             plan_type: formData.plan_type,
             status: formData.status,
             starts_at: formData.starts_at ? new Date(formData.starts_at).toISOString() : null,
-            expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : (formData.plan_type === 'lifetime' ? null : null),
+            expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null,
         });
 
         if (error) {
@@ -228,403 +219,385 @@ export default function SubscriptionsPage() {
 
     const getStatusBadgeClass = (color) => {
         switch (color) {
-            case 'success': return styles.statusActive;
-            case 'warning': return styles.statusPending;
-            case 'error': return styles.statusExpired;
-            default: return styles.statusInactive;
+            case 'success': return 'bg-green-500/10 text-green-400';
+            case 'warning': return 'bg-amber-500/10 text-amber-400';
+            case 'error': return 'bg-red-500/10 text-red-400';
+            default: return 'bg-neutral-700 text-neutral-400';
         }
     };
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
+        <div className="p-4 sm:p-8 max-w-[1400px]">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1>User Subscriptions</h1>
-                    <p>Manage all users and their subscriptions</p>
+                    <h1 className="text-2xl font-bold text-white mb-2">User Subscriptions</h1>
+                    <p className="text-neutral-400">Manage all users and their subscriptions</p>
                 </div>
-                <div className={styles.headerActions}>
-                    <div className={styles.stats}>
-                        <div className={`${styles.statBadge} ${styles.statActive}`}>
-                            <span>{users.length}</span> Total Users
-                        </div>
-                        <div className={`${styles.statBadge} ${styles.statExpiring}`}>
-                            <span>{subscriptions.filter(s => s.status === 'active').length}</span> Active Subs
-                        </div>
+                <div className="flex gap-3">
+                    <div className="px-4 py-2 bg-primary-500/10 text-primary-400 rounded-full text-sm font-medium">
+                        <span className="font-bold">{users.length}</span> Total Users
+                    </div>
+                    <div className="px-4 py-2 bg-green-500/10 text-green-400 rounded-full text-sm font-medium">
+                        <span className="font-bold">{subscriptions.filter(s => s.status === 'active').length}</span> Active Subs
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className={styles.filters}>
-                <div className={styles.searchBox}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-                        <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
                     <input
                         type="text"
                         placeholder="Search users..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-12 pr-4 py-3 bg-neutral-900 border border-neutral-800 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500 transition-colors"
                     />
                 </div>
 
-                <div className={styles.filterGroup}>
-                    <div className={styles.dateFilters}>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                    {['all', '7days', '30days'].map((filter) => (
                         <button
-                            className={`${styles.dateBtn} ${dateFilter === 'all' ? styles.dateBtnActive : ''}`}
-                            onClick={() => setDateFilter('all')}
+                            key={filter}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${dateFilter === filter
+                                    ? 'bg-primary-600 text-white'
+                                    : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white'
+                                }`}
+                            onClick={() => setDateFilter(filter)}
                         >
-                            All Users
+                            {filter === 'all' ? 'All Users' : filter === '7days' ? 'New (7 Days)' : 'New (30 Days)'}
                         </button>
-                        <button
-                            className={`${styles.dateBtn} ${dateFilter === '7days' ? styles.dateBtnActive : ''}`}
-                            onClick={() => setDateFilter('7days')}
-                        >
-                            New (7 Days)
-                        </button>
-                        <button
-                            className={`${styles.dateBtn} ${dateFilter === '30days' ? styles.dateBtnActive : ''}`}
-                            onClick={() => setDateFilter('30days')}
-                        >
-                            New (30 Days)
-                        </button>
-                    </div>
+                    ))}
                 </div>
             </div>
 
             {/* Users Table */}
-            <div className={styles.tableContainer}>
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
                 {loading ? (
-                    <div className={styles.loading}>
-                        <div className={styles.spinner} />
+                    <div className="flex justify-center p-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
                     </div>
                 ) : filteredUsers.length > 0 ? (
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Registered</th>
-                                <th>Status</th>
-                                <th>Services</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredUsers.map((user) => {
-                                const userStatus = getUserStatus(user.id);
-                                const userSubs = userSubscriptionMap[user.id] || [];
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-neutral-800/50">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">User</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Registered</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Status</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Services</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-800">
+                                {filteredUsers.map((user) => {
+                                    const userStatus = getUserStatus(user.id);
+                                    const userSubs = userSubscriptionMap[user.id] || [];
 
-                                return (
-                                    <tr key={user.id}>
-                                        <td>
-                                            <div className={styles.userCell}>
-                                                <div className={styles.avatar}>
-                                                    {getInitials(user.full_name || user.email)}
+                                    return (
+                                        <tr key={user.id} className="hover:bg-neutral-800/30 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                                                        {getInitials(user.full_name || user.email)}
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="font-medium text-white truncate">{user.full_name || 'No name'}</span>
+                                                        <span className="text-sm text-neutral-500 truncate">{user.email}</span>
+                                                    </div>
                                                 </div>
-                                                <div className={styles.userInfo}>
-                                                    <span className={styles.userName}>{user.full_name || 'No name'}</span>
-                                                    <span className={styles.userEmail}>{user.email}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-neutral-400">
+                                                {formatDate(user.created_at)}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(userStatus.color)}`}>
+                                                    {userStatus.label}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {userSubs.length > 0 ? (
+                                                        userSubs.map(sub => (
+                                                            <button
+                                                                key={sub.id}
+                                                                className="px-2 py-1 bg-primary-500/10 text-primary-400 rounded text-xs font-medium hover:bg-primary-500/20 transition-colors"
+                                                                onClick={() => handleEditSubscription(sub)}
+                                                                title={`Click to edit - Status: ${sub.status}`}
+                                                            >
+                                                                {sub.service?.name || 'Unknown'}
+                                                                {sub.expires_at && (
+                                                                    <span className="ml-1 text-neutral-500">
+                                                                        ({new Date(sub.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
+                                                                    </span>
+                                                                )}
+                                                            </button>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-sm text-neutral-500">No services</span>
+                                                    )}
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className={styles.dateCell}>
-                                            {formatDate(user.created_at)}
-                                        </td>
-                                        <td>
-                                            <span className={`${styles.statusBadge} ${getStatusBadgeClass(userStatus.color)}`}>
-                                                {userStatus.label}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div className={styles.servicesCell}>
-                                                {userSubs.length > 0 ? (
-                                                    userSubs.map(sub => (
-                                                        <button
-                                                            key={sub.id}
-                                                            className={styles.serviceTag}
-                                                            onClick={() => handleEditSubscription(sub)}
-                                                            title={`Click to edit - Status: ${sub.status}`}
-                                                        >
-                                                            {sub.service?.name || 'Unknown'}
-                                                            {sub.expires_at && (
-                                                                <span className={styles.serviceExpiry}>
-                                                                    Exp: {new Date(sub.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    ))
-                                                ) : (
-                                                    <span className={styles.noServices}>No services</span>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className={styles.actions}>
+                                            </td>
+                                            <td className="px-6 py-4">
                                                 <button
-                                                    className={`${styles.actionBtn} ${styles.addServiceBtn}`}
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg text-primary-400 bg-primary-500/10 hover:bg-primary-500/20 transition-colors"
                                                     onClick={() => handleManageUser(user)}
                                                     title="Add/Extend Subscription"
                                                 >
-                                                    <svg viewBox="0 0 24 24" fill="none">
-                                                        <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                    </svg>
+                                                    <Plus size={18} />
                                                 </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
-                    <div className={styles.emptyState}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2" />
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                        </svg>
-                        <h3>No users found</h3>
-                        <p>Try adjusting your search or filters</p>
+                    <div className="py-16 text-center">
+                        <Users className="w-12 h-12 mx-auto text-neutral-600 mb-4" />
+                        <h3 className="text-lg font-semibold text-white mb-2">No users found</h3>
+                        <p className="text-neutral-500">Try adjusting your search or filters</p>
                     </div>
                 )}
             </div>
 
             {/* Add Subscription Modal */}
-            {
-                showModal && selectedUser && (
-                    <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
-                        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                            <div className={styles.modalHeader}>
-                                <h2>Add Subscription</h2>
-                                <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
-                                    <svg viewBox="0 0 24 24" fill="none">
-                                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                    </svg>
-                                </button>
+            {showModal && selectedUser && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+                    <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+                            <h2 className="text-lg font-semibold text-white">Add Subscription</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors" onClick={() => setShowModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div className="p-4 bg-neutral-800/50 rounded-xl space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-neutral-400">User</span>
+                                    <span className="text-white font-medium">{selectedUser.full_name || selectedUser.email}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-neutral-400">Email</span>
+                                    <span className="text-neutral-300">{selectedUser.email}</span>
+                                </div>
                             </div>
 
-                            <div className={styles.modalBody}>
-                                <div className={styles.subSummary}>
-                                    <div className={styles.summaryRow}>
-                                        <span>User</span>
-                                        <span>{selectedUser.full_name || selectedUser.email}</span>
-                                    </div>
-                                    <div className={styles.summaryRow}>
-                                        <span>Email</span>
-                                        <span>{selectedUser.email}</span>
-                                    </div>
-                                </div>
+                            <div>
+                                <label className="text-sm text-neutral-400 mb-2 block">Service</label>
+                                <select
+                                    value={formData.service_id}
+                                    onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
+                                    className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
+                                >
+                                    <option value="">-- Select Service --</option>
+                                    {services.filter(s => s.is_active).map(service => (
+                                        <option key={service.id} value={service.id}>
+                                            {service.name} - {formatCurrency(service.price_monthly)}/mo
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                                <div className={styles.formGroup}>
-                                    <label>Service</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Plan Type</label>
                                     <select
-                                        value={formData.service_id}
-                                        onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
+                                        value={formData.plan_type}
+                                        onChange={(e) => {
+                                            const newPlan = e.target.value;
+                                            setFormData({
+                                                ...formData,
+                                                plan_type: newPlan,
+                                                expires_at: getDefaultExpiry(newPlan)
+                                            });
+                                        }}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
                                     >
-                                        <option value="">-- Select Service --</option>
-                                        {services.filter(s => s.is_active).map(service => (
-                                            <option key={service.id} value={service.id}>
-                                                {service.name} - {formatCurrency(service.price_monthly)}/mo
-                                            </option>
-                                        ))}
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                        <option value="lifetime">Lifetime</option>
+                                        <option value="trial">Trial</option>
                                     </select>
                                 </div>
-
-                                <div className={styles.formRow}>
-                                    <div className={styles.formGroup}>
-                                        <label>Plan Type</label>
-                                        <select
-                                            value={formData.plan_type}
-                                            onChange={(e) => {
-                                                const newPlan = e.target.value;
-                                                setFormData({
-                                                    ...formData,
-                                                    plan_type: newPlan,
-                                                    expires_at: getDefaultExpiry(newPlan)
-                                                });
-                                            }}
-                                        >
-                                            <option value="monthly">Monthly</option>
-                                            <option value="yearly">Yearly</option>
-                                            <option value="lifetime">Lifetime</option>
-                                            <option value="trial">Trial</option>
-                                        </select>
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Status</label>
-                                        <select
-                                            value={formData.status}
-                                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                        >
-                                            <option value="active">Active</option>
-                                            <option value="pending">Pending</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className={styles.formRow}>
-                                    <div className={styles.formGroup}>
-                                        <label>Start Date</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.starts_at}
-                                            onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Expiry Date</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.expires_at}
-                                            onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
-                                        />
-                                    </div>
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Status</label>
+                                    <select
+                                        value={formData.status}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
+                                    >
+                                        <option value="active">Active</option>
+                                        <option value="pending">Pending</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div className={styles.modalFooter}>
-                                <button className={styles.cancelBtn} onClick={() => setShowModal(false)}>
-                                    Cancel
-                                </button>
-                                <button
-                                    className={styles.saveBtn}
-                                    onClick={handleCreateSubscription}
-                                    disabled={processing || !formData.service_id}
-                                >
-                                    {processing ? 'Creating...' : 'Add Subscription'}
-                                </button>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Start Date</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.starts_at}
+                                        onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Expiry Date</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.expires_at}
+                                        onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                                    />
+                                </div>
                             </div>
                         </div>
+
+                        <div className="flex gap-3 px-6 py-4 border-t border-neutral-800">
+                            <button className="flex-1 px-4 py-3 bg-neutral-800 text-white rounded-lg font-medium hover:bg-neutral-700 transition-colors" onClick={() => setShowModal(false)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
+                                onClick={handleCreateSubscription}
+                                disabled={processing || !formData.service_id}
+                            >
+                                {processing ? 'Creating...' : 'Add Subscription'}
+                            </button>
+                        </div>
                     </div>
-                )
-            }
+                </div>
+            )}
 
             {/* Edit Subscription Modal */}
-            {
-                showEditModal && selectedSub && (
-                    <div className={styles.modalOverlay} onClick={() => setShowEditModal(false)}>
-                        <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                            <div className={styles.modalHeader}>
-                                <h2>Edit Subscription</h2>
-                                <button className={styles.closeBtn} onClick={() => setShowEditModal(false)}>
-                                    <svg viewBox="0 0 24 24" fill="none">
-                                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                    </svg>
-                                </button>
+            {showEditModal && selectedSub && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowEditModal(false)}>
+                    <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+                            <h2 className="text-lg font-semibold text-white">Edit Subscription</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors" onClick={() => setShowEditModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div className="p-4 bg-neutral-800/50 rounded-xl space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-neutral-400">User</span>
+                                    <span className="text-white font-medium">{selectedSub.user?.full_name || selectedSub.user?.email}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-neutral-400">Current Service</span>
+                                    <span className="text-neutral-300">{selectedSub.service?.name}</span>
+                                </div>
                             </div>
 
-                            <div className={styles.modalBody}>
-                                <div className={styles.subSummary}>
-                                    <div className={styles.summaryRow}>
-                                        <span>User</span>
-                                        <span>{selectedSub.user?.full_name || selectedSub.user?.email}</span>
-                                    </div>
-                                    <div className={styles.summaryRow}>
-                                        <span>Current Service</span>
-                                        <span>{selectedSub.service?.name}</span>
-                                    </div>
-                                </div>
+                            <div>
+                                <label className="text-sm text-neutral-400 mb-2 block">Service</label>
+                                <select
+                                    value={formData.service_id}
+                                    onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
+                                    className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
+                                >
+                                    {services.map(service => (
+                                        <option key={service.id} value={service.id}>
+                                            {service.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                                <div className={styles.formGroup}>
-                                    <label>Service</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Plan Type</label>
                                     <select
-                                        value={formData.service_id}
-                                        onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
+                                        value={formData.plan_type}
+                                        onChange={(e) => {
+                                            const newPlan = e.target.value;
+                                            setFormData({
+                                                ...formData,
+                                                plan_type: newPlan,
+                                                expires_at: getDefaultExpiry(newPlan)
+                                            });
+                                        }}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
                                     >
-                                        {services.map(service => (
-                                            <option key={service.id} value={service.id}>
-                                                {service.name}
-                                            </option>
-                                        ))}
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                        <option value="lifetime">Lifetime</option>
+                                        <option value="trial">Trial</option>
                                     </select>
                                 </div>
-
-                                <div className={styles.formRow}>
-                                    <div className={styles.formGroup}>
-                                        <label>Plan Type</label>
-                                        <select
-                                            value={formData.plan_type}
-                                            onChange={(e) => {
-                                                const newPlan = e.target.value;
-                                                setFormData({
-                                                    ...formData,
-                                                    plan_type: newPlan,
-                                                    expires_at: getDefaultExpiry(newPlan)
-                                                });
-                                            }}
-                                        >
-                                            <option value="monthly">Monthly</option>
-                                            <option value="yearly">Yearly</option>
-                                            <option value="lifetime">Lifetime</option>
-                                            <option value="trial">Trial</option>
-                                        </select>
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Status</label>
-                                        <select
-                                            value={formData.status}
-                                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                        >
-                                            <option value="active">Active</option>
-                                            <option value="pending">Pending</option>
-                                            <option value="expired">Expired</option>
-                                            <option value="inactive">Inactive</option>
-                                            <option value="cancelled">Cancelled</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className={styles.formRow}>
-                                    <div className={styles.formGroup}>
-                                        <label>Start Date</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.starts_at}
-                                            onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label>Expiry Date</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.expires_at}
-                                            onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className={styles.dangerZone}>
-                                    <h4>Danger Zone</h4>
-                                    <button
-                                        className={styles.endBtn}
-                                        onClick={handleEndSubscription}
-                                        disabled={processing}
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Status</label>
+                                    <select
+                                        value={formData.status}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500 cursor-pointer"
                                     >
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                            <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                        </svg>
-                                        End Subscription Now
-                                    </button>
+                                        <option value="active">Active</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="expired">Expired</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div className={styles.modalFooter}>
-                                <button className={styles.cancelBtn} onClick={() => setShowEditModal(false)}>
-                                    Cancel
-                                </button>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Start Date</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.starts_at}
+                                        onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Expiry Date</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.expires_at}
+                                        onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                                <h4 className="text-red-400 font-medium mb-3">Danger Zone</h4>
                                 <button
-                                    className={styles.saveBtn}
-                                    onClick={handleUpdateSubscription}
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                    onClick={handleEndSubscription}
                                     disabled={processing}
                                 >
-                                    {processing ? 'Saving...' : 'Save Changes'}
+                                    <XCircle size={16} /> End Subscription Now
                                 </button>
                             </div>
                         </div>
+
+                        <div className="flex gap-3 px-6 py-4 border-t border-neutral-800">
+                            <button className="flex-1 px-4 py-3 bg-neutral-800 text-white rounded-lg font-medium hover:bg-neutral-700 transition-colors" onClick={() => setShowEditModal(false)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
+                                onClick={handleUpdateSubscription}
+                                disabled={processing}
+                            >
+                                {processing ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </div>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
 }

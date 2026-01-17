@@ -1,12 +1,22 @@
-import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+
+interface DeleteAccountRequest {
+    confirmation: string;
+}
+
+interface DeleteAccountResponse {
+    success?: boolean;
+    message?: string;
+    error?: string;
+}
 
 /**
  * DELETE /api/account/delete
  * Securely delete a user's account using service role key
  */
-export async function DELETE(request) {
+export async function DELETE(request: NextRequest): Promise<NextResponse<DeleteAccountResponse>> {
     try {
         // 1. Authenticate the user making the request
         const supabase = await createServerClient();
@@ -20,9 +30,9 @@ export async function DELETE(request) {
         }
 
         // 2. Parse request body for confirmation
-        const { confirmation } = await request.json();
+        const body: DeleteAccountRequest = await request.json();
 
-        if (confirmation !== 'DELETE') {
+        if (body.confirmation !== 'DELETE') {
             return NextResponse.json(
                 { error: 'Please type DELETE to confirm account deletion.' },
                 { status: 400 }
@@ -30,9 +40,9 @@ export async function DELETE(request) {
         }
 
         // 3. Create admin client with service role key
-        const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY
+        const supabaseAdmin: SupabaseClient = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
         // 4. Delete user data from all tables (cascade should handle related data)
@@ -77,13 +87,17 @@ export async function DELETE(request) {
             );
         }
 
-        // 6. Log the deletion for audit
-        await supabaseAdmin.from('audit_log').insert({
-            action: 'account_deleted',
-            table_name: 'auth.users',
-            record_id: user.id,
-            new_data: { deleted_at: new Date().toISOString() },
-        }).catch(() => { }); // Ignore if audit_log doesn't exist
+        // 6. Log the deletion for audit (ignore errors if table doesn't exist)
+        try {
+            await supabaseAdmin.from('audit_log').insert({
+                action: 'account_deleted',
+                table_name: 'auth.users',
+                record_id: user.id,
+                new_data: { deleted_at: new Date().toISOString() },
+            });
+        } catch {
+            // Ignore if audit_log doesn't exist
+        }
 
         return NextResponse.json({
             success: true,

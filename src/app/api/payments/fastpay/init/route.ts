@@ -1,9 +1,35 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
 import { generateFastPayQR } from '@/lib/utils/fastpay';
-import { APP_CONFIG } from '@/lib/utils/constants';
 
-export async function POST(req) {
+interface InitPaymentRequest {
+    service_id: string;
+    plan_type: 'monthly' | 'yearly';
+}
+
+interface ServiceRecord {
+    id: string;
+    name: string;
+    slug: string;
+    price_monthly: number;
+    price_yearly: number;
+}
+
+interface InitPaymentResponse {
+    success?: boolean;
+    orderId?: string;
+    qrUrl?: string;
+    qrText?: string;
+    amount?: number;
+    serviceName?: string;
+    error?: string;
+}
+
+/**
+ * POST /api/payments/fastpay/init
+ * Initialize a FastPay payment and generate QR code
+ */
+export async function POST(req: NextRequest): Promise<NextResponse<InitPaymentResponse>> {
     try {
         const supabase = await createClient();
 
@@ -13,7 +39,8 @@ export async function POST(req) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { service_id, plan_type } = await req.json();
+        const body: InitPaymentRequest = await req.json();
+        const { service_id, plan_type } = body;
 
         if (!service_id || !plan_type) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -30,7 +57,7 @@ export async function POST(req) {
             query = query.eq('slug', service_id);
         }
 
-        const { data: svc, error: svcErr } = await query.single();
+        const { data: svc, error: svcErr } = await query.single() as { data: ServiceRecord | null; error: unknown };
 
         if (svcErr || !svc) {
             console.error('Service lookup failed:', svcErr, service_id);
@@ -40,12 +67,13 @@ export async function POST(req) {
         // Use the actual database UUID from here on
         const dbServiceId = svc.id;
 
+        // Amount comes from the service's own price
         const amount = plan_type === 'yearly'
-            ? svc.price_yearly || APP_CONFIG.pricing.yearly
-            : svc.price_monthly || APP_CONFIG.pricing.monthly;
+            ? svc.price_yearly
+            : svc.price_monthly || svc.price_yearly;
 
         // 3. Find or Create Pending Subscription
-        let { data: subscription, error: subErr } = await supabase
+        let { data: subscription } = await supabase
             .from('subscriptions')
             .select('id')
             .eq('user_id', user.id)
@@ -101,8 +129,8 @@ export async function POST(req) {
         return NextResponse.json({
             success: true,
             orderId: payment.id,
-            qrUrl: qrResult.data.qrUrl,
-            qrText: qrResult.data.qrText,
+            qrUrl: qrResult.data?.qrUrl,
+            qrText: qrResult.data?.qrText,
             amount,
             serviceName: svc.name,
         });

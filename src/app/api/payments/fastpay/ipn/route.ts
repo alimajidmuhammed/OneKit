@@ -1,33 +1,59 @@
-import { createClient } from '@supabase/supabase-js';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { validateFastPayPayment } from '@/lib/utils/fastpay';
 
+interface IPNBody {
+    merchant_order_id?: string;
+    status?: string;
+    [key: string]: unknown;
+}
+
+interface PaymentRecord {
+    id: string;
+    user_id: string;
+    subscription_id: string;
+    status: string;
+    subscription?: {
+        plan_type: string;
+        starts_at: string | null;
+    };
+}
+
+interface IPNResponse {
+    success?: boolean;
+    message?: string;
+    error?: string;
+}
+
 // Helper to get admin client
-const getSupabaseAdmin = () => {
+const getSupabaseAdmin = (): SupabaseClient => {
     return createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 };
 
-export async function POST(req) {
+/**
+ * POST /api/payments/fastpay/ipn
+ * Handle FastPay Instant Payment Notification (IPN) webhook
+ */
+export async function POST(req: NextRequest): Promise<NextResponse<IPNResponse>> {
     const supabaseAdmin = getSupabaseAdmin();
     try {
         // IPN data usually comes as form data or JSON
-        let body;
+        let body: IPNBody;
         const contentType = req.headers.get('content-type') || '';
 
         if (contentType.includes('application/json')) {
             body = await req.json();
         } else {
             const formData = await req.formData();
-            body = Object.fromEntries(formData);
+            body = Object.fromEntries(formData) as IPNBody;
         }
 
         console.log('FastPay IPN Received:', body);
 
         const orderId = body.merchant_order_id;
-        const status = body.status;
 
         if (!orderId) {
             return NextResponse.json({ error: 'Missing merchant_order_id' }, { status: 400 });
@@ -38,7 +64,7 @@ export async function POST(req) {
             .from('payments')
             .select('*, subscription:subscriptions(*)')
             .eq('id', orderId)
-            .single();
+            .single() as { data: PaymentRecord | null; error: unknown };
 
         if (fetchErr || !payment) {
             console.error('IPN Error: Payment not found', orderId);
@@ -52,7 +78,7 @@ export async function POST(req) {
         // 2. Mandatory Validation via FastPay API
         const validationResult = await validateFastPayPayment(orderId);
 
-        if (validationResult.success && validationResult.data.status === 'success') {
+        if (validationResult.success && validationResult.data?.status === 'success') {
             const fastPayData = validationResult.data;
             const now = new Date();
 
@@ -80,7 +106,7 @@ export async function POST(req) {
                 .from('subscriptions')
                 .update({
                     status: 'active',
-                    starts_at: payment.subscription.starts_at || now.toISOString(),
+                    starts_at: payment.subscription?.starts_at || now.toISOString(),
                     expires_at: expiryDate.toISOString(),
                     updated_at: now.toISOString(),
                 })

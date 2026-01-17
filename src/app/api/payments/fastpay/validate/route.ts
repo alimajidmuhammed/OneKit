@@ -1,22 +1,43 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
 import { validateFastPayPayment } from '@/lib/utils/fastpay';
 
-export async function GET(req) {
+interface PaymentRecord {
+    id: string;
+    user_id: string;
+    subscription_id: string;
+    status: string;
+    subscription?: {
+        plan_type: string;
+        starts_at: string | null;
+    };
+}
+
+interface ValidateResponse {
+    success: boolean;
+    status?: string;
+    error?: string;
+}
+
+/**
+ * GET /api/payments/fastpay/validate
+ * Validate a FastPay payment status (called by client to check payment)
+ */
+export async function GET(req: NextRequest): Promise<NextResponse<ValidateResponse>> {
     try {
         const { searchParams } = new URL(req.url);
         const orderId = searchParams.get('orderId');
 
         if (!orderId) {
-            return NextResponse.json({ error: 'Missing orderId' }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Missing orderId' }, { status: 400 });
         }
 
         const supabase = await createClient();
 
         // 1. Check Auth
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
         }
 
         // 2. Check Database Status first
@@ -24,11 +45,11 @@ export async function GET(req) {
             .from('payments')
             .select('*, subscription:subscriptions(*)')
             .eq('id', orderId)
-            .eq('user_id', session.user.id)
-            .single();
+            .eq('user_id', user.id)
+            .single() as { data: PaymentRecord | null; error: unknown };
 
         if (payErr || !payment) {
-            return NextResponse.json({ error: 'Payment record not found' }, { status: 404 });
+            return NextResponse.json({ success: false, error: 'Payment record not found' }, { status: 404 });
         }
 
         if (payment.status === 'approved') {
@@ -42,7 +63,7 @@ export async function GET(req) {
         // 3. Proactively Validate with FastPay if still pending
         const validationResult = await validateFastPayPayment(orderId);
 
-        if (validationResult.success && validationResult.data.status === 'success') {
+        if (validationResult.success && validationResult.data?.status === 'success') {
             const fastPayData = validationResult.data;
             const now = new Date();
 
@@ -72,7 +93,7 @@ export async function GET(req) {
                 .from('subscriptions')
                 .update({
                     status: 'active',
-                    starts_at: payment.subscription.starts_at || now.toISOString(),
+                    starts_at: payment.subscription?.starts_at || now.toISOString(),
                     expires_at: expiryDate.toISOString(),
                     updated_at: now.toISOString(),
                 })
@@ -82,7 +103,7 @@ export async function GET(req) {
 
             // Create Audit Log
             await supabase.from('audit_log').insert({
-                user_id: session.user.id,
+                user_id: user.id,
                 action: 'payment_success_fastpay',
                 table_name: 'payments',
                 record_id: orderId,
@@ -96,6 +117,6 @@ export async function GET(req) {
 
     } catch (error) {
         console.error('FastPay Validation API Error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
     }
 }

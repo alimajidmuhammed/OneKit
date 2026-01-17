@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { formatCurrency, formatDate } from '@/lib/utils/helpers';
-import styles from './services.module.css';
+import { Plus, Edit3, Trash2, X, Monitor, AlertTriangle, Loader2 } from 'lucide-react';
 
 export default function AdminServicesPage() {
     const { loading, fetchServices, createService, updateService, deleteService } = useAdmin();
@@ -38,14 +38,12 @@ export default function AdminServicesPage() {
         setSaving(true);
         try {
             if (selectedService) {
-                // Update existing service
                 const { error } = await updateService(selectedService.id, formData);
                 if (error) {
                     alert('Error updating service: ' + error);
                     return;
                 }
             } else {
-                // Create new service
                 const { error } = await createService(formData);
                 if (error) {
                     alert('Error creating service: ' + error);
@@ -53,7 +51,6 @@ export default function AdminServicesPage() {
                 }
             }
 
-            // Refresh services list
             const data = await fetchServices();
             setServices(data || []);
             setShowModal(false);
@@ -108,7 +105,6 @@ export default function AdminServicesPage() {
                 return;
             }
 
-            // Refresh services list
             const data = await fetchServices();
             setServices(data || []);
             setShowDeleteModal(false);
@@ -119,116 +115,107 @@ export default function AdminServicesPage() {
     };
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
+        <div className="p-4 sm:p-8 max-w-[1400px]">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1>Services Management</h1>
-                    <p>Manage your platform services</p>
+                    <h1 className="text-2xl font-bold text-white mb-2">Services Management</h1>
+                    <p className="text-neutral-400">Manage your platform services</p>
                 </div>
-                <button className={styles.addBtn} onClick={handleCreate}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                    Add Service
+                <button
+                    className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+                    onClick={handleCreate}
+                >
+                    <Plus size={18} /> Add Service
                 </button>
             </div>
 
             {/* Services Table */}
-            <div className={styles.tableContainer}>
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
                 {loading ? (
-                    <div className={styles.loading}>
-                        <div className={styles.spinner} />
+                    <div className="flex justify-center p-12">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
                     </div>
                 ) : (
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>Service</th>
-                                <th>Slug</th>
-                                <th>Monthly Price</th>
-                                <th>Yearly Price</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {services.map((service) => (
-                                <tr key={service.id}>
-                                    <td>
-                                        <div className={styles.serviceCell}>
-                                            <div className={styles.serviceIcon}>
-                                                <svg viewBox="0 0 24 24" fill="none">
-                                                    <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
-                                                    <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
-                                                    <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
-                                                    <rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.6" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <span className={styles.serviceName}>{service.name}</span>
-                                                <span className={styles.serviceDesc}>{service.description?.slice(0, 50)}...</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <code className={styles.slugCode}>{service.slug}</code>
-                                    </td>
-                                    <td>{formatCurrency(service.price_monthly)}</td>
-                                    <td>{formatCurrency(service.price_yearly)}</td>
-                                    <td>
-                                        <span className={`${styles.statusBadge} ${service.is_active ? styles.statusActive : styles.statusInactive}`}>
-                                            {service.is_active ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </td>
-                                    <td className={styles.dateCell}>{formatDate(service.created_at)}</td>
-                                    <td>
-                                        <div className={styles.actions}>
-                                            <button
-                                                className={styles.actionBtn}
-                                                onClick={() => handleEdit(service)}
-                                                title="Edit"
-                                            >
-                                                <svg viewBox="0 0 24 24" fill="none">
-                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                                </svg>
-                                            </button>
-                                            <button
-                                                className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                                                onClick={() => handleDeleteClick(service)}
-                                                title="Delete"
-                                            >
-                                                <svg viewBox="0 0 24 24" fill="none">
-                                                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-neutral-800/50">
+                                <tr>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Service</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Slug</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Monthly</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Yearly</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Status</th>
+                                    <th className="text-left px-6 py-4 text-sm font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-800">
+                                {services.map((service) => (
+                                    <tr key={service.id} className="hover:bg-neutral-800/30 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center text-primary-500">
+                                                    <Monitor size={20} />
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="font-medium text-white">{service.name}</span>
+                                                    <span className="text-xs text-neutral-500 truncate max-w-[200px]">{service.description?.slice(0, 50)}...</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <code className="px-2 py-1 bg-neutral-800 text-neutral-300 rounded text-sm">{service.slug}</code>
+                                        </td>
+                                        <td className="px-6 py-4 text-white">{formatCurrency(service.price_monthly)}</td>
+                                        <td className="px-6 py-4 text-white">{formatCurrency(service.price_yearly)}</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 text-xs font-medium rounded-full ${service.is_active
+                                                    ? 'bg-green-500/10 text-green-400'
+                                                    : 'bg-red-500/10 text-red-400'
+                                                }`}>
+                                                {service.is_active ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors"
+                                                    onClick={() => handleEdit(service)}
+                                                    title="Edit"
+                                                >
+                                                    <Edit3 size={16} />
+                                                </button>
+                                                <button
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                                                    onClick={() => handleDeleteClick(service)}
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
 
             {/* Edit/Create Modal */}
             {showModal && (
-                <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
-                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h2>{selectedService ? 'Edit Service' : 'Create Service'}</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                </svg>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+                    <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+                            <h2 className="text-lg font-semibold text-white">{selectedService ? 'Edit Service' : 'Create Service'}</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors" onClick={() => setShowModal(false)}>
+                                <X size={20} />
                             </button>
                         </div>
 
-                        <div className={styles.modalBody}>
-                            <div className={styles.formGroup}>
-                                <label>Service Name</label>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="text-sm text-neutral-400 mb-2 block">Service Name</label>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -238,65 +225,73 @@ export default function AdminServicesPage() {
                                         slug: selectedService ? formData.slug : generateSlug(e.target.value)
                                     })}
                                     placeholder="e.g., CV Maker"
+                                    className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500"
                                 />
                             </div>
 
-                            <div className={styles.formGroup}>
-                                <label>Slug</label>
+                            <div>
+                                <label className="text-sm text-neutral-400 mb-2 block">Slug</label>
                                 <input
                                     type="text"
                                     value={formData.slug}
                                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                                     placeholder="e.g., cv-maker"
+                                    className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500"
                                 />
                             </div>
 
-                            <div className={styles.formGroup}>
-                                <label>Description</label>
+                            <div>
+                                <label className="text-sm text-neutral-400 mb-2 block">Description</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     placeholder="Brief description of the service..."
                                     rows={3}
+                                    className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500 resize-none"
                                 />
                             </div>
 
-                            <div className={styles.formRow}>
-                                <div className={styles.formGroup}>
-                                    <label>Monthly Price (IQD)</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Monthly Price (IQD)</label>
                                     <input
                                         type="number"
                                         value={formData.price_monthly}
                                         onChange={(e) => setFormData({ ...formData, price_monthly: Number(e.target.value) })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     />
                                 </div>
-                                <div className={styles.formGroup}>
-                                    <label>Yearly Price (IQD)</label>
+                                <div>
+                                    <label className="text-sm text-neutral-400 mb-2 block">Yearly Price (IQD)</label>
                                     <input
                                         type="number"
                                         value={formData.price_yearly}
                                         onChange={(e) => setFormData({ ...formData, price_yearly: Number(e.target.value) })}
+                                        className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:border-primary-500"
                                     />
                                 </div>
                             </div>
 
-                            <div className={styles.formGroup}>
-                                <label className={styles.checkboxLabel}>
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.is_active}
-                                        onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                    />
-                                    <span>Service is active</span>
-                                </label>
-                            </div>
+                            <label className="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.is_active}
+                                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                    className="w-5 h-5 accent-primary-500"
+                                />
+                                <span className="text-white">Service is active</span>
+                            </label>
                         </div>
 
-                        <div className={styles.modalFooter}>
-                            <button className={styles.cancelBtn} onClick={() => setShowModal(false)}>
+                        <div className="flex gap-3 px-6 py-4 border-t border-neutral-800">
+                            <button className="flex-1 px-4 py-3 bg-neutral-800 text-white rounded-lg font-medium hover:bg-neutral-700 transition-colors" onClick={() => setShowModal(false)}>
                                 Cancel
                             </button>
-                            <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+                            <button
+                                className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
+                                onClick={handleSave}
+                                disabled={saving}
+                            >
                                 {saving ? 'Saving...' : (selectedService ? 'Save Changes' : 'Create Service')}
                             </button>
                         </div>
@@ -306,41 +301,36 @@ export default function AdminServicesPage() {
 
             {/* Delete Confirmation Modal */}
             {showDeleteModal && serviceToDelete && (
-                <div className={styles.modalOverlay} onClick={() => setShowDeleteModal(false)}>
-                    <div className={`${styles.modal} ${styles.deleteModal}`} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h2>Delete Service</h2>
-                            <button className={styles.closeBtn} onClick={() => setShowDeleteModal(false)}>
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                </svg>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowDeleteModal(false)}>
+                    <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+                            <h2 className="text-lg font-semibold text-white">Delete Service</h2>
+                            <button className="w-8 h-8 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors" onClick={() => setShowDeleteModal(false)}>
+                                <X size={20} />
                             </button>
                         </div>
 
-                        <div className={styles.modalBody}>
-                            <div className={styles.deleteWarning}>
-                                <svg viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                        <div className="p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 flex-shrink-0 rounded-full bg-red-500/10 flex items-center justify-center text-red-400">
+                                    <AlertTriangle size={24} />
+                                </div>
                                 <div>
-                                    <h3>Are you sure you want to delete this service?</h3>
-                                    <p>
-                                        You are about to delete <strong>{serviceToDelete.name}</strong>.
-                                        This action cannot be undone.
+                                    <h3 className="text-white font-medium mb-2">Are you sure you want to delete this service?</h3>
+                                    <p className="text-neutral-400 text-sm mb-2">
+                                        You are about to delete <strong className="text-white">{serviceToDelete.name}</strong>. This action cannot be undone.
                                     </p>
-                                    <p className={styles.warningNote}>
-                                        Note: Services with active subscriptions cannot be deleted.
-                                    </p>
+                                    <p className="text-amber-400 text-xs">Note: Services with active subscriptions cannot be deleted.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className={styles.modalFooter}>
-                            <button className={styles.cancelBtn} onClick={() => setShowDeleteModal(false)}>
+                        <div className="flex gap-3 px-6 py-4 border-t border-neutral-800">
+                            <button className="flex-1 px-4 py-3 bg-neutral-800 text-white rounded-lg font-medium hover:bg-neutral-700 transition-colors" onClick={() => setShowDeleteModal(false)}>
                                 Cancel
                             </button>
                             <button
-                                className={styles.deleteConfirmBtn}
+                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
                                 onClick={handleDeleteConfirm}
                                 disabled={deleting}
                             >

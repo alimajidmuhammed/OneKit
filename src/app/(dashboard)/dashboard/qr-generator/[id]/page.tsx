@@ -7,7 +7,7 @@ import { useQRCode } from '@/lib/hooks/useQRCode';
 import { useTrial } from '@/lib/hooks/useTrial';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { APP_CONFIG } from '@/lib/utils/constants';
-import styles from './editor.module.css';
+import { ChevronLeft, Check, Loader2, X, Download, QrCode, User, Link2, Palette, Plus, ChevronUp, ChevronDown, Trash2, Upload, Sparkles, RotateCcw, ExternalLink } from 'lucide-react';
 
 
 // Preset Icons with SVG
@@ -359,8 +359,8 @@ export default function QREditorPage({ params }) {
 
     if (loading) {
         return (
-            <div className={styles.loading}>
-                <div className={styles.spinner}></div>
+            <div className="flex flex-col items-center justify-center h-screen gap-4 text-neutral-500">
+                <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
                 <span>Loading...</span>
             </div>
         );
@@ -377,75 +377,99 @@ export default function QREditorPage({ params }) {
     };
 
     return (
-        <div className={styles.editor}>
-            <header className={styles.header}>
-                <button className={styles.backBtn} onClick={() => router.push('/dashboard/qr-generator')}>
-                    <span>←</span>
-                    <span>Back</span>
+        <div className="min-h-screen flex flex-col bg-neutral-50">
+            {/* Header */}
+            <header className="flex items-center gap-4 px-6 py-4 bg-white border-b border-neutral-200 sticky top-0 z-50">
+                <button
+                    className="flex items-center gap-2 px-3 py-2 bg-neutral-100 text-neutral-600 rounded-lg hover:bg-neutral-200 transition-colors"
+                    onClick={() => router.push('/dashboard/qr-generator')}
+                >
+                    <ChevronLeft size={18} />
+                    <span className="hidden sm:inline">Back</span>
                 </button>
-                <h1>{qr.name}</h1>
-                <div className={styles.headerActions}>
-                    {saveStatus === 'saving' && <span className={styles.saving}>Saving...</span>}
-                    {saveStatus === 'saved' && <span className={styles.saved}>Saved</span>}
+                <h1 className="flex-1 text-lg font-bold text-neutral-900 truncate">{qr.name}</h1>
+                <div className="flex items-center gap-3">
+                    {saveStatus === 'saving' && (
+                        <span className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full">
+                            <Loader2 size={14} className="animate-spin" /> Saving...
+                        </span>
+                    )}
+                    {saveStatus === 'saved' && (
+                        <span className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+                            <Check size={14} /> Saved
+                        </span>
+                    )}
                 </div>
             </header>
 
             {isTrialExpired && (
-                <div className={styles.expiredNotice}>
-                    Your trial has expired. <a href="/dashboard/subscriptions">Upgrade now</a> to continue editing.
+                <div className="py-3 px-4 bg-amber-50 text-amber-800 text-center text-sm">
+                    Your trial has expired. <a href="/dashboard/subscriptions" className="text-primary-600 font-semibold hover:underline">Upgrade now</a> to continue editing.
                 </div>
             )}
 
             {/* Tabs */}
-            <div className={styles.tabs}>
+            <div className="flex gap-1 px-6 py-3 bg-white border-b border-neutral-200 overflow-x-auto">
                 {['profile', 'links', 'design'].map(tab => (
                     <button
                         key={tab}
-                        className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors ${activeTab === tab ? 'bg-primary-500 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'}`}
                         onClick={() => setActiveTab(tab)}
                     >
-                        {tab === 'profile' && '👤'}
-                        {tab === 'links' && '🔗'}
-                        {tab === 'design' && '🎨'}
+                        {tab === 'profile' && <User size={16} />}
+                        {tab === 'links' && <Link2 size={16} />}
+                        {tab === 'design' && <Palette size={16} />}
                         <span>{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
                     </button>
                 ))}
             </div>
 
-            <div className={styles.content}>
+            <div className="flex-1 grid lg:grid-cols-[1fr_400px] overflow-hidden">
                 {/* Form */}
-                <div className={styles.form}>
+                <div className="p-6 sm:p-8 overflow-y-auto lg:max-h-[calc(100vh-130px)] space-y-6 bg-white">
                     {/* Profile Tab */}
                     {activeTab === 'profile' && (
-                        <div className={styles.section}>
-                            <h3>Profile</h3>
-                            <p className={styles.sectionDesc}>Set up your profile information</p>
+                        <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2 text-neutral-900">
+                                <User size={20} className="text-primary-500" />
+                                <h3 className="text-base font-black uppercase tracking-wider">Profile</h3>
+                            </div>
+                            <p className="text-sm text-neutral-500 mb-6">Set up your profile information</p>
 
                             {/* Logo Upload */}
-                            <div className={styles.logoUpload}>
-                                <label>Logo / Profile Photo</label>
-                                <div className={styles.logoContainer}>
+                            <div className="mb-6">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-3 block">Logo / Profile Photo</label>
+                                <div className="flex flex-col items-center gap-4">
                                     {qr.logo_url ? (
-                                        <div className={styles.logoPreview}>
+                                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary-500">
                                             <img
                                                 src={qr.logo_url}
                                                 alt="Logo"
                                                 style={logoStyle}
+                                                className="w-full h-full object-cover"
                                             />
-                                            <button className={styles.removeLogo} onClick={() => updateField('logo_url', null)}>×</button>
+                                            <button
+                                                className="absolute top-0 right-0 w-6 h-6 bg-red-500 text-white rounded-full border-2 border-white text-sm hover:bg-red-600"
+                                                onClick={() => updateField('logo_url', null)}
+                                            >
+                                                <X size={12} className="mx-auto" />
+                                            </button>
                                         </div>
                                     ) : (
-                                        <div className={styles.logoPlaceholder} onClick={() => fileInputRef.current?.click()}>
-                                            <span>📷</span>
-                                            <span>Upload Logo</span>
+                                        <div
+                                            className="w-24 h-24 rounded-full bg-neutral-100 border-2 border-dashed border-neutral-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <Upload size={24} className="text-neutral-400" />
+                                            <span className="text-[10px] text-neutral-500 mt-1">Upload</span>
                                         </div>
                                     )}
                                     {qr.logo_url && (
                                         <button
-                                            className={styles.studioBtn}
+                                            className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 border border-primary-200 rounded-full text-sm font-semibold hover:bg-primary-100 transition-colors"
                                             onClick={() => setIsLogoStudioOpen(!isLogoStudioOpen)}
                                         >
-                                            ✨ Logo Studio
+                                            <Sparkles size={14} /> Logo Studio
                                         </button>
                                     )}
                                 </div>
@@ -459,14 +483,16 @@ export default function QREditorPage({ params }) {
                             </div>
 
                             {isLogoStudioOpen && qr.logo_url && (
-                                <div className={styles.logoStudio}>
-                                    <div className={styles.studioHeader}>
-                                        <h4>Logo Studio</h4>
-                                        <button onClick={() => setIsLogoStudioOpen(false)}>×</button>
+                                <div className="mt-6 bg-neutral-50 border border-neutral-200 rounded-xl overflow-hidden">
+                                    <div className="flex justify-between items-center px-4 py-3 bg-white border-b border-neutral-200">
+                                        <h4 className="text-sm font-bold text-neutral-900">Logo Studio</h4>
+                                        <button className="text-neutral-400 hover:text-neutral-600" onClick={() => setIsLogoStudioOpen(false)}>
+                                            <X size={18} />
+                                        </button>
                                     </div>
-                                    <div className={styles.studioBody}>
-                                        <div className={styles.studioGroup}>
-                                            <label>Zoom</label>
+                                    <div className="p-4 space-y-4">
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-xs font-semibold text-neutral-500">Zoom</label>
                                             <input
                                                 type="range"
                                                 min="1"
@@ -474,10 +500,11 @@ export default function QREditorPage({ params }) {
                                                 step="0.01"
                                                 value={logoSettings.zoom}
                                                 onChange={(e) => handleLogoSettingChange('zoom', parseFloat(e.target.value))}
+                                                className="w-full accent-primary-500"
                                             />
                                         </div>
-                                        <div className={styles.studioGroup}>
-                                            <label>X Position</label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-xs font-semibold text-neutral-500">X Position</label>
                                             <input
                                                 type="range"
                                                 min="-50"
@@ -485,10 +512,11 @@ export default function QREditorPage({ params }) {
                                                 step="1"
                                                 value={logoSettings.x}
                                                 onChange={(e) => handleLogoSettingChange('x', parseInt(e.target.value))}
+                                                className="w-full accent-primary-500"
                                             />
                                         </div>
-                                        <div className={styles.studioGroup}>
-                                            <label>Y Position</label>
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-xs font-semibold text-neutral-500">Y Position</label>
                                             <input
                                                 type="range"
                                                 min="-50"
@@ -496,23 +524,25 @@ export default function QREditorPage({ params }) {
                                                 step="1"
                                                 value={logoSettings.y}
                                                 onChange={(e) => handleLogoSettingChange('y', parseInt(e.target.value))}
+                                                className="w-full accent-primary-500"
                                             />
                                         </div>
                                         <button
-                                            className={styles.resetBtn}
+                                            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition-colors"
                                             onClick={() => setLogoSettings({ zoom: 1, x: 0, y: 0 })}
                                         >
-                                            Reset Studio
+                                            <RotateCcw size={14} /> Reset Studio
                                         </button>
                                     </div>
                                 </div>
                             )}
 
                             {/* Display Name */}
-                            <div className={styles.formGroup}>
-                                <label>Display Name</label>
+                            <div className="mb-5 mt-6">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-2 block">Display Name</label>
                                 <input
                                     type="text"
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
                                     value={qr.display_name || ''}
                                     onChange={(e) => updateField('display_name', e.target.value)}
                                     placeholder="Your name or brand"
@@ -521,71 +551,91 @@ export default function QREditorPage({ params }) {
                             </div>
 
                             {/* Bio */}
-                            <div className={styles.formGroup}>
-                                <label>Short Description</label>
+                            <div>
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-2 block">Short Description</label>
                                 <textarea
+                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none resize-none"
                                     value={qr.bio || ''}
                                     onChange={(e) => updateField('bio', e.target.value.slice(0, 150))}
                                     placeholder="Brief description about you or your business"
                                     rows={3}
                                     disabled={!canEdit}
                                 />
-                                <span className={styles.charCount}>{(qr.bio || '').length}/150</span>
+                                <span className="block text-right text-xs text-neutral-400 mt-1">{(qr.bio || '').length}/150</span>
                             </div>
-                        </div>
+                        </section>
                     )}
 
                     {/* Links Tab */}
                     {activeTab === 'links' && (
-                        <div className={styles.section}>
-                            <div className={styles.sectionHeader}>
+                        <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                                 <div>
-                                    <h3>Your Links</h3>
-                                    <p className={styles.sectionDesc}>Add links with icons</p>
+                                    <div className="flex items-center gap-2 mb-1 text-neutral-900">
+                                        <Link2 size={20} className="text-primary-500" />
+                                        <h3 className="text-base font-black uppercase tracking-wider">Your Links</h3>
+                                    </div>
+                                    <p className="text-sm text-neutral-500">Add links with icons</p>
                                 </div>
-                                <button className={styles.addBtn} onClick={addLink} disabled={!canEdit}>
-                                    + Add Link
+                                <button
+                                    className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={addLink}
+                                    disabled={!canEdit}
+                                >
+                                    <Plus size={16} /> Add Link
                                 </button>
                             </div>
 
-                            <div className={styles.linksList}>
+                            <div className="space-y-3">
                                 {(!qr.links || qr.links.length === 0) ? (
-                                    <div className={styles.emptyLinks}>
-                                        <span className={styles.emptyIcon}>🔗</span>
-                                        <p>No links yet</p>
-                                        <span>Add your first link to get started</span>
+                                    <div className="text-center py-12 px-6 bg-neutral-50 rounded-2xl border-2 border-dashed border-neutral-200">
+                                        <Link2 size={40} className="mx-auto text-neutral-300 mb-3" />
+                                        <p className="font-semibold text-neutral-900 mb-1">No links yet</p>
+                                        <span className="text-sm text-neutral-500">Add your first link to get started</span>
                                     </div>
                                 ) : (
                                     qr.links.map((link, index) => (
-                                        <div key={link.id} className={styles.linkCard}>
+                                        <div key={link.id} className="relative flex items-center gap-3 p-4 bg-neutral-50 border border-neutral-200 rounded-xl group">
                                             {/* Move Buttons */}
-                                            <div className={styles.linkMove}>
-                                                <button onClick={() => moveLink(index, -1)} disabled={index === 0}>↑</button>
-                                                <button onClick={() => moveLink(index, 1)} disabled={index === qr.links.length - 1}>↓</button>
+                                            <div className="hidden sm:flex flex-col gap-1">
+                                                <button
+                                                    className="w-7 h-6 bg-white border border-neutral-200 rounded text-neutral-400 text-xs hover:bg-neutral-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    onClick={() => moveLink(index, -1)}
+                                                    disabled={index === 0}
+                                                >
+                                                    <ChevronUp size={14} className="mx-auto" />
+                                                </button>
+                                                <button
+                                                    className="w-7 h-6 bg-white border border-neutral-200 rounded text-neutral-400 text-xs hover:bg-neutral-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    onClick={() => moveLink(index, 1)}
+                                                    disabled={index === qr.links.length - 1}
+                                                >
+                                                    <ChevronDown size={14} className="mx-auto" />
+                                                </button>
                                             </div>
 
                                             {/* Icon Selector */}
-                                            <div className={styles.iconSelector}>
+                                            <div className="relative">
                                                 <button
-                                                    className={styles.iconBtn}
+                                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white transition-transform hover:scale-105"
                                                     style={{ background: PRESET_ICONS[link.icon]?.color || '#6B7280' }}
                                                     onClick={() => setEditingLinkIcon(editingLinkIcon === index ? null : index)}
                                                 >
                                                     {link.customIcon ? (
-                                                        <img src={link.customIcon} alt="icon" />
+                                                        <img src={link.customIcon} alt="icon" className="w-6 h-6 rounded object-cover" />
                                                     ) : (
-                                                        PRESET_ICONS[link.icon]?.svg || PRESET_ICONS.website.svg
+                                                        <span className="w-5 h-5">{PRESET_ICONS[link.icon]?.svg || PRESET_ICONS.website.svg}</span>
                                                     )}
                                                 </button>
 
                                                 {/* Icon Picker Dropdown */}
                                                 {editingLinkIcon === index && (
-                                                    <div className={styles.iconPicker}>
-                                                        <div className={styles.iconGrid}>
+                                                    <div className="absolute top-full left-0 mt-2 p-3 bg-white border border-neutral-200 rounded-xl shadow-2xl z-50 w-72">
+                                                        <div className="grid grid-cols-6 gap-1.5 mb-3">
                                                             {Object.entries(PRESET_ICONS).map(([key, icon]) => (
                                                                 <button
                                                                     key={key}
-                                                                    className={styles.iconOption}
+                                                                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white transition-transform hover:scale-110"
                                                                     style={{ background: icon.color }}
                                                                     onClick={() => {
                                                                         updateLink(index, 'icon', key);
@@ -594,18 +644,18 @@ export default function QREditorPage({ params }) {
                                                                     }}
                                                                     title={icon.name}
                                                                 >
-                                                                    {icon.svg}
+                                                                    <span className="w-4 h-4">{icon.svg}</span>
                                                                 </button>
                                                             ))}
                                                         </div>
-                                                        <div className={styles.uploadCustom}>
-                                                            <label>
-                                                                📁 Upload Custom Icon
+                                                        <div className="pt-3 border-t border-neutral-200">
+                                                            <label className="flex items-center justify-center gap-2 py-2.5 bg-neutral-100 rounded-lg cursor-pointer text-sm font-medium text-neutral-600 hover:bg-neutral-200 transition-colors">
+                                                                <Upload size={14} /> Upload Custom Icon
                                                                 <input
                                                                     type="file"
                                                                     accept="image/*"
                                                                     onChange={(e) => handleCustomIconUpload(e, index)}
-                                                                    style={{ display: 'none' }}
+                                                                    className="hidden"
                                                                 />
                                                             </label>
                                                         </div>
@@ -614,9 +664,10 @@ export default function QREditorPage({ params }) {
                                             </div>
 
                                             {/* Link Fields */}
-                                            <div className={styles.linkFields}>
+                                            <div className="flex-1 flex flex-col gap-2 min-w-0">
                                                 <input
                                                     type="text"
+                                                    className="w-full px-3 py-2.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium focus:outline-none focus:border-primary-500 transition-colors"
                                                     value={link.title}
                                                     onChange={(e) => updateLink(index, 'title', e.target.value)}
                                                     placeholder="Link Title (e.g. My Instagram)"
@@ -624,6 +675,7 @@ export default function QREditorPage({ params }) {
                                                 />
                                                 <input
                                                     type="url"
+                                                    className="w-full px-3 py-2.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium focus:outline-none focus:border-primary-500 transition-colors"
                                                     value={link.url}
                                                     onChange={(e) => updateLink(index, 'url', e.target.value)}
                                                     placeholder="https://..."
@@ -633,170 +685,211 @@ export default function QREditorPage({ params }) {
 
                                             {/* Remove Button */}
                                             <button
-                                                className={styles.removeLink}
+                                                className="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                 onClick={() => removeLink(index)}
                                                 disabled={!canEdit}
                                             >
-                                                ×
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     ))
                                 )}
                             </div>
-                        </div>
+                        </section>
                     )}
 
                     {/* Design Tab */}
                     {activeTab === 'design' && (
-                        <div className={styles.section}>
-                            <h3>Design</h3>
-                            <p className={styles.sectionDesc}>Customize appearance</p>
+                        <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
+                            <div className="flex items-center gap-2 mb-2 text-neutral-900">
+                                <Palette size={20} className="text-primary-500" />
+                                <h3 className="text-base font-black uppercase tracking-wider">Design</h3>
+                            </div>
+                            <p className="text-sm text-neutral-500 mb-6">Customize appearance</p>
 
                             {/* Theme */}
-                            <div className={styles.formGroup}>
-                                <label>Theme</label>
-                                <div className={styles.themeGrid}>
+                            <div className="mb-6">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-3 block">Theme</label>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                                     {THEMES.map(theme => (
                                         <button
                                             key={theme.id}
-                                            className={`${styles.themeCard} ${qr.template_id === theme.id ? styles.themeActive : ''}`}
+                                            className={`flex flex-col items-center gap-2 p-2 bg-white border-2 rounded-xl cursor-pointer transition-all ${qr.template_id === theme.id ? 'border-primary-500 ring-2 ring-primary-100' : 'border-transparent hover:border-neutral-200'}`}
                                             onClick={() => updateTheme(theme.id)}
                                             disabled={!canEdit}
                                         >
                                             <div
-                                                className={styles.themePreview}
+                                                className="w-full h-12 rounded-lg"
                                                 style={{ background: `linear-gradient(135deg, ${theme.colors[0]}, ${theme.colors[1]})` }}
                                             />
-                                            <span>{theme.name}</span>
+                                            <span className="text-xs font-medium text-neutral-600">{theme.name}</span>
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Button Style */}
-                            <div className={styles.formGroup}>
-                                <label>Button Style</label>
-                                <div className={styles.buttonStyleGrid}>
-                                    {BUTTON_STYLES.map(style => (
-                                        <button
-                                            key={style.id}
-                                            className={`${styles.styleCard} ${qr.button_style === style.id ? styles.styleActive : ''}`}
-                                            onClick={() => updateField('button_style', style.id)}
-                                            disabled={!canEdit}
-                                        >
-                                            <div className={`${styles.stylePreview} ${styles[style.style]}`}>
-                                                Button
-                                            </div>
-                                            <span>{style.name}</span>
-                                        </button>
-                                    ))}
+                            <div className="mb-6">
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-3 block">Button Style</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {BUTTON_STYLES.map(style => {
+                                        const previewStyles: Record<string, string> = {
+                                            filled: 'bg-primary-500 text-white',
+                                            outline: 'bg-transparent border-2 border-primary-500 text-primary-500',
+                                            shadow: 'bg-white text-neutral-900 shadow-lg',
+                                            glass: 'bg-white/20 backdrop-blur border border-white/30 text-neutral-900',
+                                            rounded: 'bg-primary-500 text-white rounded-2xl',
+                                            pill: 'bg-primary-500 text-white rounded-full',
+                                            gradient: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
+                                            neon: 'bg-transparent border-2 border-green-400 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]'
+                                        };
+                                        return (
+                                            <button
+                                                key={style.id}
+                                                className={`flex flex-col items-center gap-2 p-3 bg-white border-2 rounded-xl cursor-pointer transition-all ${qr.button_style === style.id ? 'border-primary-500 ring-2 ring-primary-100' : 'border-transparent hover:border-neutral-200'}`}
+                                                onClick={() => updateField('button_style', style.id)}
+                                                disabled={!canEdit}
+                                            >
+                                                <div className={`w-full py-2 px-3 text-xs font-medium text-center rounded-lg ${previewStyles[style.style]}`}>
+                                                    Button
+                                                </div>
+                                                <span className="text-xs font-medium text-neutral-600">{style.name}</span>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
                             {/* Text Color */}
-                            <div className={styles.formGroup}>
-                                <label>Text Color</label>
-                                <p className={styles.sectionDesc}>Customize name and description color</p>
-                                <div className={styles.colorPickerGroup}>
+                            <div>
+                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-2 block">Text Color</label>
+                                <p className="text-sm text-neutral-500 mb-3">Customize name and description color</p>
+                                <div className="flex gap-3 items-center">
                                     <input
                                         type="color"
                                         value={qr.theme?.textColor || '#ffffff'}
                                         onChange={(e) => updateTextColor(e.target.value)}
                                         disabled={!canEdit}
-                                        className={styles.colorPicker}
+                                        className="w-14 h-10 border border-neutral-200 rounded-lg cursor-pointer"
                                     />
                                     <input
                                         type="text"
                                         value={qr.theme?.textColor || '#ffffff'}
                                         onChange={(e) => updateTextColor(e.target.value)}
                                         disabled={!canEdit}
-                                        className={styles.colorInput}
+                                        className="flex-1 p-3 border border-neutral-200 rounded-lg text-sm font-mono focus:outline-none focus:border-primary-500"
                                         placeholder="#ffffff"
                                     />
                                 </div>
                             </div>
-                        </div>
+                        </section>
                     )}
                 </div>
 
                 {/* Preview */}
-                <div className={styles.preview}>
-                    <div className={styles.previewHeader}>
-                        <span>Preview</span>
-                        <a href={`/qr/${qr.slug}`} target="_blank" className={styles.previewLink}>
-                            Open Page →
+                <div className="bg-neutral-100 border-l border-neutral-200 flex flex-col overflow-hidden lg:order-last order-first">
+                    <div className="px-4 py-3 bg-white border-b border-neutral-200 flex justify-between items-center">
+                        <span className="font-semibold text-sm text-neutral-700">Preview</span>
+                        <a
+                            href={`/qr/${qr.slug}`}
+                            target="_blank"
+                            className="flex items-center gap-1 text-sm text-primary-500 hover:underline"
+                        >
+                            Open Page <ExternalLink size={14} />
                         </a>
                     </div>
 
-                    <div className={styles.previewFrame}>
-                        <div className={styles.phoneFrame}>
-                            <div className={styles.phoneSpeaker}></div>
-                            <div className={styles.phoneScreen} style={themeStyles}>
-                                <div className={styles.linkPage}>
+                    <div className="flex-1 flex justify-center items-start p-6 overflow-y-auto">
+                        <div className="w-[300px] bg-neutral-900 rounded-[40px] p-4 shadow-2xl">
+                            <div className="w-20 h-1.5 bg-neutral-700 rounded-full mx-auto mb-3" />
+                            <div className="rounded-[28px] overflow-hidden h-[600px]" style={themeStyles}>
+                                <div className="h-full px-5 py-8 flex flex-col items-center overflow-y-auto">
                                     {/* Logo */}
                                     {qr.logo_url ? (
-                                        <div className={styles.lpLogo}>
+                                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-white/30">
                                             <img
                                                 src={qr.logo_url}
                                                 alt={qr.display_name}
                                                 style={logoStyle}
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
                                     ) : (
-                                        <div className={styles.lpLogoPlaceholder}>
+                                        <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold mb-4">
                                             {(qr.display_name || qr.name || 'A').charAt(0).toUpperCase()}
                                         </div>
                                     )}
 
-
                                     {/* Name */}
-                                    <h2 className={styles.lpName} style={{ color: qr.theme?.textColor || '#ffffff' }}>{qr.display_name || 'Your Name'}</h2>
+                                    <h2 className="text-xl font-bold mb-2 text-center" style={{ color: qr.theme?.textColor || '#ffffff' }}>
+                                        {qr.display_name || 'Your Name'}
+                                    </h2>
 
                                     {/* Bio */}
-                                    {qr.bio && <p className={styles.lpBio} style={{ color: qr.theme?.textColor || '#ffffff' }}>{qr.bio}</p>}
+                                    {qr.bio && (
+                                        <p className="text-sm opacity-90 text-center leading-relaxed mb-6" style={{ color: qr.theme?.textColor || '#ffffff' }}>
+                                            {qr.bio}
+                                        </p>
+                                    )}
 
                                     {/* Links */}
-                                    <div className={styles.lpLinks}>
-                                        {(qr.links || []).filter(l => l.title && l.url).map((link, i) => (
-                                            <div
-                                                key={i}
-                                                className={`${styles.lpLink} ${styles[qr.button_style || 'filled']}`}
-                                            >
-                                                <span className={styles.lpLinkIcon} style={{ background: PRESET_ICONS[link.icon]?.color }}>
-                                                    {link.customIcon ? (
-                                                        <img src={link.customIcon} alt="" />
-                                                    ) : (
-                                                        PRESET_ICONS[link.icon]?.svg || PRESET_ICONS.website.svg
-                                                    )}
-                                                </span>
-                                                <span className={styles.lpLinkTitle}>{link.title}</span>
-                                            </div>
-                                        ))}
+                                    <div className="w-full flex flex-col gap-2.5">
+                                        {(qr.links || []).filter(l => l.title && l.url).map((link, i) => {
+                                            const btnStyles: Record<string, string> = {
+                                                filled: 'bg-white/15 backdrop-blur',
+                                                outline: 'bg-transparent border-2 border-current opacity-90',
+                                                shadow: 'bg-white !text-neutral-900 shadow-lg',
+                                                glass: 'bg-white/10 backdrop-blur-xl border border-white/20',
+                                                rounded: 'bg-white/15 rounded-2xl',
+                                                pill: 'bg-white/15 rounded-full',
+                                                gradient: 'bg-gradient-to-r from-white/25 to-white/5 border border-white/20',
+                                                neon: 'bg-transparent border-2 border-current shadow-[0_0_10px_currentColor,0_0_20px_rgba(255,255,255,0.1)]'
+                                            };
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-transform hover:-translate-y-0.5 ${btnStyles[qr.button_style || 'filled']}`}
+                                                >
+                                                    <span
+                                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0"
+                                                        style={{ background: PRESET_ICONS[link.icon]?.color }}
+                                                    >
+                                                        {link.customIcon ? (
+                                                            <img src={link.customIcon} alt="" className="w-5 h-5 rounded object-cover" />
+                                                        ) : (
+                                                            <span className="w-4 h-4">{PRESET_ICONS[link.icon]?.svg || PRESET_ICONS.website.svg}</span>
+                                                        )}
+                                                    </span>
+                                                    <span className="flex-1 text-sm font-semibold">{link.title}</span>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
 
                     {/* QR Code */}
-                    <div className={styles.qrSection}>
-                        <div className={styles.qrCode}>
-                            <img src={getQRCodeUrl()} alt="QR Code" />
+                    <div className="p-4 bg-white border-t border-neutral-200 flex items-center gap-4">
+                        <div className="w-[70px] h-[70px] bg-white rounded-lg overflow-hidden border border-neutral-200 flex-shrink-0">
+                            <img src={getQRCodeUrl()} alt="QR Code" className="w-full h-full" />
                         </div>
-                        <div className={styles.qrInfo}>
-                            <p>Scan to view your page</p>
+                        <div className="flex-1">
+                            <p className="text-xs text-neutral-500 mb-2">Scan to view your page</p>
                             <button
                                 onClick={downloadQRCodeAsPNG}
-                                className={styles.downloadQR}
+                                className="flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                 disabled={downloading}
                             >
+                                <Download size={14} />
                                 {downloading ? 'Downloading...' : 'Download QR'}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
+

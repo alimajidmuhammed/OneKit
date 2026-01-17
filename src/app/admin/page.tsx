@@ -1,7 +1,6 @@
 // @ts-nocheck
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { formatDate, formatCurrency } from '@/lib/utils/helpers';
 import {
@@ -11,10 +10,10 @@ import {
     DollarSign,
     PlusCircle,
     ShieldCheck,
-    CreditCard,
-    ArrowRight
+    ArrowRight,
+    Loader2
 } from 'lucide-react';
-import styles from './page.module.css';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
     const { users, subscriptions, payments, loading, fetchUsers, fetchAllSubscriptions, fetchPendingPayments } = useAdmin();
@@ -32,123 +31,131 @@ export default function AdminDashboard() {
     const recentSubscriptions = subscriptions.slice(0, 5);
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
-                <h1>Admin Dashboard</h1>
-                <p>Overview of your platform's performance</p>
+        <div className="p-8 max-w-[1400px]">
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-2xl font-bold mb-2 text-white">Admin Dashboard</h1>
+                <p className="text-neutral-400">Overview of your platform's performance</p>
             </div>
 
             {/* Stats */}
-            <div className={styles.stats}>
-                <div className={styles.statCard}>
-                    <div className={`${styles.statIcon} ${styles.statIconUsers}`}>
-                        <Users size={24} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                    <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-500">
+                        <Users size={28} />
                     </div>
-                    <div className={styles.statContent}>
-                        <span className={styles.statValue}>{stats.totalUsers}</span>
-                        <span className={styles.statLabel}>Total Users</span>
-                    </div>
-                </div>
-
-                <div className={styles.statCard}>
-                    <div className={`${styles.statIcon} ${styles.statIconActive}`}>
-                        <CheckCircle size={24} />
-                    </div>
-                    <div className={styles.statContent}>
-                        <span className={styles.statValue}>{stats.activeSubscriptions}</span>
-                        <span className={styles.statLabel}>Active Subscriptions</span>
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-white">{stats.totalUsers}</span>
+                        <span className="text-sm text-neutral-500">Total Users</span>
                     </div>
                 </div>
 
-                <div className={styles.statCard}>
-                    <div className={`${styles.statIcon} ${styles.statIconPending}`}>
-                        <Clock size={24} />
+                <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                    <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-green-500/10 text-green-500">
+                        <CheckCircle size={28} />
                     </div>
-                    <div className={styles.statContent}>
-                        <span className={styles.statValue}>{stats.pendingPayments}</span>
-                        <span className={styles.statLabel}>Pending Payments</span>
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-white">{stats.activeSubscriptions}</span>
+                        <span className="text-sm text-neutral-500">Active Subscriptions</span>
                     </div>
                 </div>
 
-                <div className={styles.statCard}>
-                    <div className={`${styles.statIcon} ${styles.statIconRevenue}`}>
-                        <DollarSign size={24} />
+                <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                    <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                        <Clock size={28} />
                     </div>
-                    <div className={styles.statContent}>
-                        <span className={styles.statValue}>{formatCurrency(stats.totalRevenue)}</span>
-                        <span className={styles.statLabel}>Total Revenue</span>
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-white">{stats.pendingPayments}</span>
+                        <span className="text-sm text-neutral-500">Pending Payments</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                    <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-purple-500/10 text-purple-500">
+                        <DollarSign size={28} />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-white">{formatCurrency(stats.totalRevenue)}</span>
+                        <span className="text-sm text-neutral-500">Total Revenue</span>
                     </div>
                 </div>
             </div>
 
-            <div className={styles.grid}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {/* Recent Payments */}
-                <div className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <h2>Pending Payments</h2>
-                        <a href="/admin/payments" className={styles.viewAll}>View all <ArrowRight size={14} /></a>
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="flex justify-between items-center px-6 py-5 border-b border-neutral-800">
+                        <h2 className="text-lg font-semibold text-white">Pending Payments</h2>
+                        <Link href="/admin/payments" className="flex items-center gap-1 text-sm text-primary-500 no-underline hover:underline">
+                            View all <ArrowRight size={14} />
+                        </Link>
                     </div>
 
                     {loading ? (
-                        <div className={styles.loading}>
-                            <div className={styles.spinner} />
+                        <div className="flex justify-center p-8">
+                            <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
                         </div>
                     ) : recentPayments.length > 0 ? (
-                        <div className={styles.list}>
+                        <div className="p-2">
                             {recentPayments.map((payment) => (
-                                <div key={payment.id} className={styles.listItem}>
-                                    <div className={styles.listItemInfo}>
-                                        <span className={styles.listItemTitle}>
+                                <div key={payment.id} className="flex items-center justify-between p-4 rounded-lg hover:bg-neutral-800 transition-colors">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-medium text-white">
                                             {payment.user?.full_name || payment.user?.email || 'Unknown User'}
                                         </span>
-                                        <span className={styles.listItemMeta}>
+                                        <span className="text-sm text-neutral-500">
                                             {payment.subscription?.service?.name || 'Unknown Service'} • {formatDate(payment.created_at)}
                                         </span>
                                     </div>
-                                    <div className={styles.listItemValue}>
+                                    <div className="font-semibold text-white">
                                         {formatCurrency(payment.amount)}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className={styles.emptyState}>
+                        <div className="p-8 text-center text-neutral-500">
                             <p>No pending payments</p>
                         </div>
                     )}
                 </div>
 
                 {/* Recent Subscriptions */}
-                <div className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <h2>Recent Subscriptions</h2>
-                        <a href="/admin/subscriptions" className={styles.viewAll}>View all <ArrowRight size={14} /></a>
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                    <div className="flex justify-between items-center px-6 py-5 border-b border-neutral-800">
+                        <h2 className="text-lg font-semibold text-white">Recent Subscriptions</h2>
+                        <Link href="/admin/subscriptions" className="flex items-center gap-1 text-sm text-primary-500 no-underline hover:underline">
+                            View all <ArrowRight size={14} />
+                        </Link>
                     </div>
 
                     {loading ? (
-                        <div className={styles.loading}>
-                            <div className={styles.spinner} />
+                        <div className="flex justify-center p-8">
+                            <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
                         </div>
                     ) : recentSubscriptions.length > 0 ? (
-                        <div className={styles.list}>
+                        <div className="p-2">
                             {recentSubscriptions.map((sub) => (
-                                <div key={sub.id} className={styles.listItem}>
-                                    <div className={styles.listItemInfo}>
-                                        <span className={styles.listItemTitle}>
+                                <div key={sub.id} className="flex items-center justify-between p-4 rounded-lg hover:bg-neutral-800 transition-colors">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-medium text-white">
                                             {sub.user?.full_name || sub.user?.email || 'Unknown User'}
                                         </span>
-                                        <span className={styles.listItemMeta}>
+                                        <span className="text-sm text-neutral-500">
                                             {sub.service?.name || 'Unknown Service'}
                                         </span>
                                     </div>
-                                    <span className={`${styles.statusBadge} ${sub.status === 'active' ? styles.statusActive : styles.statusInactive}`}>
+                                    <span className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${sub.status === 'active'
+                                            ? 'bg-green-500/10 text-green-500'
+                                            : 'bg-neutral-700 text-neutral-400'
+                                        }`}>
                                         {sub.status}
                                     </span>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className={styles.emptyState}>
+                        <div className="p-8 text-center text-neutral-500">
                             <p>No subscriptions yet</p>
                         </div>
                     )}
@@ -156,36 +163,36 @@ export default function AdminDashboard() {
             </div>
 
             {/* Quick Actions */}
-            <div className={styles.quickActions}>
-                <h2>Quick Actions</h2>
-                <div className={styles.actionsGrid}>
-                    <a href="/admin/users" className={styles.actionCard}>
-                        <div className={styles.actionIcon}>
-                            <Users size={24} />
+            <div className="mt-8">
+                <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <Link href="/admin/users" className="flex flex-col items-center gap-3 p-6 bg-neutral-900 border border-neutral-800 rounded-xl no-underline transition-all hover:border-primary-500/50 hover:shadow-lg hover:-translate-y-0.5">
+                        <div className="w-12 h-12 flex items-center justify-center bg-primary-500/10 rounded-lg">
+                            <Users size={24} className="text-primary-500" />
                         </div>
-                        <span>Manage Users</span>
-                    </a>
+                        <span className="font-medium text-white">Manage Users</span>
+                    </Link>
 
-                    <a href="/admin/payments" className={styles.actionCard}>
-                        <div className={styles.actionIcon}>
-                            <CheckCircle size={24} />
+                    <Link href="/admin/payments" className="flex flex-col items-center gap-3 p-6 bg-neutral-900 border border-neutral-800 rounded-xl no-underline transition-all hover:border-primary-500/50 hover:shadow-lg hover:-translate-y-0.5">
+                        <div className="w-12 h-12 flex items-center justify-center bg-primary-500/10 rounded-lg">
+                            <CheckCircle size={24} className="text-primary-500" />
                         </div>
-                        <span>Approve Payments</span>
-                    </a>
+                        <span className="font-medium text-white">Approve Payments</span>
+                    </Link>
 
-                    <a href="/admin/subscriptions" className={styles.actionCard}>
-                        <div className={styles.actionIcon}>
-                            <PlusCircle size={24} />
+                    <Link href="/admin/subscriptions" className="flex flex-col items-center gap-3 p-6 bg-neutral-900 border border-neutral-800 rounded-xl no-underline transition-all hover:border-primary-500/50 hover:shadow-lg hover:-translate-y-0.5">
+                        <div className="w-12 h-12 flex items-center justify-center bg-primary-500/10 rounded-lg">
+                            <PlusCircle size={24} className="text-primary-500" />
                         </div>
-                        <span>Renew Subscriptions</span>
-                    </a>
+                        <span className="font-medium text-white">Renew Subscriptions</span>
+                    </Link>
 
-                    <a href="/admin/roles" className={styles.actionCard}>
-                        <div className={styles.actionIcon}>
-                            <ShieldCheck size={24} />
+                    <Link href="/admin/roles" className="flex flex-col items-center gap-3 p-6 bg-neutral-900 border border-neutral-800 rounded-xl no-underline transition-all hover:border-primary-500/50 hover:shadow-lg hover:-translate-y-0.5">
+                        <div className="w-12 h-12 flex items-center justify-center bg-primary-500/10 rounded-lg">
+                            <ShieldCheck size={24} className="text-primary-500" />
                         </div>
-                        <span>Manage Roles</span>
-                    </a>
+                        <span className="font-medium text-white">Manage Roles</span>
+                    </Link>
                 </div>
             </div>
         </div>

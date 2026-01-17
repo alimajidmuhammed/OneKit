@@ -1,9 +1,33 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit, RATE_LIMITS, getRateLimitHeaders } from '@/lib/utils/rateLimit';
 
-export async function POST(req) {
+interface GenerateSummaryRequest {
+    jobTitle?: string;
+    keywords?: string;
+    experience?: string;
+}
+
+interface GenerateSummaryResponse {
+    summary?: string;
+    error?: string;
+}
+
+interface GeminiModel {
+    name: string;
+    supportedGenerationMethods: string[];
+}
+
+interface GeminiModelsResponse {
+    models: GeminiModel[];
+}
+
+/**
+ * POST /api/ai/generate-summary
+ * Generate a professional summary for a CV using Gemini AI
+ */
+export async function POST(req: NextRequest): Promise<NextResponse<GenerateSummaryResponse>> {
     try {
         // SECURITY: Authenticate user to prevent API abuse
         const supabase = await createClient();
@@ -25,8 +49,8 @@ export async function POST(req) {
             );
         }
 
-
-        const { jobTitle, keywords, experience } = await req.json();
+        const body: GenerateSummaryRequest = await req.json();
+        const { jobTitle, keywords, experience } = body;
 
         if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
             return NextResponse.json(
@@ -35,15 +59,14 @@ export async function POST(req) {
             );
         }
 
-
         const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
         const genAI = new GoogleGenerativeAI(apiKey);
 
         // 1. Get all available models for this key
-        let candidateModels = [];
+        let candidateModels: string[] = [];
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-            const data = await response.json();
+            const data: GeminiModelsResponse = await response.json();
 
             candidateModels = data.models
                 .filter(m => m.supportedGenerationMethods.includes("generateContent"))
@@ -56,7 +79,8 @@ export async function POST(req) {
                 return aIsFlash - bIsFlash;
             });
         } catch (e) {
-            console.warn("Failed to list models, using absolute defaults:", e.message);
+            const error = e instanceof Error ? e.message : 'Unknown error';
+            console.warn("Failed to list models, using absolute defaults:", error);
             candidateModels = ["gemini-1.5-flash", "gemini-pro", "gemini-2.0-flash-exp"];
         }
 
@@ -71,13 +95,13 @@ export async function POST(req) {
     `;
 
         // 2. Try generation with each candidate until one works
-        let generatedText = null;
+        let generatedText: string | null = null;
         let lastError = "";
 
         for (const modelName of candidateModels) {
             try {
                 console.log(`Attempting AI generation with: ${modelName}`);
-                const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
+                const model: GenerativeModel = genAI.getGenerativeModel({ model: modelName });
                 const result = await model.generateContent(prompt);
                 generatedText = result.response.text().trim();
 
@@ -86,9 +110,10 @@ export async function POST(req) {
                     break;
                 }
             } catch (err) {
-                console.warn(`Model ${modelName} failed:`, err.message);
-                lastError = err.message;
-                continue; // Try next model
+                const error = err instanceof Error ? err.message : 'Unknown error';
+                console.warn(`Model ${modelName} failed:`, error);
+                lastError = error;
+                continue;
             }
         }
 
@@ -99,8 +124,9 @@ export async function POST(req) {
         return NextResponse.json({ summary: generatedText });
     } catch (error) {
         console.error("AI Summary Error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to generate summary";
         return NextResponse.json(
-            { error: error.message || "Failed to generate summary" },
+            { error: errorMessage },
             { status: 500 }
         );
     }

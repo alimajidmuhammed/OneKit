@@ -220,7 +220,7 @@ export function useMenu() {
 
 
     // Add category
-    const addCategory = useCallback(async (menuId, name, description = '') => {
+    const addCategory = useCallback(async (menuId, name, description = '', imageUrl = '') => {
         setSaving(true);
         try {
             const sortOrder = categories.length;
@@ -230,6 +230,7 @@ export function useMenu() {
                     menu_id: menuId,
                     name,
                     description,
+                    image_url: imageUrl,
                     sort_order: sortOrder,
                 })
                 .select()

@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { getSupabaseClient } from '@/lib/supabase/client';
-import styles from '../page.module.css';
+import { Eye, Calendar, TrendingUp, Globe, RefreshCw, Loader2 } from 'lucide-react';
 
 // Service colors for charts
 const SERVICE_COLORS = {
@@ -24,7 +24,7 @@ export default function AnalyticsPage() {
         byCountry: [],
         recentVisits: [],
     });
-    const [dateRange, setDateRange] = useState('7d'); // '24h', '7d', '30d', 'all'
+    const [dateRange, setDateRange] = useState('7d');
     const supabase = getSupabaseClient();
 
     useEffect(() => {
@@ -34,7 +34,6 @@ export default function AnalyticsPage() {
     const fetchAnalytics = async () => {
         setLoading(true);
         try {
-            // Calculate date range
             const now = new Date();
             let startDate = null;
 
@@ -46,7 +45,6 @@ export default function AnalyticsPage() {
                 startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
             }
 
-            // Fetch all visits
             let query = supabase
                 .from('page_visits')
                 .select('*')
@@ -64,16 +62,13 @@ export default function AnalyticsPage() {
                 return;
             }
 
-            // Calculate today's visits
             const todayStart = new Date();
             todayStart.setHours(0, 0, 0, 0);
             const todayVisits = visits?.filter(v => new Date(v.created_at) >= todayStart).length || 0;
 
-            // Calculate weekly visits
             const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
             const weeklyVisits = visits?.filter(v => new Date(v.created_at) >= weekStart).length || 0;
 
-            // Group by service
             const serviceGroups = {};
             visits?.forEach(v => {
                 const service = v.service_type || 'unknown';
@@ -84,7 +79,6 @@ export default function AnalyticsPage() {
             });
             const byService = Object.values(serviceGroups).sort((a, b) => b.count - a.count);
 
-            // Group by country
             const countryGroups = {};
             visits?.forEach(v => {
                 const country = v.country || 'Unknown';
@@ -95,7 +89,6 @@ export default function AnalyticsPage() {
             });
             const byCountry = Object.values(countryGroups).sort((a, b) => b.count - a.count).slice(0, 10);
 
-            // Recent visits (last 20)
             const recentVisits = visits?.slice(0, 20) || [];
 
             setAnalytics({
@@ -139,24 +132,18 @@ export default function AnalyticsPage() {
     const maxServiceCount = Math.max(...analytics.byService.map(s => s.count), 1);
 
     return (
-        <div className={styles.page}>
-            <header className={styles.header}>
+        <div className="p-4 sm:p-8 max-w-[1400px]">
+            {/* Header */}
+            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1 className={styles.title}>📊 Analytics</h1>
-                    <p className={styles.subtitle}>Track visitor activity across all services</p>
+                    <h1 className="text-2xl font-bold text-white mb-2">📊 Analytics</h1>
+                    <p className="text-neutral-400">Track visitor activity across all services</p>
                 </div>
-                <div className={styles.headerActions}>
+                <div className="flex items-center gap-3">
                     <select
                         value={dateRange}
                         onChange={(e) => setDateRange(e.target.value)}
-                        style={{
-                            padding: '10px 16px',
-                            borderRadius: '8px',
-                            border: '1px solid #e2e8f0',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            cursor: 'pointer'
-                        }}
+                        className="px-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-lg text-white text-sm font-medium cursor-pointer focus:outline-none focus:border-primary-500"
                     >
                         <option value="24h">Last 24 Hours</option>
                         <option value="7d">Last 7 Days</option>
@@ -165,94 +152,83 @@ export default function AnalyticsPage() {
                     </select>
                     <button
                         onClick={fetchAnalytics}
-                        style={{
-                            padding: '10px 16px',
-                            borderRadius: '8px',
-                            border: 'none',
-                            background: '#3b82f6',
-                            color: 'white',
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            cursor: 'pointer'
-                        }}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
                     >
-                        🔄 Refresh
+                        <RefreshCw size={16} /> Refresh
                     </button>
                 </div>
             </header>
 
             {loading ? (
-                <div className={styles.loading}>
-                    <div className={styles.spinner}></div>
-                    <p>Loading analytics...</p>
+                <div className="flex flex-col items-center justify-center py-16">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-4" />
+                    <p className="text-neutral-400">Loading analytics...</p>
                 </div>
             ) : (
                 <>
                     {/* Stats Cards */}
-                    <div className={styles.statsGrid}>
-                        <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ background: '#eff6ff' }}>
-                                👁️
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                        <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+                                <Eye size={28} />
                             </div>
-                            <div className={styles.statContent}>
-                                <span className={styles.statValue}>{analytics.totalVisits.toLocaleString()}</span>
-                                <span className={styles.statLabel}>Total Visits</span>
-                            </div>
-                        </div>
-                        <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ background: '#f0fdf4' }}>
-                                📅
-                            </div>
-                            <div className={styles.statContent}>
-                                <span className={styles.statValue}>{analytics.todayVisits.toLocaleString()}</span>
-                                <span className={styles.statLabel}>Today</span>
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-bold text-white">{analytics.totalVisits.toLocaleString()}</span>
+                                <span className="text-sm text-neutral-500">Total Visits</span>
                             </div>
                         </div>
-                        <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ background: '#fef3c7' }}>
-                                📈
+                        <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-green-500/10 text-green-500">
+                                <Calendar size={28} />
                             </div>
-                            <div className={styles.statContent}>
-                                <span className={styles.statValue}>{analytics.weeklyVisits.toLocaleString()}</span>
-                                <span className={styles.statLabel}>This Week</span>
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-bold text-white">{analytics.todayVisits.toLocaleString()}</span>
+                                <span className="text-sm text-neutral-500">Today</span>
                             </div>
                         </div>
-                        <div className={styles.statCard}>
-                            <div className={styles.statIcon} style={{ background: '#fce7f3' }}>
-                                🌍
+                        <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                                <TrendingUp size={28} />
                             </div>
-                            <div className={styles.statContent}>
-                                <span className={styles.statValue}>{analytics.byCountry.length}</span>
-                                <span className={styles.statLabel}>Countries</span>
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-bold text-white">{analytics.weeklyVisits.toLocaleString()}</span>
+                                <span className="text-sm text-neutral-500">This Week</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4 p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-purple-500/10 text-purple-500">
+                                <Globe size={28} />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-2xl font-bold text-white">{analytics.byCountry.length}</span>
+                                <span className="text-sm text-neutral-500">Countries</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Charts Row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '24px' }}>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                         {/* By Service */}
-                        <div className={styles.card}>
-                            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>
-                                📊 Visits by Service
-                            </h3>
+                        <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                            <h3 className="text-base font-semibold text-white mb-5">📊 Visits by Service</h3>
                             {analytics.byService.length === 0 ? (
-                                <p style={{ color: '#64748b', textAlign: 'center', padding: '40px 0' }}>No data available</p>
+                                <p className="text-neutral-500 text-center py-10">No data available</p>
                             ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div className="flex flex-col gap-3">
                                     {analytics.byService.map((item) => (
                                         <div key={item.service}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                                <span style={{ fontSize: '14px', fontWeight: '500' }}>{getServiceName(item.service)}</span>
-                                                <span style={{ fontSize: '14px', color: '#64748b' }}>{item.count.toLocaleString()}</span>
+                                            <div className="flex justify-between mb-1">
+                                                <span className="text-sm font-medium text-white">{getServiceName(item.service)}</span>
+                                                <span className="text-sm text-neutral-500">{item.count.toLocaleString()}</span>
                                             </div>
-                                            <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                                                <div style={{
-                                                    height: '100%',
-                                                    width: `${(item.count / maxServiceCount) * 100}%`,
-                                                    background: SERVICE_COLORS[item.service] || '#94a3b8',
-                                                    borderRadius: '4px',
-                                                    transition: 'width 0.3s ease'
-                                                }} />
+                                            <div className="h-2 bg-neutral-800 rounded overflow-hidden">
+                                                <div
+                                                    className="h-full rounded transition-all duration-300"
+                                                    style={{
+                                                        width: `${(item.count / maxServiceCount) * 100}%`,
+                                                        background: SERVICE_COLORS[item.service] || '#94a3b8'
+                                                    }}
+                                                />
                                             </div>
                                         </div>
                                     ))}
@@ -261,51 +237,24 @@ export default function AnalyticsPage() {
                         </div>
 
                         {/* By Country */}
-                        <div className={styles.card}>
-                            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>
-                                🌍 Top Countries
-                            </h3>
+                        <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                            <h3 className="text-base font-semibold text-white mb-5">🌍 Top Countries</h3>
                             {analytics.byCountry.length === 0 ? (
-                                <p style={{ color: '#64748b', textAlign: 'center', padding: '40px 0' }}>No location data available</p>
+                                <p className="text-neutral-500 text-center py-10">No location data available</p>
                             ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <div className="flex flex-col gap-2">
                                     {analytics.byCountry.map((item, index) => (
                                         <div
                                             key={item.country}
-                                            style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                padding: '10px 12px',
-                                                background: index % 2 === 0 ? '#f8fafc' : 'white',
-                                                borderRadius: '8px'
-                                            }}
+                                            className={`flex justify-between items-center p-3 rounded-lg ${index % 2 === 0 ? 'bg-neutral-800/50' : ''}`}
                                         >
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <span style={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    borderRadius: '50%',
-                                                    background: '#e2e8f0',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '12px',
-                                                    fontWeight: '600',
-                                                    color: '#64748b'
-                                                }}>
+                                            <div className="flex items-center gap-3">
+                                                <span className="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-xs font-semibold text-neutral-400">
                                                     {index + 1}
                                                 </span>
-                                                <span style={{ fontSize: '14px', fontWeight: '500' }}>{item.country}</span>
+                                                <span className="text-sm font-medium text-white">{item.country}</span>
                                             </div>
-                                            <span style={{
-                                                padding: '4px 10px',
-                                                background: '#eff6ff',
-                                                color: '#3b82f6',
-                                                borderRadius: '12px',
-                                                fontSize: '13px',
-                                                fontWeight: '600'
-                                            }}>
+                                            <span className="px-2.5 py-1 bg-primary-500/10 text-primary-400 rounded-full text-xs font-semibold">
                                                 {item.count.toLocaleString()}
                                             </span>
                                         </div>
@@ -316,43 +265,37 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Recent Visits Table */}
-                    <div className={styles.card}>
-                        <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>
-                            🕐 Recent Visits
-                        </h3>
+                    <div className="p-6 bg-neutral-900 border border-neutral-800 rounded-xl">
+                        <h3 className="text-base font-semibold text-white mb-5">🕐 Recent Visits</h3>
                         {analytics.recentVisits.length === 0 ? (
-                            <p style={{ color: '#64748b', textAlign: 'center', padding: '40px 0' }}>No visits recorded yet</p>
+                            <p className="text-neutral-500 text-center py-10">No visits recorded yet</p>
                         ) : (
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
                                     <thead>
-                                        <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                                            <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Date</th>
-                                            <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Service</th>
-                                            <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Page</th>
-                                            <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>Country</th>
-                                            <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>City</th>
+                                        <tr className="border-b-2 border-neutral-800">
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Date</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Service</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Page</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">Country</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase">City</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {analytics.recentVisits.map((visit, index) => (
-                                            <tr key={visit.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                                <td style={{ padding: '12px 8px', fontSize: '14px' }}>{formatDate(visit.created_at)}</td>
-                                                <td style={{ padding: '12px 8px' }}>
-                                                    <span style={{
-                                                        padding: '4px 10px',
-                                                        borderRadius: '12px',
-                                                        background: SERVICE_COLORS[visit.service_type] || '#94a3b8',
-                                                        color: 'white',
-                                                        fontSize: '12px',
-                                                        fontWeight: '600'
-                                                    }}>
+                                    <tbody className="divide-y divide-neutral-800">
+                                        {analytics.recentVisits.map((visit) => (
+                                            <tr key={visit.id} className="hover:bg-neutral-800/30 transition-colors">
+                                                <td className="px-4 py-3 text-sm text-neutral-300">{formatDate(visit.created_at)}</td>
+                                                <td className="px-4 py-3">
+                                                    <span
+                                                        className="px-2.5 py-1 rounded-full text-xs font-semibold text-white"
+                                                        style={{ background: SERVICE_COLORS[visit.service_type] || '#94a3b8' }}
+                                                    >
                                                         {getServiceName(visit.service_type)}
                                                     </span>
                                                 </td>
-                                                <td style={{ padding: '12px 8px', fontSize: '14px', color: '#64748b' }}>{visit.page_slug || '-'}</td>
-                                                <td style={{ padding: '12px 8px', fontSize: '14px' }}>{visit.country || 'Unknown'}</td>
-                                                <td style={{ padding: '12px 8px', fontSize: '14px', color: '#64748b' }}>{visit.city || '-'}</td>
+                                                <td className="px-4 py-3 text-sm text-neutral-500">{visit.page_slug || '-'}</td>
+                                                <td className="px-4 py-3 text-sm text-neutral-300">{visit.country || 'Unknown'}</td>
+                                                <td className="px-4 py-3 text-sm text-neutral-500">{visit.city || '-'}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -363,12 +306,10 @@ export default function AnalyticsPage() {
 
                     {/* Setup Instructions */}
                     {analytics.totalVisits === 0 && (
-                        <div className={styles.card} style={{ background: '#fffbeb', border: '1px solid #fbbf24' }}>
-                            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', color: '#92400e' }}>
-                                ⚠️ No Analytics Data Yet
-                            </h3>
-                            <p style={{ color: '#92400e', fontSize: '14px', lineHeight: '1.6' }}>
-                                Analytics tracking requires a <code style={{ background: '#fef3c7', padding: '2px 6px', borderRadius: '4px' }}>page_visits</code> table in your Supabase database.
+                        <div className="mt-6 p-6 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                            <h3 className="text-base font-semibold text-amber-400 mb-3">⚠️ No Analytics Data Yet</h3>
+                            <p className="text-amber-300 text-sm leading-relaxed">
+                                Analytics tracking requires a <code className="px-1.5 py-0.5 bg-amber-500/20 rounded">page_visits</code> table in your Supabase database.
                                 Create this table with columns: <code>id</code>, <code>service_type</code>, <code>page_slug</code>, <code>country</code>, <code>city</code>, <code>created_at</code>.
                             </p>
                         </div>

@@ -1,16 +1,31 @@
-import { createClient } from '@supabase/supabase-js';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export async function POST(request) {
+interface ResetPasswordRequest {
+    accessToken: string;
+    refreshToken?: string;
+    newPassword: string;
+}
+
+interface ResetPasswordResponse {
+    success?: boolean;
+    error?: string;
+}
+
+/**
+ * POST /api/auth/reset-password
+ * Reset a user's password using an access token from the reset email
+ */
+export async function POST(request: NextRequest): Promise<NextResponse<ResetPasswordResponse>> {
     // Create Supabase admin client inside handler
-    const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
+    const supabaseAdmin: SupabaseClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
     try {
-
-        const { accessToken, refreshToken, newPassword } = await request.json();
+        const body: ResetPasswordRequest = await request.json();
+        const { accessToken, newPassword } = body;
 
         if (!newPassword || newPassword.length < 6) {
             return NextResponse.json(

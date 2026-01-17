@@ -1,9 +1,34 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from "next/server";
+import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit, RATE_LIMITS, getRateLimitHeaders } from '@/lib/utils/rateLimit';
 
-export async function POST(req) {
+interface RefineBulletsRequest {
+    text?: string;
+    position?: string;
+    company?: string;
+    generateNew?: boolean;
+}
+
+interface RefineBulletsResponse {
+    refinedText?: string;
+    error?: string;
+}
+
+interface GeminiModel {
+    name: string;
+    supportedGenerationMethods: string[];
+}
+
+interface GeminiModelsResponse {
+    models: GeminiModel[];
+}
+
+/**
+ * POST /api/ai/refine-bullets
+ * Refine or generate job description bullets using Gemini AI
+ */
+export async function POST(req: NextRequest): Promise<NextResponse<RefineBulletsResponse>> {
     try {
         // SECURITY: Authenticate user to prevent API abuse
         const supabase = await createClient();
@@ -25,8 +50,8 @@ export async function POST(req) {
             );
         }
 
-
-        const { text, position, company, generateNew } = await req.json();
+        const body: RefineBulletsRequest = await req.json();
+        const { text, position, company, generateNew } = body;
 
         if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
             return NextResponse.json(
@@ -35,15 +60,14 @@ export async function POST(req) {
             );
         }
 
-
         const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
         const genAI = new GoogleGenerativeAI(apiKey);
 
         // 1. Get all available models
-        let candidateModels = [];
+        let candidateModels: string[] = [];
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-            const data = await response.json();
+            const data: GeminiModelsResponse = await response.json();
 
             candidateModels = data.models
                 .filter(m => m.supportedGenerationMethods.includes("generateContent"))
@@ -59,7 +83,7 @@ export async function POST(req) {
         }
 
         // Different prompts for generating new vs refining existing
-        let prompt;
+        let prompt: string;
         if (generateNew || !text || text.trim() === '') {
             prompt = `
 You are a professional resume writer. Generate a concise, impactful job description paragraph for the following position.
@@ -87,13 +111,13 @@ Return ONLY the refined text. No quotes.
         }
 
         // 2. Try until success
-        let refinedText = null;
+        let refinedText: string | null = null;
         let lastError = "";
 
         for (const modelName of candidateModels) {
             try {
                 console.log(`Attempting AI generation with: ${modelName}`);
-                const model = genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1beta' });
+                const model: GenerativeModel = genAI.getGenerativeModel({ model: modelName });
                 const result = await model.generateContent(prompt);
                 refinedText = result.response.text().trim();
                 if (refinedText) {
@@ -101,8 +125,9 @@ Return ONLY the refined text. No quotes.
                     break;
                 }
             } catch (err) {
-                console.log(`Model ${modelName} failed: ${err.message}`);
-                lastError = err.message;
+                const error = err instanceof Error ? err.message : 'Unknown error';
+                console.log(`Model ${modelName} failed: ${error}`);
+                lastError = error;
                 continue;
             }
         }
@@ -114,8 +139,9 @@ Return ONLY the refined text. No quotes.
         return NextResponse.json({ refinedText });
     } catch (error) {
         console.error("AI Refine Error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to generate description";
         return NextResponse.json(
-            { error: error.message || "Failed to generate description" },
+            { error: errorMessage },
             { status: 500 }
         );
     }
