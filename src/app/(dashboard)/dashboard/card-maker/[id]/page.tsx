@@ -16,6 +16,8 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import styles from './editor.module.css';
 import jsPDF from 'jspdf';
+import { BusinessCardPDF } from '@/components/pdf/BusinessCardPDF';
+import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
 
 const SECTIONS = [
     { id: 'branding', label: 'Branding', icon: '🎨' },
@@ -1149,9 +1151,12 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
 
                 <div className={styles.viewToggle}>
                     <div className={styles.exportTools} style={{ marginRight: 'auto', display: 'flex', gap: '8px' }}>
-                        <button className={styles.toolBtn} onClick={() => handleExport('pdf')} disabled={exporting}>
-                            {exporting ? '...' : 'PDF'}
-                        </button>
+                        <PDFDownloadButton
+                            document={<BusinessCardPDF card={card} />}
+                            fileName={`business-card-${card.name?.replace(/\s+/g, '-') || 'new'}.pdf`}
+                            className={styles.toolBtn}
+                            label="HQ"
+                        />
                         <button className={styles.toolBtn} onClick={() => handleExport('jpg')} disabled={exporting}>
                             {exporting ? '...' : 'JPG'}
                         </button>

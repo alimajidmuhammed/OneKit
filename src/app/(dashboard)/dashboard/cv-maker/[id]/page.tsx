@@ -2,6 +2,9 @@
 'use client';
 
 import { useState, useEffect, use, useRef, useCallback } from 'react';
+import { jsPDF } from 'jspdf';
+import { CVPDF } from '@/components/pdf/CVPDF';
+import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
 import { useRouter } from 'next/navigation';
 import { useCV } from '@/lib/hooks/useCV';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -1010,6 +1013,14 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                     <Icons.jpg />
                                     <span>Download JPG</span>
                                 </button>
+                                <div style={{ borderTop: '1px solid #e2e8f0', margin: '4px 0' }} />
+                                <PDFDownloadButton
+                                    document={<CVPDF cv={cv} />}
+                                    fileName={`cv-${cv.personalInfo?.fullName?.replace(/\s+/g, '-') || 'resume'}.pdf`}
+                                    label="HQ Text-Searchable PDF"
+                                    className={styles.hqPdfBtn}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '12px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '14px', color: '#3b82f6' }}
+                                />
                             </div>
                         )}
                     </div>

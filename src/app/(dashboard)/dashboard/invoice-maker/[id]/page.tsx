@@ -24,6 +24,8 @@ import {
     ImageRun,
     ShadingType,
 } from 'docx';
+import { InvoicePDF } from '@/components/pdf/InvoicePDF';
+import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
 import {
     Facebook,
     Instagram,
@@ -884,10 +886,12 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                         <FileText size={18} />
                         DOCX
                     </button>
-                    <button onClick={downloadPdf} disabled={downloading} className={styles.pdfBtn}>
-                        <FileText size={18} />
-                        PDF
-                    </button>
+                    <PDFDownloadButton
+                        document={<InvoicePDF invoice={invoice} labels={labels} brandColor={brandColor} />}
+                        fileName={`invoice-${invoice.invoice_id || 'new'}.pdf`}
+                        className={styles.pdfBtn}
+                        label="HQ PDF"
+                    />
                     <button onClick={downloadInvoice} disabled={downloading} className={styles.downloadBtn}>
                         {downloading ? (
                             'Preparing...'
