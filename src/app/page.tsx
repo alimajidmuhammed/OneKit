@@ -154,9 +154,9 @@ export default function HomePage() {
                           <h4 className="text-2xl font-bold text-white mb-2">Menu Maker</h4>
                           <span className="px-3 py-1 bg-accent-500/20 text-accent-400 text-xs font-bold rounded-full border border-accent-500/30">Most Popular</span>
                         </div>
-                        <div className="text-right">
-                          <div className="text-3xl font-bold text-white">25,000</div>
-                          <div className="text-sm text-neutral-400">IQD / Year</div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="text-2xl sm:text-3xl font-bold text-white whitespace-nowrap">25,000</div>
+                          <div className="text-xs sm:text-sm text-neutral-400 whitespace-nowrap">IQD / Year</div>
                         </div>
                       </div>
                       <ul className="space-y-3 mb-8 text-neutral-300">
@@ -183,9 +183,9 @@ export default function HomePage() {
                         <div>
                           <h4 className="text-2xl font-bold text-neutral-900 mb-2">QR Generator</h4>
                         </div>
-                        <div className="text-right">
-                          <div className="text-3xl font-bold text-neutral-900">10,000</div>
-                          <div className="text-sm text-neutral-500">IQD / Year</div>
+                        <div className="text-right flex-shrink-0">
+                          <div className="text-2xl sm:text-3xl font-bold text-neutral-900 whitespace-nowrap">10,000</div>
+                          <div className="text-xs sm:text-sm text-neutral-500 whitespace-nowrap">IQD / Year</div>
                         </div>
                       </div>
                       <ul className="space-y-3 mb-8 text-neutral-600">
