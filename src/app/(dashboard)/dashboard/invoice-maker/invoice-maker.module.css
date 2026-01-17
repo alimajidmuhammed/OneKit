@@ -31,9 +31,13 @@
     color: white;
     border: none;
     border-radius: var(--radius-lg);
-    font-weight: var(--font-weight-semibold);
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-fast);
+    white-space: nowrap;
+    min-height: 44px;
+    flex-shrink: 0;
 }
 
 .createBtn:hover {
@@ -44,7 +48,9 @@
 .createBtn svg {
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
 }
+
 
 /* Invoices Grid */
 .invoicesGrid {

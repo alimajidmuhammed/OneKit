@@ -28,21 +28,28 @@
     padding: var(--space-3) var(--space-5);
     background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
     color: white;
-    font-weight: var(--font-weight-medium);
+    font-size: 14px;
+    font-weight: 600;
     border: none;
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all var(--transition-fast);
+    white-space: nowrap;
+    min-height: 44px;
+    flex-shrink: 0;
 }
 
 .createBtn:hover {
     box-shadow: 0 4px 12px rgba(91, 110, 242, 0.3);
+    transform: translateY(-1px);
 }
 
 .createBtn svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
 }
+
 
 /* Trial Banner */
 .trialBanner {
