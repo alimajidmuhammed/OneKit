@@ -1275,35 +1275,76 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                     )}
 
                     {activeSection === 'education' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Education</h2>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Education
+                                </h2>
                                 <button
                                     onClick={addEducation}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '6px', background: '#2563eb', color: 'white', border: 'none', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all font-bold text-xs shadow-md hover:shadow-lg group"
                                 >
-                                    <Icons.add /> Add
+                                    <Icons.add size={16} className="group-hover:rotate-90 transition-transform" />
+                                    <span>Add Education</span>
                                 </button>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                            <div className="space-y-6">
                                 {(cv.education || []).map((e, idx) => (
-                                    <div key={e.id} className={styles.itemCard} style={{ padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', position: 'relative', background: '#f8fafc' }}>
+                                    <div
+                                        key={e.id}
+                                        className="relative p-6 rounded-2xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all group animate-in zoom-in-98 duration-300"
+                                    >
                                         <button
                                             onClick={() => removeEducation(idx)}
-                                            style={{ position: 'absolute', top: '12px', right: '12px', border: 'none', background: 'none', cursor: 'pointer', color: '#94a3b8' }}
+                                            className="absolute top-4 right-4 p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                                         >
-                                            <Icons.close />
+                                            <Icons.close size={16} />
                                         </button>
-                                        <div style={{ display: 'grid', gap: '12px' }}>
-                                            <input style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="Institution" value={e.institution} onChange={v => updateEducation(idx, 'institution', v.target.value)} />
-                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
-                                                <input style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="Degree / Field" value={e.degree} onChange={v => updateEducation(idx, 'degree', v.target.value)} />
-                                                <input style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }} placeholder="Year" value={e.endDate} onChange={v => updateEducation(idx, 'endDate', v.target.value)} />
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="md:col-span-2">
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Institution</label>
+                                                <input
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="University or School Name"
+                                                    value={e.institution}
+                                                    onChange={v => updateEducation(idx, 'institution', v.target.value)}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Degree / Field</label>
+                                                <input
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="e.g. Bachelor of Science"
+                                                    value={e.degree}
+                                                    onChange={v => updateEducation(idx, 'degree', v.target.value)}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Graduation Year</label>
+                                                <input
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="e.g. 2023"
+                                                    value={e.endDate}
+                                                    onChange={v => updateEducation(idx, 'endDate', v.target.value)}
+                                                />
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+
+                            {(!cv.education || cv.education.length === 0) && (
+                                <div className="text-center py-12 bg-neutral-50 rounded-2xl border-2 border-dashed border-neutral-200">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                        <Icons.pdf size={24} className="text-neutral-300" />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-neutral-900">No education added yet</h3>
+                                    <p className="text-xs text-neutral-500 mt-1 max-w-[200px] mx-auto">Click "Add Education" to list your academic background.</p>
+                                </div>
+                            )}
                         </div>
                     )}
 
