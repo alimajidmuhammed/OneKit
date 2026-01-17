@@ -86,10 +86,11 @@ export default function Header({ initialUser = null, initialProfile = null }) {
     };
 
     return (
-        <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-300 ${isScrolled
-            ? 'bg-white/80 backdrop-blur-lg border-b border-neutral-100 shadow-sm h-16'
-            : 'bg-transparent h-[72px]'
+        <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-300 bg-white ${isScrolled
+            ? 'backdrop-blur-lg border-b border-neutral-100 shadow-sm h-16'
+            : 'border-b border-neutral-50 h-[72px]'
             }`}>
+
             <div className="w-full max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-3 group relative z-[20]">

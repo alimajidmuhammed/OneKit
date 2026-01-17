@@ -121,7 +121,7 @@ export default function DashboardPage() {
                     <h2>Your Activity 📊</h2>
                 </div>
                 <div className={styles.stats}>
-                    <div className={styles.statCard}>
+                    <Link href="/dashboard/card-maker" className={`${styles.statCard} ${styles.statCardClickable}`}>
                         <div className={styles.statIcon}>
                             <svg viewBox="0 0 24 24" fill="none">
                                 <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2" />
@@ -130,11 +130,12 @@ export default function DashboardPage() {
                         </div>
                         <div className={styles.statContent}>
                             <span className={styles.statValue}>{userStats.cardsCreated}</span>
-                            <span className={styles.statLabel}>Business Cards Created</span>
+                            <span className={styles.statLabel}>Business Cards</span>
                         </div>
-                    </div>
+                        {userStats.cardsCreated === 0 && <span className={styles.statCta}>Create →</span>}
+                    </Link>
 
-                    <div className={styles.statCard}>
+                    <Link href="/dashboard/menu-maker" className={`${styles.statCard} ${styles.statCardClickable}`}>
                         <div className={`${styles.statIcon} ${styles.statIconSuccess}`}>
                             <svg viewBox="0 0 24 24" fill="none">
                                 <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
@@ -145,9 +146,10 @@ export default function DashboardPage() {
                             <span className={styles.statValue}>{userStats.menusCreated}</span>
                             <span className={styles.statLabel}>Menus Created</span>
                         </div>
-                    </div>
+                        {userStats.menusCreated === 0 && <span className={styles.statCta}>Create →</span>}
+                    </Link>
 
-                    <div className={styles.statCard}>
+                    <Link href="/dashboard/cv-maker" className={`${styles.statCard} ${styles.statCardClickable}`}>
                         <div className={`${styles.statIcon} ${styles.statIconWarning}`}>
                             <svg viewBox="0 0 24 24" fill="none">
                                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="2" />
@@ -158,9 +160,11 @@ export default function DashboardPage() {
                             <span className={styles.statValue}>{userStats.cvsCreated}</span>
                             <span className={styles.statLabel}>CVs Created</span>
                         </div>
-                    </div>
+                        {userStats.cvsCreated === 0 && <span className={styles.statCta}>Create →</span>}
+                    </Link>
                 </div>
             </div>
+
 
             {/* Quick Access */}
             <section className={styles.section}>

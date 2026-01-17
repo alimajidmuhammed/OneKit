@@ -87,6 +87,37 @@
     color: var(--text-tertiary);
 }
 
+/* Clickable stat cards */
+.statCardClickable {
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    transition: all var(--transition-base);
+}
+
+.statCardClickable:hover {
+    border-color: var(--primary-300);
+    box-shadow: 0 4px 12px rgba(10, 36, 114, 0.08);
+    transform: translateY(-2px);
+}
+
+.statCta {
+    position: absolute;
+    right: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--primary-600);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.statCardClickable:hover .statCta {
+    opacity: 1;
+}
+
+
 /* Sections */
 .section {
     margin-bottom: var(--space-8);
