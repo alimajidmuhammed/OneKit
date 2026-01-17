@@ -477,9 +477,12 @@ export default function CVEditorPage({ params }) {
                 }
 
                 setCV(data);
-                if (data.section_order && Array.isArray(data.section_order)) {
+                // Set section order from database, or use default if not present
+                if (data.section_order && Array.isArray(data.section_order) && data.section_order.length > 0) {
                     setSectionOrder(data.section_order);
                 }
+                // If no section_order in database, keep the default initial state
+
                 if (data.personal_info) {
                     setPhotoZoom(data.personal_info.photoZoom || 1);
                     setPhotoRotation(data.personal_info.photoRotation || 0);
@@ -860,12 +863,6 @@ export default function CVEditorPage({ params }) {
     // Get ordered sections for rendering
     const orderedSections = sectionOrder.map(id => SECTIONS.find(s => s.id === id)).filter(Boolean);
 
-    // Debug logging
-    console.log('🔍 Debug Info:');
-    console.log('sectionOrder:', sectionOrder);
-    console.log('orderedSections:', orderedSections);
-    console.log('SECTIONS constant:', SECTIONS);
-
     const addExperience = () => { setCV(prev => ({ ...prev, experience: [...(prev.experience || []), { id: Date.now(), company: '', position: '', location: '', startDate: '', endDate: '', description: '' }] })); setHasChanges(true); };
     const updateExperience = (index, field, value) => { setCV(prev => { const exp = [...(prev.experience || [])]; exp[index] = { ...exp[index], [field]: value }; return { ...prev, experience: exp }; }); setHasChanges(true); };
     const removeExperience = (index) => { setCV(prev => ({ ...prev, experience: prev.experience.filter((_, i) => i !== index) })); setHasChanges(true); };
@@ -1050,9 +1047,6 @@ export default function CVEditorPage({ params }) {
                         marginBottom: '16px',
                         boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
                     }}>
-                        <div style={{ marginBottom: '8px', fontSize: '11px', color: '#ef4444', fontWeight: 'bold' }}>
-                            DEBUG: Tabs container visible. Section count: {orderedSections.length}
-                        </div>
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
