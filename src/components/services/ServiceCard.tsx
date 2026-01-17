@@ -4,110 +4,99 @@
 import Link from 'next/link';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useSubscription } from '@/lib/hooks/useSubscription';
-import styles from './ServiceCard.module.css';
+import {
+    FileText,
+    Menu as MenuIcon,
+    QrCode,
+    Receipt,
+    Compass,
+    CreditCard,
+    ArrowRight
+} from 'lucide-react';
 
-// Service icons
-const ServiceIcon = ({ type }) => {
+/**
+ * ServiceIcon - Maps service types to Lucide components
+ */
+const ServiceIcon = ({ type, className }: { type: string, className?: string }) => {
     const icons = {
-        document: (
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        menu: (
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <circle cx="8" cy="6" r="1" fill="currentColor" />
-                <circle cx="8" cy="12" r="1" fill="currentColor" />
-                <circle cx="8" cy="18" r="1" fill="currentColor" />
-            </svg>
-        ),
-        qr: (
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
-                <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
-                <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2" />
-                <rect x="14" y="14" width="3" height="3" stroke="currentColor" strokeWidth="2" />
-                <rect x="18" y="18" width="3" height="3" stroke="currentColor" strokeWidth="2" />
-                <path d="M14 18h3M18 14v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-        ),
-        invoice: (
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M14 2v6h6M9 15l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        logo: (
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-                <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-            </svg>
-        ),
-        card: (
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2" />
-                <path d="M6 15h.01M10 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-        ),
+        document: <FileText className={className} />,
+        menu: <MenuIcon className={className} />,
+        qr: <QrCode className={className} />,
+        invoice: <Receipt className={className} />,
+        logo: <Compass className={className} />,
+        card: <CreditCard className={className} />,
     };
 
-    return icons[type] || icons.document;
+    return icons[type as keyof typeof icons] || icons.document;
 };
 
-export default function ServiceCard({ service, showStatus = false, customPriceLabel = null }) {
+export default function ServiceCard({ service, showStatus = false, customPriceLabel = null }: {
+    service: any,
+    showStatus?: boolean,
+    customPriceLabel?: string | null
+}) {
     const { user } = useAuth();
     const { getSubscriptionStatus } = useSubscription();
 
     const status = showStatus && user ? getSubscriptionStatus(service.slug) : null;
 
-    const colorClasses = {
-        primary: styles.colorPrimary,
-        accent: styles.colorAccent,
-        success: styles.colorSuccess,
-        info: styles.colorInfo,
-        warning: styles.colorWarning,
+    // Color theme mapping
+    const themeClasses = {
+        primary: 'border-primary-100 hover:border-primary-200 group-hover:shadow-primary-100/20',
+        accent: 'border-accent-100 hover:border-accent-200 group-hover:shadow-accent-100/20',
+        success: 'border-green-100 hover:border-green-200 group-hover:shadow-green-100/20',
+        info: 'border-blue-100 hover:border-blue-200 group-hover:shadow-blue-100/20',
+        warning: 'border-orange-100 hover:border-orange-200 group-hover:shadow-orange-100/20',
     };
 
-    const statusLabels = {
-        active: { text: 'Active', class: styles.statusActive },
-        expired: { text: 'Expired', class: styles.statusExpired },
-        pending: { text: 'Pending', class: styles.statusPending },
-        inactive: { text: 'Inactive', class: styles.statusInactive },
-        none: { text: 'Not Subscribed', class: styles.statusNone },
+    const iconBgClasses = {
+        primary: 'bg-primary-50 text-primary-600',
+        accent: 'bg-accent-50 text-accent-600',
+        success: 'bg-green-50 text-green-600',
+        info: 'bg-blue-50 text-blue-600',
+        warning: 'bg-orange-50 text-orange-600',
     };
 
     const cardLink = user ? `/services/${service.slug}` : `/login?redirect=/services/${service.slug}`;
 
     return (
-        <Link href={cardLink} className={`${styles.card} ${colorClasses[service.color] || colorClasses.primary}`}>
-            {/* Icon display instead of image */}
-            <div className={styles.iconContainer}>
-                <div className={styles.iconCircle}>
-                    <ServiceIcon type={service.icon} />
+        <Link
+            href={cardLink}
+            className={`flex flex-col w-full bg-white border rounded-[32px] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group ${themeClasses[service.color as keyof typeof themeClasses] || themeClasses.primary
+                }`}
+        >
+            <div className="flex justify-between items-start mb-8">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${iconBgClasses[service.color as keyof typeof iconBgClasses] || iconBgClasses.primary
+                    }`}>
+                    <ServiceIcon type={service.icon} className="w-8 h-8" />
                 </div>
-                {customPriceLabel ? (
-                    <span className={styles.priceBadge}>{customPriceLabel}</span>
-                ) : service.isFree ? (
-                    <span className={styles.freeBadge}>Free</span>
-                ) : service.priceLabel ? (
-                    <span className={styles.priceBadge}>{service.priceLabel}</span>
-                ) : null}
+
+                <div className="flex flex-col items-end">
+                    {customPriceLabel ? (
+                        <span className="px-3 py-1 bg-neutral-100 text-neutral-600 text-xs font-bold rounded-full uppercase tracking-wider">{customPriceLabel}</span>
+                    ) : service.isFree ? (
+                        <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full uppercase tracking-wider">Free</span>
+                    ) : service.priceLabel ? (
+                        <span className="px-3 py-1 bg-primary-50 text-primary-700 text-xs font-bold rounded-full uppercase tracking-wider">{service.priceLabel}</span>
+                    ) : null}
+                </div>
             </div>
 
-            <div className={styles.content}>
-                <span className={styles.category}>{service.category || 'Tool'}</span>
-                <h3 className={styles.title}>{service.name}</h3>
-                <p className={styles.description}>{service.description}</p>
+            <div className="flex-1">
+                <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-2 block">
+                    {service.category || 'Tool'}
+                </span>
+                <h3 className="text-2xl font-bold text-neutral-900 mb-3 group-hover:text-primary-900 transition-colors">
+                    {service.name}
+                </h3>
+                <p className="text-neutral-500 leading-relaxed mb-8">
+                    {service.description}
+                </p>
+            </div>
 
-                <div className={styles.cta}>
-                    See More
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                </div>
+            <div className="flex items-center gap-2 text-primary-600 font-bold text-sm group-hover:gap-3 transition-all">
+                Explore Tool
+                <ArrowRight size={18} />
             </div>
         </Link>
     );

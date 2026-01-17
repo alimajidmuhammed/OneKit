@@ -2,7 +2,16 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import styles from './photo-studio.module.css';
+import {
+    X,
+    Shield,
+    Wand2,
+    Settings2,
+    Maximize2,
+    RotateCw,
+    Undo2,
+    Check
+} from 'lucide-react';
 
 const FILTERS = [
     { id: 'none', name: 'Original', filter: '' },
@@ -13,6 +22,10 @@ const FILTERS = [
     { id: 'fade', name: 'Fade', filter: 'brightness(1.1) contrast(0.9) saturate(0.8)' },
 ];
 
+/**
+ * PhotoStudio - Migrated to Tailwind CSS for Phase 2b
+ * Advanced photo editing interface for Menu Maker and other services.
+ */
 export default function PhotoStudio({ imageUrl, onSave, onClose }) {
     const [activeSection, setActiveSection] = useState('adjust');
     const [settings, setSettings] = useState({
@@ -59,32 +72,18 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
             const ctx = canvas.getContext('2d');
             const img = imageRef.current;
 
-            // Set canvas size to image size
-            // Note: For zoom/crop, we keep the original aspect ratio but 
-            // the canvas content will represent the zoomed/moved portion.
             canvas.width = img.naturalWidth;
             canvas.height = img.naturalHeight;
 
-            // Apply filters
             ctx.filter = getFilterString();
 
-            // Clear and apply transformations
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
 
-            // 1. Move to center to rotate/zoom around center
             ctx.translate(canvas.width / 2, canvas.height / 2);
-
-            // 2. Rotate
             ctx.rotate((settings.rotate * Math.PI) / 180);
-
-            // 3. Zoom
             ctx.scale(settings.zoom, settings.zoom);
-
-            // 4. Translate by offset (adjusted for zoom)
             ctx.translate(settings.x, settings.y);
-
-            // 5. Draw image centered
             ctx.drawImage(img, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
 
             ctx.restore();
@@ -102,7 +101,6 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
     };
 
     const handleAIEnhance = () => {
-        // Simulated AI Enhancement
         setSettings(prev => ({
             ...prev,
             brightness: 105,
@@ -113,29 +111,32 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
     };
 
     return (
-        <div className={styles.studioOverlay} onClick={onClose}>
-            <div className={styles.studioContainer} onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in" onClick={onClose}>
+            <div className="w-full max-w-[1000px] h-[85vh] bg-[#1a1a1a] rounded-[32px] flex flex-col overflow-hidden shadow-2xl border border-white/5 animate-in slide-in-from-bottom-10" onClick={e => e.stopPropagation()}>
                 {/* Header */}
-                <header className={styles.studioHeader}>
-                    <h2>
-                        <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" />
-                            <circle cx="12" cy="11" r="3" stroke="currentColor" strokeWidth="2" />
-                        </svg>
+                <header className="px-6 py-4 bg-[#252525] border-b border-white/5 flex justify-between items-center shrink-0">
+                    <h2 className="text-white text-lg font-bold flex items-center gap-2.5">
+                        <Shield className="text-primary-500" size={20} />
                         Advanced Photo Studio
                     </h2>
-                    <button className={styles.closeBtn} onClick={onClose}>×</button>
+                    <button
+                        className="text-neutral-400 hover:text-white transition-colors p-1"
+                        onClick={onClose}
+                        aria-label="Close studio"
+                    >
+                        <X size={24} />
+                    </button>
                 </header>
 
                 {/* Main */}
-                <main className={styles.studioMain}>
-                    <div className={styles.canvasArea}>
-                        <div className={styles.previewContainer}>
+                <main className="flex-1 flex flex-col md:grid md:grid-cols-[1fr_300px] overflow-hidden">
+                    <div className="bg-[#0f0f0f] flex items-center justify-center p-8 relative overflow-hidden flex-1">
+                        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
                             <img
                                 ref={imageRef}
                                 src={imageUrl}
                                 alt="Preview"
-                                className={styles.previewImage}
+                                className="max-w-full max-h-full object-contain shadow-2xl rounded-2xl transition-all duration-300 ease-out border border-white/5"
                                 style={{
                                     filter: getFilterString(),
                                     transform: `translate(${settings.x}px, ${settings.y}px) rotate(${settings.rotate}deg) scale(${settings.zoom})`
@@ -143,187 +144,166 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
                                 crossOrigin="anonymous"
                             />
                         </div>
-                        <canvas ref={canvasRef} style={{ display: 'none' }} />
+                        <canvas ref={canvasRef} className="hidden" />
                     </div>
 
-                    <aside className={styles.studioSidebar}>
-                        <div className={styles.sidebarTabs}>
+                    <aside className="bg-[#252525] border-l border-white/5 flex flex-col overflow-y-auto w-full md:w-[300px] shrink-0">
+                        <div className="grid grid-cols-2 bg-[#2a2a2a] border-b border-white/5 sticky top-0 z-10">
                             <button
-                                className={activeSection === 'adjust' ? styles.tabActive : ''}
+                                className={`py-4 text-sm font-bold transition-all border-b-2 ${activeSection === 'adjust'
+                                        ? 'text-white border-primary-500 bg-white/5'
+                                        : 'text-neutral-500 border-transparent hover:text-neutral-300'
+                                    }`}
                                 onClick={() => setActiveSection('adjust')}
                             >
-                                Adjust
+                                <div className="flex items-center justify-center gap-2">
+                                    <Settings2 size={16} />
+                                    Adjust
+                                </div>
                             </button>
                             <button
-                                className={activeSection === 'transform' ? styles.tabActive : ''}
+                                className={`py-4 text-sm font-bold transition-all border-b-2 ${activeSection === 'transform'
+                                        ? 'text-white border-primary-500 bg-white/5'
+                                        : 'text-neutral-500 border-transparent hover:text-neutral-300'
+                                    }`}
                                 onClick={() => setActiveSection('transform')}
                             >
-                                Transform
+                                <div className="flex items-center justify-center gap-2">
+                                    <Maximize2 size={16} />
+                                    Transform
+                                </div>
                             </button>
                         </div>
 
-                        {activeSection === 'adjust' ? (
-                            <>
-                                <div className={`${styles.sidebarSection} ${styles.aiSection}`}>
-                                    <h3>AI Magic</h3>
-                                    <button className={styles.aiBtn} onClick={handleAIEnhance}>
-                                        <svg viewBox="0 0 24 24" fill="none">
-                                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                            <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z" stroke="currentColor" strokeWidth="2" />
-                                        </svg>
-                                        AI Enhance
-                                    </button>
-                                </div>
-
-                                <div className={styles.sidebarSection}>
-                                    <h3>Adjustments</h3>
-
-                                    <div className={styles.controlGroup}>
-                                        <label>
-                                            <span>Brightness</span>
-                                            <span>{settings.brightness}%</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="0" max="200"
-                                            value={settings.brightness}
-                                            onChange={e => setSettings({ ...settings, brightness: e.target.value })}
-                                        />
+                        <div className="p-5 flex flex-col gap-8">
+                            {activeSection === 'adjust' ? (
+                                <>
+                                    <div className="space-y-4 rounded-2xl bg-gradient-to-br from-primary-900/10 to-purple-900/10 p-4 border border-white/5">
+                                        <h3 className="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">AI Lab</h3>
+                                        <button
+                                            className="w-full py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary-900/40 hover:scale-[1.02] active:scale-95 transition-all"
+                                            onClick={handleAIEnhance}
+                                        >
+                                            <Wand2 size={18} />
+                                            AI Enhance
+                                        </button>
                                     </div>
 
-                                    <div className={styles.controlGroup}>
-                                        <label>
-                                            <span>Contrast</span>
-                                            <span>{settings.contrast}%</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="0" max="200"
-                                            value={settings.contrast}
-                                            onChange={e => setSettings({ ...settings, contrast: e.target.value })}
-                                        />
-                                    </div>
+                                    <div className="space-y-6">
+                                        <h3 className="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Adjustments</h3>
 
-                                    <div className={styles.controlGroup}>
-                                        <label>
-                                            <span>Saturation</span>
-                                            <span>{settings.saturation}%</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="0" max="200"
-                                            value={settings.saturation}
-                                            onChange={e => setSettings({ ...settings, saturation: e.target.value })}
-                                        />
-                                    </div>
-
-                                    <div className={styles.controlGroup}>
-                                        <label>
-                                            <span>Background Blur</span>
-                                            <span>{settings.blur}px</span>
-                                        </label>
-                                        <input
-                                            type="range"
-                                            min="0" max="20"
-                                            value={settings.blur}
-                                            onChange={e => setSettings({ ...settings, blur: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className={styles.sidebarSection}>
-                                    <h3>Creative Filters</h3>
-                                    <div className={styles.filterGrid}>
-                                        {FILTERS.map(f => (
-                                            <button
-                                                key={f.id}
-                                                className={`${styles.filterBtn} ${settings.activeFilter === f.id ? styles.filterActive : ''}`}
-                                                onClick={() => setSettings({ ...settings, activeFilter: f.id })}
-                                            >
-                                                <div className={styles.filterPreview} style={{ filter: f.filter }}></div>
-                                                <span>{f.name}</span>
-                                            </button>
+                                        {[
+                                            { label: 'Brightness', key: 'brightness', min: 0, max: 200, unit: '%' },
+                                            { label: 'Contrast', key: 'contrast', min: 0, max: 200, unit: '%' },
+                                            { label: 'Saturation', key: 'saturation', min: 0, max: 200, unit: '%' },
+                                            { label: 'Background Blur', key: 'blur', min: 0, max: 20, unit: 'px' }
+                                        ].map((ctrl) => (
+                                            <div key={ctrl.key} className="space-y-3">
+                                                <div className="flex justify-between text-xs text-neutral-400 font-bold">
+                                                    <span>{ctrl.label}</span>
+                                                    <span className="text-white">{settings[ctrl.key]}{ctrl.unit}</span>
+                                                </div>
+                                                <input
+                                                    type="range"
+                                                    min={ctrl.min} max={ctrl.max}
+                                                    value={settings[ctrl.key]}
+                                                    onChange={e => setSettings({ ...settings, [ctrl.key]: e.target.value })}
+                                                    className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                                                />
+                                            </div>
                                         ))}
                                     </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className={styles.sidebarSection}>
-                                <h3>Transforms</h3>
 
-                                <div className={styles.controlGroup}>
-                                    <label>
-                                        <span>Rotation</span>
-                                        <span>{settings.rotate}°</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="-180" max="180"
-                                        value={settings.rotate}
-                                        onChange={e => setSettings({ ...settings, rotate: e.target.value })}
-                                    />
-                                </div>
+                                    <div className="space-y-4">
+                                        <h3 className="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Creative Filters</h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {FILTERS.map(f => (
+                                                <button
+                                                    key={f.id}
+                                                    className={`flex flex-col items-center gap-2 p-3 bg-[#333] border rounded-2xl transition-all ${settings.activeFilter === f.id
+                                                            ? 'bg-primary-900/30 border-primary-500 text-white shadow-lg'
+                                                            : 'border-white/5 text-neutral-400 hover:bg-[#444] hover:border-white/10'
+                                                        }`}
+                                                    onClick={() => setSettings({ ...settings, activeFilter: f.id })}
+                                                >
+                                                    <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shadow-inner grayscale-[0.5]" style={{ filter: f.filter, background: 'linear-gradient(135deg, #12c2e9, #c471ed, #f64f59)' }}></div>
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider">{f.name}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="space-y-8 animate-in fade-in duration-300">
+                                    <h3 className="text-white/40 text-[10px] uppercase font-bold tracking-[0.2em]">Transforms</h3>
 
-                                <div className={styles.controlGroup}>
-                                    <label>
-                                        <span>Zoom</span>
-                                        <span>{parseFloat(settings.zoom).toFixed(1)}x</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="0.5" max="3" step="0.1"
-                                        value={settings.zoom}
-                                        onChange={e => setSettings({ ...settings, zoom: e.target.value })}
-                                    />
-                                </div>
+                                    {[
+                                        { label: 'Rotation', key: 'rotate', min: -180, max: 180, unit: '°' },
+                                        { label: 'Zoom', key: 'zoom', min: 0.5, max: 3, unit: 'x', step: 0.1 },
+                                        { label: 'Horizontal Offset', key: 'x', min: -200, max: 200, unit: 'px' },
+                                        { label: 'Vertical Offset', key: 'y', min: -200, max: 200, unit: 'px' }
+                                    ].map((ctrl) => (
+                                        <div key={ctrl.key} className="space-y-3">
+                                            <div className="flex justify-between text-xs text-neutral-400 font-bold">
+                                                <span>{ctrl.label}</span>
+                                                <span className="text-white">
+                                                    {ctrl.key === 'zoom' ? parseFloat(settings[ctrl.key]).toFixed(1) : settings[ctrl.key]}
+                                                    {ctrl.unit}
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min={ctrl.min} max={ctrl.max} step={ctrl.step || 1}
+                                                value={settings[ctrl.key]}
+                                                onChange={e => setSettings({ ...settings, [ctrl.key]: e.target.value })}
+                                                className="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                                            />
+                                        </div>
+                                    ))}
 
-                                <div className={styles.controlGroup}>
-                                    <label>
-                                        <span>Move Horizontal</span>
-                                        <span>{settings.x}px</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="-200" max="200"
-                                        value={settings.x}
-                                        onChange={e => setSettings({ ...settings, x: parseInt(e.target.value) })}
-                                    />
+                                    <button
+                                        className="w-full py-2.5 bg-[#333] text-neutral-400 border border-white/5 rounded-xl text-xs font-bold hover:bg-[#444] hover:text-white transition-all flex items-center justify-center gap-2"
+                                        onClick={() => setSettings({ ...settings, rotate: 0, zoom: 1, x: 0, y: 0 })}
+                                    >
+                                        <Undo2 size={14} />
+                                        Reset Transforms
+                                    </button>
                                 </div>
-
-                                <div className={styles.controlGroup}>
-                                    <label>
-                                        <span>Move Vertical</span>
-                                        <span>{settings.y}px</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="-200" max="200"
-                                        value={settings.y}
-                                        onChange={e => setSettings({ ...settings, y: parseInt(e.target.value) })}
-                                    />
-                                </div>
-
-                                <button
-                                    className={styles.resetBtn}
-                                    onClick={() => setSettings({ ...settings, rotate: 0, zoom: 1, x: 0, y: 0 })}
-                                >
-                                    Reset Transforms
-                                </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </aside>
                 </main>
 
                 {/* Footer */}
-                <footer className={styles.studioFooter}>
-                    <button className={styles.cancelBtn} onClick={onClose} disabled={loading}>
+                <footer className="px-6 py-4 bg-[#252525] border-t border-white/5 flex justify-end gap-3 shrink-0">
+                    <button
+                        className="px-6 py-2.5 bg-neutral-800 text-white rounded-xl text-sm font-bold hover:bg-neutral-700 transition-all"
+                        onClick={onClose}
+                        disabled={loading}
+                    >
                         Cancel
                     </button>
-                    <button className={styles.saveBtn} onClick={handleSave} disabled={loading}>
-                        {loading ? 'Processing...' : 'Apply Changes'}
+                    <button
+                        className="px-8 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-900/30 hover:bg-primary-500 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                        onClick={handleSave}
+                        disabled={loading}
+                    >
+                        {loading && <Loader2 className="animate-spin" size={18} />}
+                        {loading ? 'Processing...' : (
+                            <>
+                                <Check size={18} />
+                                Apply Changes
+                            </>
+                        )}
                     </button>
                 </footer>
             </div>
         </div>
     );
 }
+
+const Loader2 = ({ className, size }) => (
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+);

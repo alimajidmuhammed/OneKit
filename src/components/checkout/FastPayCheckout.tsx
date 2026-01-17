@@ -2,8 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from './FastPayCheckout.module.css';
+import { CheckCircle, AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
 
+/**
+ * FastPayCheckout - Migrated to Tailwind CSS for Phase 2b
+ * Secure payment modal for FastPay IQ integration.
+ */
 export default function FastPayCheckout({ serviceId, serviceName, planType, onSuccess, onCancel }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -62,67 +66,81 @@ export default function FastPayCheckout({ serviceId, serviceName, planType, onSu
 
     if (status === 'approved') {
         return (
-            <div className={styles.container}>
-                <div className={styles.successState}>
-                    <div className={styles.successIcon}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                            <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
+            <div className="bg-white rounded-3xl p-8 max-w-[450px] w-full shadow-2xl border border-neutral-100 animate-in fade-in slide-in-from-bottom-5">
+                <div className="text-center py-8">
+                    <div className="w-16 h-16 text-green-500 mx-auto mb-6 animate-scale-in">
+                        <CheckCircle size={64} strokeWidth={1.5} />
                     </div>
-                    <h2>Payment Successful!</h2>
-                    <p>Your subscription is now active. High-five! 🙌</p>
-                    <p className={styles.redirecting}>Redirecting to your tool...</p>
+                    <h2 className="text-2xl font-bold text-neutral-900 mb-2">Payment Successful!</h2>
+                    <p className="text-neutral-500 mb-6">Your subscription is now active. High-five! 🙌</p>
+                    <p className="text-xs text-neutral-400 font-medium animate-pulse">Redirecting to your tool...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <img src="/fastpay-logo.png" alt="FastPay" className={styles.logo} onError={(e) => e.target.style.display = 'none'} />
-                <h2>Pay with FastPay</h2>
-                <p>Subscribe to <strong>{serviceName}</strong> ({planType})</p>
+        <div className="bg-white rounded-3xl p-8 max-w-[450px] w-full shadow-2xl border border-neutral-100 animate-in fade-in slide-in-from-bottom-5">
+            <div className="text-center mb-6">
+                <img
+                    src="/fastpay-logo.png"
+                    alt="FastPay"
+                    className="h-12 mx-auto mb-4"
+                    onError={(e) => e.target.style.display = 'none'}
+                />
+                <h2 className="text-xl font-bold text-neutral-900 mb-1">Pay with FastPay</h2>
+                <p className="text-sm text-neutral-500">Subscribe to <strong className="text-neutral-900">{serviceName}</strong> ({planType})</p>
             </div>
 
-            <div className={styles.content}>
+            <div className="bg-neutral-50 rounded-2xl p-6 mb-6 min-h-[350px] flex flex-col justify-center items-center border border-neutral-100/50">
                 {loading ? (
-                    <div className={styles.loadingState}>
-                        <div className={styles.spinner} />
-                        <p>Generating secure payment QR...</p>
+                    <div className="text-center text-neutral-600">
+                        <Loader2 className="w-10 h-10 animate-spin text-primary-600 mx-auto mb-4" />
+                        <p className="text-sm font-medium">Generating secure payment QR...</p>
                     </div>
                 ) : error ? (
-                    <div className={styles.errorState}>
-                        <p>❌ {error}</p>
-                        <button onClick={onCancel} className={styles.backBtn}>Go Back</button>
+                    <div className="text-center">
+                        <div className="w-12 h-12 text-red-100 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="text-red-500" size={24} />
+                        </div>
+                        <p className="text-red-600 font-medium mb-6">{error}</p>
+                        <button
+                            onClick={onCancel}
+                            className="bg-primary-900 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg hover:bg-primary-800 transition-colors"
+                        >
+                            Go Back
+                        </button>
                     </div>
                 ) : (
-                    <div className={styles.qrContainer}>
-                        <div className={styles.qrWrapper}>
-                            <img src={qrData.qrUrl} alt="FastPay QR" className={styles.qrImage} />
-                            <div className={styles.qrOverlay}>
-                                <span>FastPay QR</span>
+                    <div className="w-full">
+                        <div className="relative w-[200px] h-[200px] mx-auto mb-6 bg-white p-2 rounded-xl shadow-md border border-neutral-100">
+                            <img src={qrData.qrUrl} alt="FastPay QR" className="w-full h-full object-contain" />
+                            <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm">
+                                FASTPAY QR
                             </div>
                         </div>
-                        <div className={styles.instructions}>
-                            <ol>
-                                <li>Open your <strong>FastPay App</strong></li>
-                                <li>Tap on <strong>Scan QR</strong></li>
+                        <div className="mb-6">
+                            <ol className="list-decimal pl-5 text-sm space-y-2 text-neutral-600 font-medium">
+                                <li>Open your <strong className="text-neutral-900">FastPay App</strong></li>
+                                <li>Tap on <strong className="text-neutral-900">Scan QR</strong></li>
                                 <li>Scan the code above</li>
-                                <li>Confirm the payment of <strong>{qrData.amount.toLocaleString()} IQD</strong></li>
+                                <li>Confirm the payment of <strong className="text-neutral-900">{qrData.amount.toLocaleString()} IQD</strong></li>
                             </ol>
                         </div>
-                        <div className={styles.pollingHint}>
-                            <div className={styles.pulse} />
+                        <div className="flex items-center justify-center gap-2 text-xs text-neutral-400 italic">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse-shadow"></div>
                             Waiting for payment confirmation...
                         </div>
                     </div>
                 )}
             </div>
 
-            <div className={styles.footer}>
-                <button onClick={onCancel} className={styles.cancelBtn} disabled={loading}>
+            <div className="text-center">
+                <button
+                    onClick={onCancel}
+                    className="text-neutral-400 hover:text-red-500 text-sm font-medium underline transition-colors decoration-dotted underline-offset-4"
+                    disabled={loading}
+                >
                     Cancel Payment
                 </button>
             </div>

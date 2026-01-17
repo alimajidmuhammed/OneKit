@@ -4,6 +4,16 @@
 import { useEffect, useState } from 'react';
 import { useAdmin } from '@/lib/hooks/useAdmin';
 import { formatDate, formatCurrency } from '@/lib/utils/helpers';
+import {
+    Users,
+    CheckCircle,
+    Clock,
+    DollarSign,
+    PlusCircle,
+    ShieldCheck,
+    CreditCard,
+    ArrowRight
+} from 'lucide-react';
 import styles from './page.module.css';
 
 export default function AdminDashboard() {
@@ -32,10 +42,7 @@ export default function AdminDashboard() {
             <div className={styles.stats}>
                 <div className={styles.statCard}>
                     <div className={`${styles.statIcon} ${styles.statIconUsers}`}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2" />
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                        </svg>
+                        <Users size={24} />
                     </div>
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{stats.totalUsers}</span>
@@ -45,10 +52,7 @@ export default function AdminDashboard() {
 
                 <div className={styles.statCard}>
                     <div className={`${styles.statIcon} ${styles.statIconActive}`}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" strokeWidth="2" />
-                            <path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
+                        <CheckCircle size={24} />
                     </div>
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{stats.activeSubscriptions}</span>
@@ -58,10 +62,7 @@ export default function AdminDashboard() {
 
                 <div className={styles.statCard}>
                     <div className={`${styles.statIcon} ${styles.statIconPending}`}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                            <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
+                        <Clock size={24} />
                     </div>
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{stats.pendingPayments}</span>
@@ -71,10 +72,7 @@ export default function AdminDashboard() {
 
                 <div className={styles.statCard}>
                     <div className={`${styles.statIcon} ${styles.statIconRevenue}`}>
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                            <path d="M12 6v12M15 9.5a2.5 2.5 0 00-2.5-2.5H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        </svg>
+                        <DollarSign size={24} />
                     </div>
                     <div className={styles.statContent}>
                         <span className={styles.statValue}>{formatCurrency(stats.totalRevenue)}</span>
@@ -88,7 +86,7 @@ export default function AdminDashboard() {
                 <div className={styles.card}>
                     <div className={styles.cardHeader}>
                         <h2>Pending Payments</h2>
-                        <a href="/admin/payments" className={styles.viewAll}>View all →</a>
+                        <a href="/admin/payments" className={styles.viewAll}>View all <ArrowRight size={14} /></a>
                     </div>
 
                     {loading ? (
@@ -124,7 +122,7 @@ export default function AdminDashboard() {
                 <div className={styles.card}>
                     <div className={styles.cardHeader}>
                         <h2>Recent Subscriptions</h2>
-                        <a href="/admin/subscriptions" className={styles.viewAll}>View all →</a>
+                        <a href="/admin/subscriptions" className={styles.viewAll}>View all <ArrowRight size={14} /></a>
                     </div>
 
                     {loading ? (
@@ -163,40 +161,28 @@ export default function AdminDashboard() {
                 <div className={styles.actionsGrid}>
                     <a href="/admin/users" className={styles.actionCard}>
                         <div className={styles.actionIcon}>
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2" />
-                                <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                                <path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
+                            <Users size={24} />
                         </div>
                         <span>Manage Users</span>
                     </a>
 
                     <a href="/admin/payments" className={styles.actionCard}>
                         <div className={styles.actionIcon}>
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                            </svg>
+                            <CheckCircle size={24} />
                         </div>
                         <span>Approve Payments</span>
                     </a>
 
                     <a href="/admin/subscriptions" className={styles.actionCard}>
                         <div className={styles.actionIcon}>
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2" />
-                            </svg>
+                            <PlusCircle size={24} />
                         </div>
                         <span>Renew Subscriptions</span>
                     </a>
 
                     <a href="/admin/roles" className={styles.actionCard}>
                         <div className={styles.actionIcon}>
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" />
-                            </svg>
+                            <ShieldCheck size={24} />
                         </div>
                         <span>Manage Roles</span>
                     </a>

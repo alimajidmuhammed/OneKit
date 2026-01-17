@@ -1,8 +1,11 @@
+// @ts-nocheck
 import '@/app/globals.css';
 import '@/styles/components.css';
 import { Analytics } from '@vercel/analytics/next';
+import { Metadata, Viewport } from 'next';
+import ServerAuthProvider from '@/components/auth/ServerAuthProvider';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: {
     default: 'OneKit - All Your Professional Tools in One Place',
     template: '%s | OneKit',
@@ -52,19 +55,17 @@ export const metadata = {
   manifest: '/site.webmanifest',
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
   themeColor: '#ffffff',
 };
 
-import ServerAuthProvider from '@/components/auth/ServerAuthProvider';
-
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen bg-white font-sans antialiased">
         <ServerAuthProvider>
           {children}
         </ServerAuthProvider>
@@ -73,4 +74,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-

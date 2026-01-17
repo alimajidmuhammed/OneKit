@@ -3,29 +3,24 @@
 
 import { useServices } from '@/lib/hooks/useServices';
 import ServiceCard from '@/components/services/ServiceCard';
-import styles from '@/app/page.module.css';
 
 export default function ServicesSection() {
     const { services, loading } = useServices();
 
     if (loading) {
         return (
-            <section id="services" className={styles.services}>
-                <div className={styles.container}>
-                    <div className={styles.sectionHeader}>
-                        <span className={styles.sectionLabel}>Our Services</span>
-                        <h2 className={styles.sectionTitle}>
+            <section id="services" className="py-20 lg:py-32 bg-white">
+                <div className="w-full max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <span className="inline-block px-4 py-1.5 bg-primary-50 text-primary-700 text-sm font-bold rounded-full uppercase tracking-widest border border-primary-100 mb-4 animate-pulse">Our Services</span>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4 tracking-tight">
                             Everything You Need in One Place
                         </h2>
-                        <p className={styles.sectionDescription}>
-                            Choose from our collection of professional tools designed to help you create amazing things.
-                        </p>
+                        <div className="h-6 w-3/4 max-w-2xl mx-auto bg-neutral-100 animate-pulse rounded-full" />
                     </div>
-                    <div className={styles.servicesGrid}>
+                    <div className="grid md:grid-cols-3 gap-8">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className={styles.serviceCardWrapper} style={{ opacity: 0.5 }}>
-                                <div style={{ height: 200, background: '#f0f0f0', borderRadius: 12 }} />
-                            </div>
+                            <div key={i} className="h-[300px] bg-neutral-50 rounded-[32px] animate-pulse" />
                         ))}
                     </div>
                 </div>
@@ -34,30 +29,44 @@ export default function ServicesSection() {
     }
 
     return (
-        <section id="services" className={styles.services}>
-            <div className={styles.container}>
-                <div className={styles.sectionHeader}>
-                    <span className={styles.sectionLabel}>Our Services</span>
-                    <h2 className={styles.sectionTitle}>
+        <section id="services" className="py-20 lg:py-32 bg-white">
+            <div className="w-full max-w-7xl mx-auto px-6">
+                <div className="text-center mb-16">
+                    <span className="inline-block px-4 py-1.5 bg-primary-50 text-primary-700 text-sm font-bold rounded-full uppercase tracking-widest border border-primary-100 mb-4">Our Services</span>
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4 tracking-tight">
                         Everything You Need in One Place
                     </h2>
-                    <p className={styles.sectionDescription}>
+                    <p className="text-xl text-neutral-500 max-w-2xl mx-auto">
                         Choose from our collection of professional tools designed to help you create amazing things.
                     </p>
                 </div>
 
-                <div className={styles.servicesGrid}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {services.map((service, index) => (
                         <div
                             key={service.id || service.slug}
-                            className={styles.serviceCardWrapper}
-                            style={{ animationDelay: `${index * 100}ms` }}
+                            className="flex"
+                            style={{
+                                animation: 'fadeInUp 0.6s ease forwards',
+                                animationDelay: `${index * 100}ms`,
+                                opacity: 0,
+                                transform: 'translateY(20px)'
+                            }}
                         >
                             <ServiceCard service={service} />
                         </div>
                     ))}
                 </div>
             </div>
+
+            <style jsx>{`
+                @keyframes fadeInUp {
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
         </section>
     );
 }
