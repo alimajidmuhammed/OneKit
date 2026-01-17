@@ -1049,7 +1049,7 @@ export default function CVEditorPage({ params }) {
                             gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
                             gap: '8px'
                         }}>
-                            {orderedSections.map(s => (
+                            {orderedSections.map(s => s && (
                                 <button
                                     key={s.id}
                                     onClick={() => setActiveSection(s.id)}
