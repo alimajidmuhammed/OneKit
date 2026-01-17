@@ -10,8 +10,15 @@ import {
     Maximize2,
     RotateCw,
     Undo2,
-    Check
+    Check,
+    Loader2
 } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 const FILTERS = [
     { id: 'none', name: 'Original', filter: '' },
@@ -23,7 +30,7 @@ const FILTERS = [
 ];
 
 /**
- * PhotoStudio - Migrated to Tailwind CSS for Phase 2b
+ * PhotoStudio - Updated with shadcn/ui Dialog
  * Advanced photo editing interface for Menu Maker and other services.
  */
 export default function PhotoStudio({ imageUrl, onSave, onClose }) {
@@ -111,8 +118,12 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
     };
 
     return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in" onClick={onClose}>
-            <div className="w-full max-w-[1000px] h-[85vh] bg-[#1a1a1a] rounded-[32px] flex flex-col overflow-hidden shadow-2xl border border-white/5 animate-in slide-in-from-bottom-10" onClick={e => e.stopPropagation()}>
+        <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="max-w-[1000px] w-[95vw] h-[85vh] p-0 flex flex-col gap-0 bg-[#1a1a1a] border-white/10 sm:rounded-[32px] overflow-hidden focus:outline-none">
+                <DialogHeader className="sr-only">
+                    <DialogTitle>Photo Studio</DialogTitle>
+                </DialogHeader>
+
                 {/* Header */}
                 <header className="px-6 py-4 bg-[#252525] border-b border-white/5 flex justify-between items-center shrink-0">
                     <h2 className="text-white text-lg font-bold flex items-center gap-2.5">
@@ -151,8 +162,8 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
                         <div className="grid grid-cols-2 bg-[#2a2a2a] border-b border-white/5 sticky top-0 z-10">
                             <button
                                 className={`py-4 text-sm font-bold transition-all border-b-2 ${activeSection === 'adjust'
-                                        ? 'text-white border-primary-500 bg-white/5'
-                                        : 'text-neutral-500 border-transparent hover:text-neutral-300'
+                                    ? 'text-white border-primary-500 bg-white/5'
+                                    : 'text-neutral-500 border-transparent hover:text-neutral-300'
                                     }`}
                                 onClick={() => setActiveSection('adjust')}
                             >
@@ -163,8 +174,8 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
                             </button>
                             <button
                                 className={`py-4 text-sm font-bold transition-all border-b-2 ${activeSection === 'transform'
-                                        ? 'text-white border-primary-500 bg-white/5'
-                                        : 'text-neutral-500 border-transparent hover:text-neutral-300'
+                                    ? 'text-white border-primary-500 bg-white/5'
+                                    : 'text-neutral-500 border-transparent hover:text-neutral-300'
                                     }`}
                                 onClick={() => setActiveSection('transform')}
                             >
@@ -221,8 +232,8 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
                                                 <button
                                                     key={f.id}
                                                     className={`flex flex-col items-center gap-2 p-3 bg-[#333] border rounded-2xl transition-all ${settings.activeFilter === f.id
-                                                            ? 'bg-primary-900/30 border-primary-500 text-white shadow-lg'
-                                                            : 'border-white/5 text-neutral-400 hover:bg-[#444] hover:border-white/10'
+                                                        ? 'bg-primary-900/30 border-primary-500 text-white shadow-lg'
+                                                        : 'border-white/5 text-neutral-400 hover:bg-[#444] hover:border-white/10'
                                                         }`}
                                                     onClick={() => setSettings({ ...settings, activeFilter: f.id })}
                                                 >
@@ -297,13 +308,7 @@ export default function PhotoStudio({ imageUrl, onSave, onClose }) {
                         )}
                     </button>
                 </footer>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }
-
-const Loader2 = ({ className, size }) => (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-);

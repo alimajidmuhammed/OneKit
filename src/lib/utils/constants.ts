@@ -183,6 +183,7 @@ export const ADMIN_NAV = [
     { label: 'Subscriptions', href: '/admin/subscriptions', icon: 'subscription' },
     { label: 'Payments', href: '/admin/payments', icon: 'payment' },
     { label: 'Roles & Permissions', href: '/admin/roles', icon: 'roles' },
+    { label: 'Audit Logs', href: '/admin/logs', icon: 'logs' },
     { label: 'Settings', href: '/admin/settings', icon: 'settings' },
 ];
 
