@@ -542,7 +542,12 @@ export default function CVEditorPage({ params }) {
     };
 
     const updateField = (field, value) => {
-        setCV(prev => ({ ...prev, [field]: value }));
+        console.log(`🔍 updateField called: ${field} =`, value);
+        setCV(prev => {
+            const updated = { ...prev, [field]: value };
+            console.log('📝 Updated CV state:', updated);
+            return updated;
+        });
         setHasChanges(true);
     };
 
