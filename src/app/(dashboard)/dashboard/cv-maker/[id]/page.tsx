@@ -30,7 +30,7 @@ import {
     RotateCcw,
     RotateCw
 } from 'lucide-react';
-import styles from './editor.module.css';
+import './cv-templates.css';
 
 
 // Premium CV Templates - 20 Designs
@@ -121,22 +121,22 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
         switch (id) {
             case 'summary':
                 return cv.summary && (
-                    <div className={styles.cvSection} key="summary">
+                    <div className="cvSection" key="summary">
                         <h3>{currentTemplate.baseTemplate === 'sydney' ? 'About Me' : 'Summary'}</h3>
                         <p>{cv.summary}</p>
                     </div>
                 );
             case 'experience':
                 return cv.experience?.length > 0 && (
-                    <div className={styles.cvSection} key="experience">
+                    <div className="cvSection" key="experience">
                         <h3>Experience</h3>
                         {cv.experience.map((exp, i) => (
-                            <div key={i} className={styles.cvItem}>
-                                <div className={styles.cvItemHeader}>
+                            <div key={i} className="cvItem">
+                                <div className="cvItemHeader">
                                     <strong>{exp.position || 'Position'}</strong>
                                     <span>{exp.startDate} - {exp.endDate || 'Present'}</span>
                                 </div>
-                                <p className={styles.company}>{exp.company}</p>
+                                <p className="company">{exp.company}</p>
                                 {exp.description && <p>{exp.description}</p>}
                             </div>
                         ))}
@@ -144,11 +144,11 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                 );
             case 'education':
                 return cv.education?.length > 0 && (
-                    <div className={styles.cvSection} key="education">
+                    <div className="cvSection" key="education">
                         <h3>Education</h3>
                         {cv.education.map((edu, i) => (
-                            <div key={i} className={styles.cvItem}>
-                                <div className={styles.cvItemHeader}>
+                            <div key={i} className="cvItem">
+                                <div className="cvItemHeader">
                                     <strong>{edu.degree} in {edu.field}</strong>
                                     <span>{edu.endDate}</span>
                                 </div>
@@ -159,23 +159,23 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                 );
             case 'skills':
                 return cv.skills?.length > 0 && (
-                    <div className={styles.cvSection} key="skills">
+                    <div className="cvSection" key="skills">
                         <h3>Skills</h3>
                         {currentTemplate.baseTemplate === 'sydney' ? (
-                            <div className={styles.skillList}>
+                            <div className="skillList">
                                 {cv.skills.map((skill, i) => (
-                                    <div key={i} className={styles.skillItem}>
-                                        <span className={styles.skillName}>{skill.name}</span>
-                                        <div className={styles.skillBar}>
-                                            <div className={styles.skillFill} style={{ width: `${getSkillLevel(skill.level)}%` }} />
+                                    <div key={i} className="skillItem">
+                                        <span className="skillName">{skill.name}</span>
+                                        <div className="skillBar">
+                                            <div className="skillFill" style={{ width: `${getSkillLevel(skill.level)}%` }} />
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className={styles.skillTags}>
+                            <div className="skillTags">
                                 {cv.skills.map((skill, i) => (
-                                    <span key={i} className={styles.skillTag}>{skill.name}</span>
+                                    <span key={i} className="skillTag">{skill.name}</span>
                                 ))}
                             </div>
                         )}
@@ -183,23 +183,23 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                 );
             case 'languages':
                 return cv.languages?.length > 0 && (
-                    <div className={styles.cvSection} key="languages">
+                    <div className="cvSection" key="languages">
                         <h3>Languages</h3>
                         {currentTemplate.baseTemplate === 'sydney' ? (
-                            <div className={styles.skillList}>
+                            <div className="skillList">
                                 {cv.languages.map((lang, i) => (
-                                    <div key={i} className={styles.skillItem}>
-                                        <span className={styles.skillName}>{lang.name}</span>
-                                        <div className={styles.skillBar}>
-                                            <div className={styles.skillFill} style={{ width: `${getSkillLevel(lang.level)}%` }} />
+                                    <div key={i} className="skillItem">
+                                        <span className="skillName">{lang.name}</span>
+                                        <div className="skillBar">
+                                            <div className="skillFill" style={{ width: `${getSkillLevel(lang.level)}%` }} />
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className={styles.skillTags}>
+                            <div className="skillTags">
                                 {cv.languages.map((lang, i) => (
-                                    <span key={i} className={styles.skillTag}>{lang.name} ({lang.level})</span>
+                                    <span key={i} className="skillTag">{lang.name} ({lang.level})</span>
                                 ))}
                             </div>
                         )}
@@ -207,11 +207,11 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                 );
             case 'certifications':
                 return cv.certifications?.length > 0 && (
-                    <div className={styles.cvSection} key="certifications">
+                    <div className="cvSection" key="certifications">
                         <h3>Certifications</h3>
                         {cv.certifications.map((cert, i) => (
-                            <div key={i} className={styles.cvItem}>
-                                <div className={styles.cvItemHeader}>
+                            <div key={i} className="cvItem">
+                                <div className="cvItemHeader">
                                     <strong>{cert.name}</strong>
                                     <span>{cert.date}</span>
                                 </div>
@@ -222,11 +222,11 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
                 );
             case 'organizations':
                 return cv.organizations?.length > 0 && (
-                    <div className={styles.cvSection} key="organizations">
+                    <div className="cvSection" key="organizations">
                         <h3>Organizations</h3>
                         {cv.organizations.map((org, i) => (
-                            <div key={i} className={styles.cvItem}>
-                                <div className={styles.cvItemHeader}>
+                            <div key={i} className="cvItem">
+                                <div className="cvItemHeader">
                                     <strong>{org.name}</strong>
                                     <span>{org.startDate} - {org.endDate || 'Present'}</span>
                                 </div>
@@ -243,7 +243,7 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
     return (
         <div
             ref={contentRef}
-            className={`${styles.cvPreview} ${styles[`template_${currentTemplate.baseTemplate || cv.template_id}`]} ${isExport ? styles.exportItem : ''}`}
+            className={`cvPreview template_${currentTemplate.baseTemplate || cv.template_id} ${isExport ? 'exportItem' : ''}`}
             style={{
                 '--template-primary': cv.custom_colors?.primary || currentTemplate.colors.primary,
                 '--template-accent': cv.custom_colors?.accent || currentTemplate.colors.accent,
@@ -252,67 +252,67 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
             } as React.CSSProperties}
         >
             {currentTemplate.baseTemplate === 'sydney' ? (
-                <div className={styles.cvInner}>
-                    <div className={styles.cvSidebar}>
+                <div className="cvInner">
+                    <div className="cvSidebar">
                         {(cv.personal_info?.photo || photoUploadPreview) && (
-                            <div className={styles.cvPhoto}>
+                            <div className="cvPhoto">
                                 <img src={photoUploadPreview || cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                             </div>
                         )}
-                        <div className={styles.sidebarName}>{cv.personal_info?.fullName || 'Your Name'}</div>
-                        <div className={styles.sidebarTitle}>{cv.personal_info?.jobTitle || 'Job Title'}</div>
+                        <div className="sidebarName">{cv.personal_info?.fullName || 'Your Name'}</div>
+                        <div className="sidebarTitle">{cv.personal_info?.jobTitle || 'Job Title'}</div>
 
-                        <div className={styles.sidebarSection}>
+                        <div className="sidebarSection">
                             <h4>Contact</h4>
-                            <div className={styles.contactList}>
-                                {cv.personal_info?.email && <div className={styles.contactItem}><span className={styles.icon}><Icons.email /></span> {cv.personal_info.email}</div>}
-                                {cv.personal_info?.phone && <div className={styles.contactItem}><span className={styles.icon}><Icons.phone /></span> {cv.personal_info.phone}</div>}
-                                {cv.personal_info?.location && <div className={styles.contactItem}><span className={styles.icon}><Icons.location /></span> {cv.personal_info.location}</div>}
-                                {cv.personal_info?.linkedin && <div className={styles.contactItem}><span className={styles.icon}><Icons.linkedin /></span> {cv.personal_info.linkedin}</div>}
+                            <div className="contactList">
+                                {cv.personal_info?.email && <div className="contactItem"><span className="icon"><Icons.email /></span> {cv.personal_info.email}</div>}
+                                {cv.personal_info?.phone && <div className="contactItem"><span className="icon"><Icons.phone /></span> {cv.personal_info.phone}</div>}
+                                {cv.personal_info?.location && <div className="contactItem"><span className="icon"><Icons.location /></span> {cv.personal_info.location}</div>}
+                                {cv.personal_info?.linkedin && <div className="contactItem"><span className="icon"><Icons.linkedin /></span> {cv.personal_info.linkedin}</div>}
                             </div>
                         </div>
 
                         {/* Order-aware Sidebar Sections (Skills/Languages usually sidebar in Sydney) */}
                         {order.map(id => (id === 'skills' || id === 'languages') && renderSection(id))}
                     </div>
-                    <div className={styles.cvMain}>
+                    <div className="cvMain">
                         {/* Order-aware Main Sections (Excluding personal, design, and sidebar items) */}
                         {order.map(id => (id !== 'personal' && id !== 'design' && id !== 'skills' && id !== 'languages') && renderSection(id))}
                     </div>
                 </div>
             ) : (
-                <div className={styles.cvInner}>
-                    <div className={styles.cvHeader}>
+                <div className="cvInner">
+                    <div className="cvHeader">
                         {(cv.personal_info?.photo || photoUploadPreview) && (
-                            <div className={styles.cvPhoto}>
+                            <div className="cvPhoto">
                                 <img src={photoUploadPreview || cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                             </div>
                         )}
-                        <div className={styles.cvHeaderText}>
+                        <div className="cvHeaderText">
                             <h1>{cv.personal_info?.fullName || 'Your Name'}</h1>
-                            <p className={styles.jobTitle}>{cv.personal_info?.jobTitle || 'Job Title'}</p>
-                            <div className={styles.contactInfo}>
+                            <p className="jobTitle">{cv.personal_info?.jobTitle || 'Job Title'}</p>
+                            <div className="contactInfo">
                                 {cv.personal_info?.email && (
-                                    <div className={styles.contactItem}>
-                                        <span className={styles.icon}><Icons.email /></span>
+                                    <div className="contactItem">
+                                        <span className="icon"><Icons.email /></span>
                                         <span>{cv.personal_info.email}</span>
                                     </div>
                                 )}
                                 {cv.personal_info?.phone && (
-                                    <div className={styles.contactItem}>
-                                        <span className={styles.icon}><Icons.phone /></span>
+                                    <div className="contactItem">
+                                        <span className="icon"><Icons.phone /></span>
                                         <span>{cv.personal_info.phone}</span>
                                     </div>
                                 )}
                                 {cv.personal_info?.location && (
-                                    <div className={styles.contactItem}>
-                                        <span className={styles.icon}><Icons.location /></span>
+                                    <div className="contactItem">
+                                        <span className="icon"><Icons.location /></span>
                                         <span>{cv.personal_info.location}</span>
                                     </div>
                                 )}
                                 {cv.personal_info?.linkedin && (
-                                    <div className={styles.contactItem}>
-                                        <span className={styles.icon}><Icons.linkedin /></span>
+                                    <div className="contactItem">
+                                        <span className="icon"><Icons.linkedin /></span>
                                         <span>{cv.personal_info.linkedin}</span>
                                     </div>
                                 )}
