@@ -3,17 +3,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
+import type { CVDocument } from '@/lib/types/cv';
+
+interface CVActionResult<T = CVDocument | null> {
+    data?: T;
+    error: string | null;
+}
 
 export function useCV() {
-    const [cvs, setCvs] = useState([]);
-    const [currentCV, setCurrentCV] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
+    const [cvs, setCvs] = useState<CVDocument[]>([]);
+    const [currentCV, setCurrentCV] = useState<CVDocument | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [saving, setSaving] = useState<boolean>(false);
     const { user } = useAuth();
     const supabase = getSupabaseClient();
 
     // Fetch user's CVs
-    const fetchCVs = useCallback(async () => {
+    const fetchCVs = useCallback(async (): Promise<void> => {
         if (!user) {
             setLoading(false);
             return;
@@ -27,7 +33,7 @@ export function useCV() {
                 .order('updated_at', { ascending: false });
 
             if (error) throw error;
-            setCvs(data || []);
+            setCvs((data as CVDocument[]) || []);
         } catch (err) {
             console.error('Error fetching CVs:', err);
         } finally {
@@ -36,7 +42,7 @@ export function useCV() {
     }, [user, supabase]);
 
     // Fetch single CV
-    const fetchCV = useCallback(async (id) => {
+    const fetchCV = useCallback(async (id: string): Promise<CVDocument | null> => {
         try {
             const { data, error } = await supabase
                 .from('cv_documents')
@@ -45,8 +51,8 @@ export function useCV() {
                 .single();
 
             if (error) throw error;
-            setCurrentCV(data);
-            return data;
+            setCurrentCV(data as CVDocument);
+            return data as CVDocument;
         } catch (err) {
             console.error('Error fetching CV:', err);
             return null;
@@ -54,7 +60,10 @@ export function useCV() {
     }, [supabase]);
 
     // Create new CV
-    const createCV = useCallback(async (name, templateId = 'professional') => {
+    const createCV = useCallback(async (
+        name: string,
+        templateId: string = 'professional'
+    ): Promise<CVActionResult> => {
         if (!user) return { error: 'Not authenticated' };
 
         setSaving(true);
@@ -81,16 +90,19 @@ export function useCV() {
 
             if (error) throw error;
             await fetchCVs();
-            return { data, error: null };
-        } catch (err) {
-            return { data: null, error: err.message };
+            return { data: data as CVDocument, error: null };
+        } catch (err: any) {
+            return { data: undefined, error: err.message };
         } finally {
             setSaving(false);
         }
     }, [user, supabase, fetchCVs]);
 
     // Update CV
-    const updateCV = useCallback(async (id, updates) => {
+    const updateCV = useCallback(async (
+        id: string,
+        updates: Partial<CVDocument>
+    ): Promise<CVActionResult> => {
         setSaving(true);
         try {
             const { data, error } = await supabase
@@ -104,17 +116,17 @@ export function useCV() {
                 .single();
 
             if (error) throw error;
-            setCurrentCV(data);
-            return { data, error: null };
-        } catch (err) {
-            return { data: null, error: err.message };
+            setCurrentCV(data as CVDocument);
+            return { data: data as CVDocument, error: null };
+        } catch (err: any) {
+            return { data: undefined, error: err.message };
         } finally {
             setSaving(false);
         }
     }, [supabase]);
 
     // Delete CV and clean up R2 images
-    const deleteCV = useCallback(async (id) => {
+    const deleteCV = useCallback(async (id: string): Promise<CVActionResult<never>> => {
         try {
             // First fetch the CV to get the photo URL
             const { data: cvData, error: fetchError } = await supabase
@@ -149,14 +161,14 @@ export function useCV() {
             if (error) throw error;
             await fetchCVs();
             return { error: null };
-        } catch (err) {
+        } catch (err: any) {
             return { error: err.message };
         }
     }, [supabase, fetchCVs]);
 
 
     // Duplicate CV
-    const duplicateCV = useCallback(async (id) => {
+    const duplicateCV = useCallback(async (id: string): Promise<CVActionResult> => {
         const cv = cvs.find(c => c.id === id);
         if (!cv) return { error: 'CV not found' };
 
