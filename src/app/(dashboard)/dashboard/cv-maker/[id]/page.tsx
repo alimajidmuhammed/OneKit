@@ -1729,14 +1729,14 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
                 {/* Preview Side */}
                 <div
-                    className={`${styles.previewSide} ${mobileView === 'edit' ? styles.hideMobile : ''}`}
+                    className={`bg-slate-100/50 backdrop-blur-sm rounded-3xl p-4 lg:p-10 overflow-auto relative min-h-[calc(100vh-160px)] flex justify-center items-start transition-all duration-500 border border-neutral-100 ${mobileView === 'edit' ? 'hidden lg:flex' : 'flex'}`}
                     ref={containerRef}
                 >
                     <div
-                        className={styles.previewContainer}
+                        className="bg-white shadow-2xl origin-top transition-transform duration-300 ease-out hover:shadow-primary-500/10"
                         style={{
                             transform: `scale(${previewScale})`,
-                            transformOrigin: 'top center'
+                            width: '794px', // A4 aspect ratio base width
                         }}
                     >
                         <CVContent
@@ -1752,136 +1752,179 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
             {/* Template Selection Overlay */}
             {showTemplates && (
-                <div className={styles.modalOverlay} onClick={() => setShowTemplates(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-                    <div className={styles.templateDropdown} onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800' }}>Choose a Template</h3>
-                            <button onClick={() => setShowTemplates(false)} style={{ border: 'none', background: '#f1f5f9', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                <Icons.close />
+                <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm flex items-center justify-center z-[1000] p-4 lg:p-8 animate-in fade-in duration-300">
+                    <div
+                        className="bg-white rounded-[32px] w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-300"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="px-8 py-6 border-b border-neutral-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                            <div>
+                                <h3 className="text-2xl font-black text-neutral-900 leading-tight">Choose Your Template</h3>
+                                <p className="text-sm text-neutral-500 mt-1 font-medium">Select a design that best represents your professional brand</p>
+                            </div>
+                            <button
+                                onClick={() => setShowTemplates(false)}
+                                className="p-3 bg-neutral-50 hover:bg-neutral-100 text-neutral-400 hover:text-neutral-900 rounded-full transition-all"
+                            >
+                                <Icons.close size={24} />
                             </button>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
-                            {CV_TEMPLATES.map(t => (
-                                <div
-                                    key={t.id}
-                                    onClick={() => changeTemplate(t.id)}
-                                    style={{
-                                        cursor: 'pointer',
-                                        borderRadius: '20px',
-                                        border: cv.template_id === t.id ? '3px solid #2563eb' : '1px solid #e2e8f0',
-                                        padding: '16px',
-                                        background: cv.template_id === t.id ? '#eff6ff' : 'white',
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        transform: cv.template_id === t.id ? 'scale(1.02)' : 'none'
-                                    }}
-                                    onMouseEnter={e => !(cv.template_id === t.id) && (e.currentTarget.style.borderColor = '#2563eb')}
-                                    onMouseLeave={e => !(cv.template_id === t.id) && (e.currentTarget.style.borderColor = '#e2e8f0')}
-                                >
-                                    <div style={{ height: '120px', background: '#f8fafc', borderRadius: '8px', marginBottom: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                                        <div style={{ height: '12px', background: t.colors.primary, marginBottom: '8px' }} />
-                                        <div style={{ padding: '8px' }}>
-                                            <div style={{ height: '6px', background: '#e2e8f0', width: '60%', marginBottom: '4px' }} />
-                                            <div style={{ height: '4px', background: '#f1f5f9', width: '100%', marginBottom: '2px' }} />
-                                            <div style={{ height: '4px', background: '#f1f5f9', width: '90%', marginBottom: '2px' }} />
+
+                        {/* Modal Content */}
+                        <div className="flex-1 overflow-y-auto p-8 scrollbar-thin">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {CV_TEMPLATES.map(t => (
+                                    <div
+                                        key={t.id}
+                                        onClick={() => changeTemplate(t.id)}
+                                        className={`group cursor-pointer rounded-2xl border-2 transition-all duration-300 overflow-hidden relative ${cv.template_id === t.id
+                                            ? 'border-primary-500 bg-primary-50 shadow-lg scale-[1.02]'
+                                            : 'border-neutral-100 bg-white hover:border-primary-200 hover:shadow-xl hover:translate-y-[-4px]'
+                                            }`}
+                                    >
+                                        {/* Template Preview Illustration */}
+                                        <div className="aspect-[3/4] p-4 bg-neutral-50 group-hover:bg-white transition-colors">
+                                            <div className="w-full h-full bg-white rounded shadow-sm border border-neutral-100 overflow-hidden">
+                                                <div className="h-2 w-full" style={{ background: t.colors.primary }} />
+                                                <div className="p-3 space-y-2">
+                                                    <div className="h-1.5 w-1/2 bg-neutral-100 rounded" />
+                                                    <div className="space-y-1">
+                                                        <div className="h-1 w-full bg-neutral-50 rounded" />
+                                                        <div className="h-1 w-full bg-neutral-50 rounded" />
+                                                        <div className="h-1 w-3/4 bg-neutral-50 rounded" />
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        {/* Template Info */}
+                                        <div className="p-4 flex justify-between items-center">
+                                            <div>
+                                                <h4 className="text-sm font-bold text-neutral-900">{t.name}</h4>
+                                                <p className="text-[10px] text-neutral-400 font-medium uppercase tracking-wider">{t.description}</p>
+                                            </div>
+                                            {cv.template_id === t.id && (
+                                                <div className="bg-primary-500 text-white p-1 rounded-full">
+                                                    <Icons.pdf size={14} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* RTL Badge */}
+                                        {t.rtl && (
+                                            <div className="absolute top-2 right-2 bg-indigo-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-sm uppercase">RTL</div>
+                                        )}
                                     </div>
-                                    <div style={{ fontWeight: '600', fontSize: '14px' }}>{t.name}</div>
-                                    <div style={{ fontSize: '11px', color: '#64748b' }}>{t.description}</div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="px-8 py-6 border-t border-neutral-100 bg-neutral-50/50 flex justify-end">
+                            <button
+                                onClick={() => setShowTemplates(false)}
+                                className="px-8 py-3 bg-neutral-900 hover:bg-black text-white rounded-2xl transition-all font-bold text-sm shadow-lg hover:shadow-neutral-900/20 active:scale-95"
+                            >
+                                Apply Template
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
             {isPhotoStudioOpen && (
-                <div className={styles.modalOverlay} onClick={() => setIsPhotoStudioOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '20px' }}>
-                    <div className={styles.photoStudioModal} onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '500px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                            <h3 style={{ margin: '0 0 8px 0', fontSize: '1.5rem', fontWeight: '800' }}>Photo Studio</h3>
-                            <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>Adjust your profile photo for the perfect fit</p>
+                <div className="fixed inset-0 bg-neutral-900/80 backdrop-blur-md flex items-center justify-center z-[1100] p-4 lg:p-8 animate-in fade-in duration-500">
+                    <div
+                        className="bg-white rounded-[40px] w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-500"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {/* Modal Header */}
+                        <div className="px-10 pt-10 pb-6 text-center">
+                            <h3 className="text-3xl font-black text-neutral-900 leading-tight">Photo Studio</h3>
+                            <p className="text-sm text-neutral-500 mt-2 font-medium">Perfect your profile picture for a professional look</p>
                         </div>
 
-                        <div className={styles.studioContent} style={{ display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
-                            <div className={styles.studioPreviewSection}>
+                        {/* Studio Content */}
+                        <div className="px-10 pb-10 flex flex-col gap-8 items-center">
+                            {/* Preview Circle */}
+                            <div className="relative group">
                                 <div
-                                    className={styles.studioPreviewCircle}
-                                    style={{
-                                        width: '240px',
-                                        height: '240px',
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        border: '8px solid #f1f5f9',
-                                        boxShadow: 'inset 0 4px 6px 0 rgba(0,0,0,0.1)',
-                                        position: 'relative',
-                                        cursor: isDragging ? 'grabbing' : 'grab',
-                                        touchAction: 'none'
-                                    }}
+                                    className={`w-64 h-64 rounded-full overflow-hidden border-8 border-neutral-50 shadow-2xl relative transition-all duration-300 ${isDragging ? 'cursor-grabbing scale-[1.02] shadow-primary-500/20' : 'cursor-grab hover:scale-[1.01]'}`}
                                     onMouseDown={handlePhotoMouseDown}
                                     onTouchStart={handlePhotoTouchStart}
                                 >
                                     <img
                                         src={photoUploadPreview || cv.personal_info.photo}
                                         alt="Profile"
+                                        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
                                         style={{
-                                            position: 'absolute',
                                             transform: `translate(${studioPhotoPosition.x}px, ${studioPhotoPosition.y}px) scale(${photoZoom}) rotate(${photoRotation}deg)`,
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
                                         }}
-                                        draggable={false}
                                         crossOrigin="anonymous"
                                     />
-                                    <div style={{ position: 'absolute', inset: 0, border: '1px solid rgba(0,0,0,0.1)', borderRadius: '50%', pointerEvents: 'none' }} />
+                                    {/* Overlay Grid/Guide */}
+                                    <div className="absolute inset-0 border border-white/20 rounded-full pointer-events-none" />
                                 </div>
-                                <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '12px', color: '#94a3b8' }}>
-                                    Tip: Drag photo to reposition
+
+                                {/* Reposition Tip */}
+                                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full shadow-lg border border-neutral-100 flex items-center gap-2 animate-bounce">
+                                    <Icons.magic size={12} className="text-primary-500" />
+                                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Drag to Reposition</span>
                                 </div>
                             </div>
 
-                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                <div>
-                                    <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: '600', marginBottom: '8px' }}>
-                                        Zoom <span>{Math.round(photoZoom * 100)}%</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="0.5"
-                                        max="3"
-                                        step="0.01"
-                                        value={photoZoom}
-                                        onChange={e => setPhotoZoom(parseFloat(e.target.value))}
-                                        style={{ width: '100%', height: '6px', background: '#e2e8f0', borderRadius: '3px', appearance: 'none', cursor: 'pointer' }}
-                                    />
+                            {/* Controls */}
+                            <div className="w-full space-y-8 mt-4">
+                                {/* Zoom Control */}
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-end">
+                                        <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Zoom Level</label>
+                                        <span className="text-sm font-black text-primary-600 bg-primary-50 px-3 py-1 rounded-lg">{Math.round(photoZoom * 100)}%</span>
+                                    </div>
+                                    <div className="relative flex items-center h-6">
+                                        <input
+                                            type="range"
+                                            min="0.5"
+                                            max="3"
+                                            step="0.01"
+                                            value={photoZoom}
+                                            onChange={e => setPhotoZoom(parseFloat(e.target.value))}
+                                            className="w-full h-1.5 bg-neutral-100 rounded-lg appearance-none cursor-pointer accent-primary-600"
+                                        />
+                                    </div>
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '12px' }}>
+                                {/* Rotation Controls */}
+                                <div className="grid grid-cols-2 gap-4">
                                     <button
                                         onClick={() => setPhotoRotation(r => r - 90)}
-                                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}
+                                        className="flex items-center justify-center gap-3 p-4 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all font-bold text-sm group"
                                     >
-                                        ↺ Rotate Left
+                                        <Icons.rotateCw size={18} className="rotate-180 group-hover:-rotate-90 transition-transform" />
+                                        <span>Rotate Left</span>
                                     </button>
                                     <button
                                         onClick={() => setPhotoRotation(r => r + 90)}
-                                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}
+                                        className="flex items-center justify-center gap-3 p-4 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all font-bold text-sm group"
                                     >
-                                        ↻ Rotate Right
+                                        <Icons.rotateCw size={18} className="group-hover:rotate-90 transition-transform" />
+                                        <span>Rotate Right</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <div style={{ width: '100%', display: 'flex', gap: '12px', marginTop: '8px' }}>
+                            {/* Action Buttons */}
+                            <div className="w-full flex gap-4 pt-4 mt-4 border-t border-neutral-100">
                                 <button
                                     onClick={() => setIsPhotoStudioOpen(false)}
-                                    style={{ flex: 1, padding: '14px', borderRadius: '14px', border: 'none', background: '#f1f5f9', color: '#64748b', fontWeight: '700', cursor: 'pointer' }}
+                                    className="flex-1 py-4 px-6 bg-neutral-50 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 rounded-2xl transition-all font-bold text-sm"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={applyPhotoEdits}
-                                    style={{ flex: 1, padding: '14px', borderRadius: '14px', border: 'none', background: '#2563eb', color: 'white', fontWeight: '700', cursor: 'pointer' }}
+                                    className="flex-1 py-4 px-6 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl transition-all font-bold text-sm shadow-xl shadow-primary-600/20 active:scale-95"
                                 >
                                     Apply Changes
                                 </button>
