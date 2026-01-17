@@ -164,7 +164,7 @@ const Icons = {
     ),
 };
 
-const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentRef }) => {
+const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentRef, photoUploadPreview = null }) => {
     const getSkillLevel = (level) => {
         const l = level?.toLowerCase();
         const levels = {
@@ -313,9 +313,9 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
             {currentTemplate.baseTemplate === 'sydney' ? (
                 <div className={styles.cvInner}>
                     <div className={styles.cvSidebar}>
-                        {cv.personal_info?.photo && (
+                        {(cv.personal_info?.photo || photoUploadPreview) && (
                             <div className={styles.cvPhoto}>
-                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
+                                <img src={photoUploadPreview || cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                             </div>
                         )}
                         <div className={styles.sidebarName}>{cv.personal_info?.fullName || 'Your Name'}</div>
@@ -342,9 +342,9 @@ const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentR
             ) : (
                 <div className={styles.cvInner}>
                     <div className={styles.cvHeader}>
-                        {cv.personal_info?.photo && (
+                        {(cv.personal_info?.photo || photoUploadPreview) && (
                             <div className={styles.cvPhoto}>
-                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
+                                <img src={photoUploadPreview || cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
                             </div>
                         )}
                         <div className={styles.cvHeaderText}>
@@ -448,6 +448,11 @@ export default function CVEditorPage({ params }) {
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+    // Photo Upload State
+    const [photoUploadPreview, setPhotoUploadPreview] = useState(null);
+    const [photoUploadError, setPhotoUploadError] = useState(null);
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
     useEffect(() => {
         isMounted.current = true;
         return () => { isMounted.current = false; };
@@ -516,10 +521,11 @@ export default function CVEditorPage({ params }) {
     }, [cv, id, updateCV, sectionOrder]);
 
     useEffect(() => {
-        if (!hasChanges || !cv) return;
+        // Block auto-save while uploading photo to prevent blob URL persistence
+        if (!hasChanges || !cv || isUploadingPhoto) return;
         const timeoutId = setTimeout(() => handleSave(), 2500);
         return () => clearTimeout(timeoutId);
-    }, [cv, hasChanges, handleSave]);
+    }, [cv, hasChanges, handleSave, isUploadingPhoto]);
 
     const changeTemplate = (templateId) => {
         const template = CV_TEMPLATES.find(t => t.id === templateId);
@@ -549,16 +555,38 @@ export default function CVEditorPage({ params }) {
         const file = e.target.files[0];
         if (!file || !user) return;
 
-        // Show immediate preview
-        const localPreview = URL.createObjectURL(file);
-        updatePersonalInfo('photo', localPreview);
-        setIsPhotoStudioOpen(true);
+        // Reset any previous errors
+        setPhotoUploadError(null);
+        setIsUploadingPhoto(true);
 
-        // Upload optimized image to R2
-        const publicUrl = await uploadImage(file, { folder: 'cv-photos', type: 'photo' });
-        if (publicUrl) {
-            updatePersonalInfo('photo', publicUrl);
-            setHasChanges(true);
+        try {
+            // Create blob URL for immediate preview (DO NOT save to cv state)
+            const localPreview = URL.createObjectURL(file);
+            setPhotoUploadPreview(localPreview);
+            setIsPhotoStudioOpen(true);
+
+            // Upload optimized image to R2
+            const publicUrl = await uploadImage(file, { folder: 'cv-photos', type: 'photo' });
+
+            if (publicUrl) {
+                // Success: Update with permanent R2 URL
+                updatePersonalInfo('photo', publicUrl);
+                setPhotoUploadPreview(null); // Clear preview
+                setHasChanges(true);
+
+                // Clean up blob URL
+                URL.revokeObjectURL(localPreview);
+            } else {
+                // Upload failed
+                throw new Error('Upload failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Photo upload error:', error);
+            setPhotoUploadError(error.message || 'Failed to upload photo');
+            setPhotoUploadPreview(null);
+            setIsPhotoStudioOpen(false);
+        } finally {
+            setIsUploadingPhoto(false);
         }
     };
 
@@ -906,6 +934,7 @@ export default function CVEditorPage({ params }) {
                     photoStyle={photoStyle}
                     isExport={true}
                     contentRef={exportRef}
+                    photoUploadPreview={photoUploadPreview}
                 />
             </div>
 
@@ -1061,29 +1090,63 @@ export default function CVEditorPage({ params }) {
                             </h2>
                             <div className={styles.photoUpload} style={{ marginBottom: '1rem' }}>
                                 <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '0.25rem' }}>Profile Photo</label>
+
+                                {/* Upload Error Message */}
+                                {photoUploadError && (
+                                    <div style={{ padding: '8px 12px', borderRadius: '8px', background: '#fef2f2', border: '1px solid #fca5a5', color: '#dc2626', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <span>⚠️</span>
+                                        <span>{photoUploadError}</span>
+                                        <button onClick={() => setPhotoUploadError(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626' }}>✕</button>
+                                    </div>
+                                )}
+
                                 <div className={styles.photoContainer} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    {cv.personal_info?.photo ? (
+                                    {/* Show photo if exists OR upload preview during upload */}
+                                    {(cv.personal_info?.photo || photoUploadPreview) ? (
                                         <>
                                             <div
                                                 className={styles.photoPreview}
-                                                onClick={() => setIsPhotoStudioOpen(true)}
-                                                style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', cursor: 'pointer', border: '3px solid white', boxShadow: '0 2px 4px -1px rgba(0,0,0,0.1)', position: 'relative' }}
+                                                onClick={() => !isUploadingPhoto && setIsPhotoStudioOpen(true)}
+                                                style={{
+                                                    width: '80px',
+                                                    height: '80px',
+                                                    borderRadius: '50%',
+                                                    overflow: 'hidden',
+                                                    cursor: isUploadingPhoto ? 'not-allowed' : 'pointer',
+                                                    border: '3px solid white',
+                                                    boxShadow: '0 2px 4px -1px rgba(0,0,0,0.1)',
+                                                    position: 'relative'
+                                                }}
                                             >
-                                                <img src={cv.personal_info.photo} alt="Profile" style={photoStyle} crossOrigin="anonymous" />
-                                                <div className={styles.photoEditOverlay} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}>
-                                                    <span style={{ fontSize: '10px' }}>Edit</span>
-                                                </div>
+                                                <img
+                                                    src={photoUploadPreview || cv.personal_info.photo}
+                                                    alt="Profile"
+                                                    style={photoStyle}
+                                                    crossOrigin="anonymous"
+                                                />
+                                                {isUploadingPhoto ? (
+                                                    <div className={styles.photoEditOverlay} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                                        <Icons.spinner />
+                                                        <span style={{ fontSize: '10px' }}>Uploading...</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className={styles.photoEditOverlay} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}>
+                                                        <span style={{ fontSize: '10px' }}>Edit</span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                                                 <button
                                                     onClick={() => setIsPhotoStudioOpen(true)}
-                                                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', fontSize: '12px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                    disabled={isUploadingPhoto}
+                                                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', fontSize: '12px', fontWeight: '500', cursor: isUploadingPhoto ? 'not-allowed' : 'pointer', opacity: isUploadingPhoto ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '4px' }}
                                                 >
                                                     ✏️ Edit
                                                 </button>
                                                 <button
                                                     onClick={removePhoto}
-                                                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #fca5a5', background: '#fef2f2', color: '#dc2626', fontSize: '12px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                    disabled={isUploadingPhoto}
+                                                    style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #fca5a5', background: '#fef2f2', color: '#dc2626', fontSize: '12px', fontWeight: '500', cursor: isUploadingPhoto ? 'not-allowed' : 'pointer', opacity: isUploadingPhoto ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '4px' }}
                                                 >
                                                     🗑️ Remove
                                                 </button>
@@ -1093,7 +1156,7 @@ export default function CVEditorPage({ params }) {
                                         <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#f8fafc', border: '2px dashed #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', position: 'relative' }}>
                                             <Icons.upload />
                                             <span style={{ fontSize: '9px', color: '#64748b', marginTop: '2px' }}>Upload</span>
-                                            <input type="file" onChange={handlePhotoUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                                            <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
                                         </div>
                                     )}
                                 </div>
@@ -1448,6 +1511,7 @@ export default function CVEditorPage({ params }) {
                             currentTemplate={currentTemplate}
                             photoStyle={photoStyle}
                             contentRef={previewRef}
+                            photoUploadPreview={photoUploadPreview}
                         />
                     </div>
                 </div>
@@ -1524,7 +1588,8 @@ export default function CVEditorPage({ params }) {
                                     onTouchStart={handlePhotoTouchStart}
                                 >
                                     <img
-                                        src={cv.personal_info.photo}
+                                        src={photoUploadPreview || cv.personal_info.photo}
+                                        alt="Profile"
                                         style={{
                                             position: 'absolute',
                                             transform: `translate(${studioPhotoPosition.x}px, ${studioPhotoPosition.y}px) scale(${photoZoom}) rotate(${photoRotation}deg)`,
