@@ -1398,36 +1398,62 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                     )}
 
                     {activeSection === 'languages' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Languages</h2>
-                                <button onClick={addLanguage} style={{ height: '32px', width: '32px', borderRadius: '50%', background: '#2563eb', color: 'white', border: 'none', cursor: 'pointer' }}>+</button>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Languages
+                                </h2>
+                                <button
+                                    onClick={addLanguage}
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all font-bold text-xs shadow-md hover:shadow-lg group"
+                                >
+                                    <Icons.add size={16} className="group-hover:rotate-90 transition-transform" />
+                                    <span>Add Language</span>
+                                </button>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+                            <div className="space-y-4">
                                 {(cv.languages || []).map((l, idx) => (
-                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                        <input
-                                            style={{ flex: 1, padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                            placeholder="Language (e.g. English)"
-                                            value={l.name}
-                                            onChange={v => updateLanguage(idx, 'name', v.target.value)}
-                                        />
-                                        <select
-                                            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px', background: 'white' }}
-                                            value={l.level}
-                                            onChange={v => updateLanguage(idx, 'level', v.target.value)}
+                                    <div
+                                        key={idx}
+                                        className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-neutral-50 p-4 rounded-xl border border-neutral-100 transition-all hover:bg-white hover:shadow-md group"
+                                    >
+                                        <div className="flex-1">
+                                            <input
+                                                className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all font-bold"
+                                                placeholder="Language (e.g. English)"
+                                                value={l.name}
+                                                onChange={v => updateLanguage(idx, 'name', v.target.value)}
+                                            />
+                                        </div>
+                                        <div className="w-full md:w-48">
+                                            <select
+                                                className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all cursor-pointer appearance-none"
+                                                value={l.level}
+                                                onChange={v => updateLanguage(idx, 'level', v.target.value)}
+                                            >
+                                                <option value="Native">Native</option>
+                                                <option value="Fluent">Fluent</option>
+                                                <option value="Advanced">Advanced</option>
+                                                <option value="Intermediate">Intermediate</option>
+                                                <option value="Basic">Basic</option>
+                                            </select>
+                                        </div>
+                                        <button
+                                            onClick={() => removeLanguage(idx)}
+                                            className="p-2.5 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all self-end md:self-auto"
                                         >
-                                            <option value="Native">Native</option>
-                                            <option value="Fluent">Fluent</option>
-                                            <option value="Advanced">Advanced</option>
-                                            <option value="Intermediate">Intermediate</option>
-                                            <option value="Basic">Basic</option>
-                                        </select>
-                                        <button onClick={() => removeLanguage(idx)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#f43f5e' }}>
-                                            <Icons.close />
+                                            <Icons.close size={18} />
                                         </button>
                                     </div>
                                 ))}
+
+                                {(cv.languages || []).length === 0 && (
+                                    <div className="text-center py-10 bg-neutral-50/50 rounded-2xl border border-dashed border-neutral-200">
+                                        <p className="text-sm text-neutral-400">No languages listed yet.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
