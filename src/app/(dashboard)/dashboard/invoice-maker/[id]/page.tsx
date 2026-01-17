@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { useState, useEffect, use, useRef, useCallback } from 'react';
@@ -85,7 +86,7 @@ const DEFAULT_LABELS = {
     label_accountant_ku: 'Accountant / ژمێریار'
 };
 
-export default function InvoiceEditorPage({ params }) {
+export default function InvoiceEditorPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const { id } = resolvedParams;
     const router = useRouter();

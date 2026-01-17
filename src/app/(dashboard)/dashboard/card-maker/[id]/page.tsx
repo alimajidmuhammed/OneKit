@@ -1118,7 +1118,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                             <div className={styles.formGroup}>
                                 <label>Biography / Notes</label>
                                 <textarea
-                                    rows="4"
+                                    rows={4}
                                     value={card.content.notes}
                                     onChange={(e) => updateContent({ notes: e.target.value })}
                                     placeholder="Brief background or tagline..."

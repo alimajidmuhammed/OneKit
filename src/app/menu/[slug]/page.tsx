@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { notFound } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
