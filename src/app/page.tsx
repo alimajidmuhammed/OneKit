@@ -43,12 +43,15 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="relative flex justify-center items-center">
-              <div className="w-full max-w-[500px] rounded-[24px] bg-white p-2.5 border border-neutral-100 shadow-2xl relative z-[5] lg:rotate-y-[-10deg] lg:rotate-x-[5deg] lg:perspective-[1000px] transform transition-transform hover:scale-[1.02]">
-                <img src="/images/platform-showcase.png" alt="OneKit Platform Showcase" className="w-full h-auto rounded-2xl block" />
-                <div className="absolute -bottom-10 left-[10%] right-[10%] h-5 bg-black/10 blur-[20px] rounded-[50%] z-[-1]"></div>
+            <div className="relative flex justify-center items-center mt-12 lg:mt-0">
+              <div className="w-full max-w-[500px] rounded-[32px] bg-white p-3 border border-neutral-100 shadow-2xl relative z-20 transform transition-all duration-500 hover:scale-[1.02]">
+                <img src="/images/platform-showcase.png" alt="OneKit Platform Showcase" className="w-full h-auto rounded-[24px] block" />
+                <div className="absolute -bottom-10 left-[10%] right-[10%] h-5 bg-black/10 blur-[30px] rounded-[50%] z-[-1]"></div>
               </div>
+              {/* Decorative background element for mobile */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary-50/50 blur-[100px] rounded-full z-[0] lg:hidden"></div>
             </div>
+
           </div>
         </section>
 

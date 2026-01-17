@@ -15,8 +15,14 @@ export default function Footer() {
                     {/* Brand */}
                     <div className="lg:col-span-4">
                         <Link href="/" className="inline-block mb-6 group">
-                            <img src="/logo.png" alt="OneKit" className="h-10 w-auto transition-transform group-hover:scale-105" />
+                            <img
+                                src="/logo.png"
+                                alt="OneKit"
+                                className="w-auto transition-transform group-hover:scale-105"
+                                style={{ height: '40px', minHeight: '40px' }}
+                            />
                         </Link>
+
                         <p className="text-neutral-500 text-lg leading-relaxed mb-8 max-w-sm">
                             {APP_CONFIG.tagline}
                         </p>

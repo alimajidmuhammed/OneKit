@@ -4,7 +4,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import ReferralSection from '@/components/dashboard/ReferralSection';
-import styles from './settings.module.css';
+import { User, Mail, Phone, Shield, Lock, Trash2, Gift, ChevronRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
+
 
 export default function SettingsPage() {
     const { user, profile, updateProfile } = useAuth();
@@ -159,166 +160,176 @@ export default function SettingsPage() {
 
 
     return (
-        <div className={styles.page}>
-            <div className={styles.header}>
-                <h1>Settings</h1>
-                <p>Manage your account settings and profile</p>
+        <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-screen">
+            <div className="mb-10">
+                <h1 className="text-3xl font-bold text-neutral-900 mb-2">Settings</h1>
+                <p className="text-neutral-500">Manage your account settings and profile</p>
             </div>
 
-            <div className={styles.content}>
+            <div className="space-y-8">
                 {/* Profile Section */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Profile Information</h2>
-                        <p>Update your personal information</p>
+                <section className="bg-white border border-neutral-100 rounded-[32px] overflow-hidden shadow-sm">
+                    <div className="p-8 border-b border-neutral-100 bg-neutral-50/50">
+                        <h2 className="text-xl font-bold text-neutral-900">Profile Information</h2>
+                        <p className="text-sm text-neutral-500">Update your personal information</p>
                     </div>
 
-                    {success && (
-                        <div className={styles.successMessage}>
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                            Profile updated successfully!
-                        </div>
-                    )}
-
-                    {error && (
-                        <div className={styles.errorMessage}>
-                            <svg viewBox="0 0 24 24" fill="none">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                            {error}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                        <div className={styles.avatarSection}>
-                            <div className={styles.avatar}>
-                                {profile?.avatar_url ? (
-                                    <img src={profile.avatar_url} alt={profile.full_name} />
-                                ) : (
-                                    <span>{profile?.full_name?.[0] || user?.email?.[0]?.toUpperCase() || '?'}</span>
-                                )}
+                    <div className="p-8">
+                        {success && (
+                            <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-2xl flex items-center gap-3 border border-green-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                                    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                                Profile updated successfully!
                             </div>
-                            <div className={styles.avatarInfo}>
-                                <span className={styles.avatarName}>{profile?.full_name || 'Your Name'}</span>
-                                <span className={styles.avatarEmail}>{user?.email}</span>
-                            </div>
-                        </div>
+                        )}
 
-                        <div className={styles.formGrid}>
-                            <div className={styles.formGroup}>
-                                <label htmlFor="full_name">Full Name</label>
-                                <input
-                                    type="text"
-                                    id="full_name"
-                                    name="full_name"
-                                    value={formData.full_name}
-                                    onChange={handleChange}
-                                    placeholder="Enter your full name"
-                                />
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-2xl flex items-center gap-3 border border-red-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                                    <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="space-y-8">
+                            <div className="flex items-center gap-6">
+                                <div className="w-20 h-20 rounded-3xl bg-brand-gradient flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-xl overflow-hidden">
+                                    {profile?.avatar_url ? (
+                                        <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span>{profile?.full_name?.[0] || user?.email?.[0]?.toUpperCase() || '?'}</span>
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="block text-xl font-bold text-neutral-900">{profile?.full_name || 'Your Name'}</span>
+                                    <span className="block text-neutral-500">{user?.email}</span>
+                                </div>
                             </div>
 
-                            <div className={styles.formGroup}>
-                                <label htmlFor="email">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    value={user?.email || ''}
-                                    disabled
-                                    className={styles.disabledInput}
-                                />
-                                <span className={styles.formHelper}>Email cannot be changed</span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label htmlFor="full_name" className="block text-sm font-semibold text-neutral-700 ml-1">Full Name</label>
+                                    <input
+                                        type="text"
+                                        id="full_name"
+                                        name="full_name"
+                                        value={formData.full_name}
+                                        onChange={handleChange}
+                                        placeholder="Enter your full name"
+                                        className="w-full px-5 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="email" className="block text-sm font-semibold text-neutral-700 ml-1">Email</label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        value={user?.email || ''}
+                                        disabled
+                                        className="w-full px-5 py-3.5 bg-neutral-100 border border-neutral-100 rounded-2xl text-neutral-400 cursor-not-allowed"
+                                    />
+                                    <span className="block text-xs text-neutral-400 ml-1">Email cannot be changed</span>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="phone" className="block text-sm font-semibold text-neutral-700 ml-1">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        id="phone"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        placeholder="+964 XXX XXX XXXX"
+                                        className="w-full px-5 py-3.5 bg-neutral-50 border border-neutral-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-semibold text-neutral-700 ml-1">Account Type</label>
+                                    <input
+                                        type="text"
+                                        value={profile?.role?.replace('_', ' ') || 'User'}
+                                        disabled
+                                        className="w-full px-5 py-3.5 bg-neutral-100 border border-neutral-100 rounded-2xl text-neutral-400 capitalize cursor-not-allowed"
+                                    />
+                                </div>
                             </div>
 
-                            <div className={styles.formGroup}>
-                                <label htmlFor="phone">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    id="phone"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    placeholder="+964 XXX XXX XXXX"
-                                />
+                            <div className="flex justify-end pt-4">
+                                <button
+                                    type="submit"
+                                    className="bg-primary-900 hover:bg-primary-800 text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
+                                </button>
                             </div>
-
-                            <div className={styles.formGroup}>
-                                <label>Account Type</label>
-                                <input
-                                    type="text"
-                                    value={profile?.role?.replace('_', ' ') || 'User'}
-                                    disabled
-                                    className={`${styles.disabledInput} ${styles.capitalize}`}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={styles.formActions}>
-                            <button type="submit" className={styles.saveBtn} disabled={loading}>
-                                {loading ? 'Saving...' : 'Save Changes'}
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </section>
 
                 {/* Security Section */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Security</h2>
-                        <p>Manage your password and security settings</p>
+                <section className="bg-white border border-neutral-100 rounded-[32px] overflow-hidden shadow-sm">
+                    <div className="p-8 border-b border-neutral-100 bg-neutral-50/50">
+                        <h2 className="text-xl font-bold text-neutral-900">Security</h2>
+                        <p className="text-sm text-neutral-500">Manage your password and security settings</p>
                     </div>
 
-                    <div className={styles.securityOptions}>
-                        <div className={styles.securityItem}>
-                            <div className={styles.securityInfo}>
-                                <h3>Password</h3>
-                                <p>Change your password to keep your account secure</p>
+                    <div className="p-8 space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-neutral-50 rounded-2xl gap-4">
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-neutral-900">Password</h3>
+                                <p className="text-sm text-neutral-500">Change your password to keep your account secure</p>
                             </div>
                             <button
-                                className={styles.securityBtn}
+                                className="px-6 py-2.5 bg-white border border-neutral-200 text-neutral-700 rounded-xl font-bold hover:bg-neutral-50 transition-colors shadow-sm"
                                 onClick={() => setShowPasswordModal(true)}
                             >
                                 Change Password
                             </button>
                         </div>
 
-                        <div className={styles.securityItem}>
-                            <div className={styles.securityInfo}>
-                                <h3>Two-Factor Authentication</h3>
-                                <p>Add an extra layer of security to your account</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-neutral-50 rounded-2xl gap-4">
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-neutral-900">Two-Factor Authentication</h3>
+                                <p className="text-sm text-neutral-500">Add an extra layer of security to your account</p>
                             </div>
-                            <span className={styles.comingSoon}>Coming Soon</span>
+                            <span className="px-4 py-1.5 bg-neutral-200 text-neutral-500 text-xs font-bold rounded-full uppercase tracking-widest">Coming Soon</span>
                         </div>
                     </div>
                 </section>
 
                 {/* Referral Program */}
-                <section className={styles.section}>
-                    <div className={styles.sectionHeader}>
-                        <h2>🎁 Referral Program</h2>
-                        <p>Invite friends and earn rewards</p>
+                <section className="bg-white border border-neutral-100 rounded-[32px] overflow-hidden shadow-sm">
+                    <div className="p-8 border-b border-neutral-100 bg-neutral-50/50">
+                        <h2 className="text-xl font-bold text-neutral-900">🎁 Referral Program</h2>
+                        <p className="text-sm text-neutral-500">Invite friends and earn rewards</p>
                     </div>
-                    <ReferralSection />
+                    <div className="p-8">
+                        <ReferralSection />
+                    </div>
                 </section>
 
                 {/* Danger Zone */}
-                <section className={`${styles.section} ${styles.dangerSection}`}>
-                    <div className={styles.sectionHeader}>
-                        <h2>Danger Zone</h2>
-                        <p>Irreversible and destructive actions</p>
+                <section className="bg-red-50/30 border border-red-100 rounded-[32px] overflow-hidden shadow-sm">
+                    <div className="p-8 border-b border-red-100 bg-red-50/50">
+                        <h2 className="text-xl font-bold text-red-900">Danger Zone</h2>
+                        <p className="text-sm text-red-700/70">Irreversible and destructive actions</p>
                     </div>
 
-                    <div className={styles.dangerOptions}>
-                        <div className={styles.dangerItem}>
-                            <div className={styles.dangerInfo}>
-                                <h3>Delete Account</h3>
-                                <p>Permanently delete your account and all associated data</p>
+                    <div className="p-8">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-white border border-red-100 rounded-2xl gap-4">
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-red-900">Delete Account</h3>
+                                <p className="text-sm text-red-700/70">Permanently delete your account and all associated data</p>
                             </div>
                             <button
-                                className={styles.dangerBtn}
+                                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg"
                                 onClick={() => setShowDeleteModal(true)}
                             >
                                 Delete Account
@@ -327,6 +338,7 @@ export default function SettingsPage() {
                     </div>
                 </section>
             </div>
+
 
             {/* Password Change Modal */}
             {showPasswordModal && (

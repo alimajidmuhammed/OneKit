@@ -2,12 +2,10 @@
 
 @plugin 'tailwindcss-animate';
 
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* ============================================
    OneKit Design System - Premium Professional
@@ -369,13 +367,17 @@ ol {
   list-style: none;
 }
 
-/* Images */
-img,
-video {
-  max-width: 100%;
-  height: auto;
-  display: block;
+@layer base {
+
+  /* Images */
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
 }
+
 
 /* Forms */
 button,

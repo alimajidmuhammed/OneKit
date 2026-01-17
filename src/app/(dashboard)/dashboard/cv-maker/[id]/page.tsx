@@ -1,6 +1,7 @@
 // @ts-nocheck
 'use client';
 
+import { use, useState, useRef, useEffect, useCallback } from 'react';
 import { jsPDF } from 'jspdf';
 import { CVPDF } from '@/components/pdf/CVPDF';
 import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
@@ -8,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useCV } from '@/lib/hooks/useCV';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
+
 import {
     Mail,
     Phone,
@@ -30,7 +32,17 @@ import {
     RotateCcw,
     RotateCw
 } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogClose,
+} from '@/components/ui/dialog';
 import './cv-templates.css';
+
 
 
 // Premium CV Templates - 20 Designs
@@ -102,8 +114,13 @@ const Icons = {
     spinner: Loader2,
     back: ArrowLeft,
     upload: Upload,
-    chevronDown: ChevronDown
+    chevronDown: ChevronDown,
+    User: User,
+    success: CheckCircle,
+    error: AlertCircle,
+    rotateCw: RotateCw,
 };
+
 
 const CVContent = ({ cv, currentTemplate, photoStyle, isExport = false, contentRef, photoUploadPreview = null }) => {
     const getSkillLevel = (level) => {
@@ -859,7 +876,8 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
     };
 
 
-    if (loading) return <div className={styles.loading}><div className={styles.spinner} /><span>Loading CV...</span></div>;
+    if (loading) return <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-50"><div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" /><span className="text-neutral-500 font-medium">Loading CV...</span></div>;
+
     if (!cv) return null;
 
     const currentTemplate = CV_TEMPLATES.find(t => t.id === cv.template_id) || CV_TEMPLATES[0];
@@ -1833,106 +1851,101 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                 </div>
             )}
 
-            {isPhotoStudioOpen && (
-                <div className="fixed inset-0 bg-neutral-900/80 backdrop-blur-md flex items-center justify-center z-[1100] p-4 lg:p-8 animate-in fade-in duration-500">
-                    <div
-                        className="bg-white rounded-[40px] w-full max-w-xl overflow-hidden shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-500"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        {/* Modal Header */}
-                        <div className="px-10 pt-10 pb-6 text-center">
-                            <h3 className="text-3xl font-black text-neutral-900 leading-tight">Photo Studio</h3>
-                            <p className="text-sm text-neutral-500 mt-2 font-medium">Perfect your profile picture for a professional look</p>
+            <Dialog open={isPhotoStudioOpen} onOpenChange={setIsPhotoStudioOpen}>
+                <DialogContent className="max-w-xl rounded-[40px] p-0 overflow-hidden shadow-2xl">
+                    {/* Modal Header */}
+                    <DialogHeader className="px-10 pt-10 pb-6 text-center">
+                        <DialogTitle className="text-3xl font-black text-neutral-900 leading-tight">Photo Studio</DialogTitle>
+                        <DialogDescription className="text-sm text-neutral-500 mt-2 font-medium">Perfect your profile picture for a professional look</DialogDescription>
+                    </DialogHeader>
+
+                    {/* Studio Content */}
+                    <div className="px-10 pb-10 flex flex-col gap-8 items-center">
+                        {/* Preview Circle */}
+                        <div className="relative group">
+                            <div
+                                className={`w-64 h-64 rounded-full overflow-hidden border-8 border-neutral-50 shadow-2xl relative transition-all duration-300 ${isDragging ? 'cursor-grabbing scale-[1.02] shadow-primary-500/20' : 'cursor-grab hover:scale-[1.01]'}`}
+                                onMouseDown={handlePhotoMouseDown}
+                                onTouchStart={handlePhotoTouchStart}
+                            >
+                                <img
+                                    src={photoUploadPreview || cv.personal_info.photo}
+                                    alt="Profile"
+                                    className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
+                                    style={{
+                                        transform: `translate(${studioPhotoPosition.x}px, ${studioPhotoPosition.y}px) scale(${photoZoom}) rotate(${photoRotation}deg)`,
+                                    }}
+                                    crossOrigin="anonymous"
+                                />
+                                {/* Overlay Grid/Guide */}
+                                <div className="absolute inset-0 border border-white/20 rounded-full pointer-events-none" />
+                            </div>
+
+                            {/* Reposition Tip */}
+                            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full shadow-lg border border-neutral-100 flex items-center gap-2 animate-bounce">
+                                <Icons.magic size={12} className="text-primary-500" />
+                                <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Drag to Reposition</span>
+                            </div>
                         </div>
 
-                        {/* Studio Content */}
-                        <div className="px-10 pb-10 flex flex-col gap-8 items-center">
-                            {/* Preview Circle */}
-                            <div className="relative group">
-                                <div
-                                    className={`w-64 h-64 rounded-full overflow-hidden border-8 border-neutral-50 shadow-2xl relative transition-all duration-300 ${isDragging ? 'cursor-grabbing scale-[1.02] shadow-primary-500/20' : 'cursor-grab hover:scale-[1.01]'}`}
-                                    onMouseDown={handlePhotoMouseDown}
-                                    onTouchStart={handlePhotoTouchStart}
-                                >
-                                    <img
-                                        src={photoUploadPreview || cv.personal_info.photo}
-                                        alt="Profile"
-                                        className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
-                                        style={{
-                                            transform: `translate(${studioPhotoPosition.x}px, ${studioPhotoPosition.y}px) scale(${photoZoom}) rotate(${photoRotation}deg)`,
-                                        }}
-                                        crossOrigin="anonymous"
+                        {/* Controls */}
+                        <div className="w-full space-y-8 mt-4">
+                            {/* Zoom Control */}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-end">
+                                    <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Zoom Level</label>
+                                    <span className="text-sm font-black text-primary-600 bg-primary-50 px-3 py-1 rounded-lg">{Math.round(photoZoom * 100)}%</span>
+                                </div>
+                                <div className="relative flex items-center h-6">
+                                    <input
+                                        type="range"
+                                        min="0.5"
+                                        max="3"
+                                        step="0.01"
+                                        value={photoZoom}
+                                        onChange={e => setPhotoZoom(parseFloat(e.target.value))}
+                                        className="w-full h-1.5 bg-neutral-100 rounded-lg appearance-none cursor-pointer accent-primary-600"
                                     />
-                                    {/* Overlay Grid/Guide */}
-                                    <div className="absolute inset-0 border border-white/20 rounded-full pointer-events-none" />
-                                </div>
-
-                                {/* Reposition Tip */}
-                                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-1.5 rounded-full shadow-lg border border-neutral-100 flex items-center gap-2 animate-bounce">
-                                    <Icons.magic size={12} className="text-primary-500" />
-                                    <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Drag to Reposition</span>
                                 </div>
                             </div>
 
-                            {/* Controls */}
-                            <div className="w-full space-y-8 mt-4">
-                                {/* Zoom Control */}
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-end">
-                                        <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest ml-1">Zoom Level</label>
-                                        <span className="text-sm font-black text-primary-600 bg-primary-50 px-3 py-1 rounded-lg">{Math.round(photoZoom * 100)}%</span>
-                                    </div>
-                                    <div className="relative flex items-center h-6">
-                                        <input
-                                            type="range"
-                                            min="0.5"
-                                            max="3"
-                                            step="0.01"
-                                            value={photoZoom}
-                                            onChange={e => setPhotoZoom(parseFloat(e.target.value))}
-                                            className="w-full h-1.5 bg-neutral-100 rounded-lg appearance-none cursor-pointer accent-primary-600"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Rotation Controls */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button
-                                        onClick={() => setPhotoRotation(r => r - 90)}
-                                        className="flex items-center justify-center gap-3 p-4 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all font-bold text-sm group"
-                                    >
-                                        <Icons.rotateCw size={18} className="rotate-180 group-hover:-rotate-90 transition-transform" />
-                                        <span>Rotate Left</span>
-                                    </button>
-                                    <button
-                                        onClick={() => setPhotoRotation(r => r + 90)}
-                                        className="flex items-center justify-center gap-3 p-4 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all font-bold text-sm group"
-                                    >
-                                        <Icons.rotateCw size={18} className="group-hover:rotate-90 transition-transform" />
-                                        <span>Rotate Right</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="w-full flex gap-4 pt-4 mt-4 border-t border-neutral-100">
+                            {/* Rotation Controls */}
+                            <div className="grid grid-cols-2 gap-4">
                                 <button
-                                    onClick={() => setIsPhotoStudioOpen(false)}
-                                    className="flex-1 py-4 px-6 bg-neutral-50 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 rounded-2xl transition-all font-bold text-sm"
+                                    onClick={() => setPhotoRotation(r => r - 90)}
+                                    className="flex items-center justify-center gap-3 p-4 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all font-bold text-sm group"
                                 >
+                                    <Icons.rotateCw size={18} className="rotate-180 group-hover:-rotate-90 transition-transform" />
+                                    <span>Rotate Left</span>
+                                </button>
+                                <button
+                                    onClick={() => setPhotoRotation(r => r + 90)}
+                                    className="flex items-center justify-center gap-3 p-4 rounded-2xl border-2 border-neutral-100 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:text-primary-600 transition-all font-bold text-sm group"
+                                >
+                                    <Icons.rotateCw size={18} className="group-hover:rotate-90 transition-transform" />
+                                    <span>Rotate Right</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <DialogFooter className="w-full flex gap-4 pt-4 mt-4 border-t border-neutral-100">
+                            <DialogClose asChild>
+                                <button className="flex-1 py-4 px-6 bg-neutral-50 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 rounded-2xl transition-all font-bold text-sm">
                                     Cancel
                                 </button>
-                                <button
-                                    onClick={applyPhotoEdits}
-                                    className="flex-1 py-4 px-6 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl transition-all font-bold text-sm shadow-xl shadow-primary-600/20 active:scale-95"
-                                >
-                                    Apply Changes
-                                </button>
-                            </div>
-                        </div>
+                            </DialogClose>
+                            <button
+                                onClick={applyPhotoEdits}
+                                className="flex-1 py-4 px-6 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl transition-all font-bold text-sm shadow-xl shadow-primary-600/20 active:scale-95"
+                            >
+                                Apply Changes
+                            </button>
+                        </DialogFooter>
                     </div>
-                </div>
-            )}
+                </DialogContent>
+            </Dialog>
+
         </div>
     );
 }

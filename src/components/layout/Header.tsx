@@ -87,23 +87,29 @@ export default function Header({ initialUser = null, initialProfile = null }) {
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-300 ${isScrolled
-                ? 'bg-white/80 backdrop-blur-lg border-b border-neutral-100 shadow-sm h-16'
-                : 'bg-transparent h-[72px]'
+            ? 'bg-white/80 backdrop-blur-lg border-b border-neutral-100 shadow-sm h-16'
+            : 'bg-transparent h-[72px]'
             }`}>
             <div className="w-full max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-3 group">
-                    <img src="/onekit-logo.png" alt="OneKit" className="h-9 w-auto transition-transform group-hover:scale-105" />
+                <Link href="/" className="flex items-center gap-3 group relative z-[20]">
+                    <img
+                        src="/onekit-logo.png"
+                        alt="OneKit"
+                        className="w-auto transition-transform group-hover:scale-105"
+                        style={{ height: '36px', minHeight: '36px' }}
+                    />
                     <span className="font-display font-extrabold text-2xl text-primary-900 tracking-tight">OneKit</span>
                 </Link>
 
+
                 {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8">
+                <nav className="hidden md:flex items-center gap-8 translate-x-4">
                     {NAV_ITEMS.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`text-sm font-semibold transition-colors hover:text-primary-600 ${activeSection === item.href ? 'text-primary-600' : 'text-neutral-600'
+                            className={`text-sm font-bold transition-all hover:text-primary-600 hover:scale-105 ${activeSection === item.href ? 'text-primary-600' : 'text-neutral-600'
                                 }`}
                         >
                             {item.label}
@@ -111,8 +117,11 @@ export default function Header({ initialUser = null, initialProfile = null }) {
                     ))}
                 </nav>
 
+
+
                 {/* Auth Actions */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4 relative z-[20]">
+
                     {auth.loading ? (
                         <div className="w-24 h-9 bg-neutral-100 animate-pulse rounded-xl" />
                     ) : user ? (
