@@ -1621,48 +1621,107 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                     )}
 
                     {activeSection === 'design' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Design & Templates</h2>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Design & Templates
+                                </h2>
                                 <button
                                     onClick={handleAIStylist}
                                     disabled={generatingStyle}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 hover:border-indigo-200 hover:bg-indigo-50 text-neutral-700 hover:text-indigo-600 rounded-xl transition-all font-bold text-xs shadow-sm group"
                                 >
-                                    {generatingStyle ? <Icons.spinner /> : <Icons.magic />} AI Stylist
+                                    {generatingStyle ? (
+                                        <Icons.spinner size={16} className="animate-spin text-indigo-500" />
+                                    ) : (
+                                        <Icons.magic size={16} className="group-hover:rotate-12 transition-transform text-indigo-500" />
+                                    )}
+                                    <span>AI Stylist</span>
                                 </button>
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#64748b', marginBottom: '0.5rem' }}>Current Template</label>
-                                <button
-                                    className={styles.themeSelectorBtn}
-                                    onClick={() => setShowTemplates(true)}
-                                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer' }}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div style={{ width: '24px', height: '24px', borderRadius: '4px', background: currentTemplate.colors.primary }} />
-                                        <span style={{ fontWeight: '600' }}>{currentTemplate.name}</span>
+                            <div className="space-y-8">
+                                <div className="group">
+                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2 ml-1">Current Template</label>
+                                    <button
+                                        onClick={() => setShowTemplates(true)}
+                                        className="w-full flex items-center justify-between p-4 rounded-2xl border border-neutral-200 bg-neutral-50/50 hover:bg-white hover:border-primary-500 hover:shadow-xl hover:shadow-primary-500/10 transition-all group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative">
+                                                <div
+                                                    className="w-10 h-10 rounded-xl shadow-inner border border-white/20"
+                                                    style={{ background: currentTemplate.colors.primary }}
+                                                />
+                                                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-white border-2 border-neutral-50 shadow-sm flex items-center justify-center">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary-500" />
+                                                </div>
+                                            </div>
+                                            <div className="text-left">
+                                                <span className="block text-sm font-bold text-neutral-900 leading-tight">{currentTemplate.name}</span>
+                                                <span className="block text-[10px] text-neutral-400 font-medium">Click to change template</span>
+                                            </div>
+                                        </div>
+                                        <Icons.chevronDown size={20} className="text-neutral-300 group-hover:text-primary-500 transition-colors" />
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="p-4 rounded-2xl border border-neutral-100 bg-neutral-50/30">
+                                        <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-3 ml-1">Primary Color</label>
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative group/picker">
+                                                <input
+                                                    type="color"
+                                                    value={cv.custom_colors?.primary || '#2563eb'}
+                                                    onChange={e => setCV({ ...cv, custom_colors: { ...cv.custom_colors, primary: e.target.value } })}
+                                                    className="w-12 h-12 p-0 border-none bg-transparent cursor-pointer relative z-10 opacity-0"
+                                                />
+                                                <div
+                                                    className="absolute inset-0 w-12 h-12 rounded-xl shadow-md border border-white/50 group-hover/picker:scale-110 transition-transform"
+                                                    style={{ background: cv.custom_colors?.primary || '#2563eb' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <span className="block font-mono text-sm font-bold text-neutral-700 uppercase">{cv.custom_colors?.primary || '#2563eb'}</span>
+                                                <span className="block text-[10px] text-neutral-400 font-medium">Theme Base</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <Icons.chevronDown />
-                                </button>
+
+                                    <div className="p-4 rounded-2xl border border-neutral-100 bg-neutral-50/30">
+                                        <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-3 ml-1">Accent Color</label>
+                                        <div className="flex items-center gap-4">
+                                            <div className="relative group/picker">
+                                                <input
+                                                    type="color"
+                                                    value={cv.custom_colors?.accent || '#eff6ff'}
+                                                    onChange={e => setCV({ ...cv, custom_colors: { ...cv.custom_colors, accent: e.target.value } })}
+                                                    className="w-12 h-12 p-0 border-none bg-transparent cursor-pointer relative z-10 opacity-0"
+                                                />
+                                                <div
+                                                    className="absolute inset-0 w-12 h-12 rounded-xl shadow-md border border-white/50 group-hover/picker:scale-110 transition-transform"
+                                                    style={{ background: cv.custom_colors?.accent || '#eff6ff' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <span className="block font-mono text-sm font-bold text-neutral-700 uppercase">{cv.custom_colors?.accent || '#eff6ff'}</span>
+                                                <span className="block text-[10px] text-neutral-400 font-medium">Highlight</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Primary Color</label>
-                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <input type="color" value={cv.custom_colors?.primary || '#2563eb'} onChange={e => setCV({ ...cv, custom_colors: { ...cv.custom_colors, primary: e.target.value } })} style={{ width: '40px', height: '40px', padding: '2px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
-                                        <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{cv.custom_colors?.primary || '#2563eb'}</span>
-                                    </div>
+                            <div className="mt-8 p-4 rounded-xl bg-primary-50 border border-primary-100/50 flex items-start gap-3">
+                                <div className="p-2 bg-white rounded-lg shadow-sm">
+                                    <Icons.magic size={14} className="text-primary-600" />
                                 </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '8px' }}>Accent Color</label>
-                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <input type="color" value={cv.custom_colors?.accent || '#eff6ff'} onChange={e => setCV({ ...cv, custom_colors: { ...cv.custom_colors, accent: e.target.value } })} style={{ width: '40px', height: '40px', padding: '2px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
-                                        <span style={{ fontFamily: 'monospace', fontSize: '12px' }}>{cv.custom_colors?.accent || '#eff6ff'}</span>
-                                    </div>
-                                </div>
+                                <p className="text-[11px] text-primary-900 leading-relaxed pt-0.5">
+                                    <strong className="block font-bold mb-0.5">Pro Tip: AI Stylist</strong>
+                                    Use the AI Stylist to automatically pick colors and templates that match your industry and personal branding.
+                                </p>
                             </div>
                         </div>
                     )}
