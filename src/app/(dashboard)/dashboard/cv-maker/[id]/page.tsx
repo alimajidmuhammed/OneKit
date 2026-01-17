@@ -1459,92 +1459,164 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                     )}
 
                     {activeSection === 'certifications' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Certifications</h2>
-                                <button onClick={addCertification} style={{ height: '32px', width: '32px', borderRadius: '50%', background: '#2563eb', color: 'white', border: 'none', cursor: 'pointer' }}>+</button>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Certifications
+                                </h2>
+                                <button
+                                    onClick={addCertification}
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all font-bold text-xs shadow-md hover:shadow-lg group"
+                                >
+                                    <Icons.add size={16} className="group-hover:rotate-90 transition-transform" />
+                                    <span>Add Certification</span>
+                                </button>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+                            <div className="space-y-6">
                                 {(cv.certifications || []).map((c, idx) => (
-                                    <div key={idx} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                        <div style={{ display: 'grid', gap: '12px' }}>
-                                            <input
-                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                placeholder="Certification Name"
-                                                value={c.name}
-                                                onChange={v => updateCertification(idx, 'name', v.target.value)}
-                                            />
-                                            <input
-                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                placeholder="Issuing Organization"
-                                                value={c.issuer}
-                                                onChange={v => updateCertification(idx, 'issuer', v.target.value)}
-                                            />
-                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div
+                                        key={idx}
+                                        className="relative p-6 rounded-2xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all group animate-in zoom-in-98 duration-300"
+                                    >
+                                        <button
+                                            onClick={() => removeCertification(idx)}
+                                            className="absolute top-4 right-4 p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        >
+                                            <Icons.close size={16} />
+                                        </button>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="md:col-span-2">
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Certification Name</label>
                                                 <input
-                                                    type="month"
-                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                    value={c.date}
-                                                    onChange={v => updateCertification(idx, 'date', v.target.value)}
-                                                />
-                                                <input
-                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                    placeholder="Credential ID (optional)"
-                                                    value={c.credentialId}
-                                                    onChange={v => updateCertification(idx, 'credentialId', v.target.value)}
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="e.g. AWS Certified Solutions Architect"
+                                                    value={c.name}
+                                                    onChange={v => updateCertification(idx, 'name', v.target.value)}
                                                 />
                                             </div>
+                                            <div>
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
+                                                <input
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="e.g. Amazon Web Services"
+                                                    value={c.issuer}
+                                                    onChange={v => updateCertification(idx, 'issuer', v.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Date</label>
+                                                    <input
+                                                        type="month"
+                                                        className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                        value={c.date}
+                                                        onChange={v => updateCertification(idx, 'date', v.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Credential ID</label>
+                                                    <input
+                                                        className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                        placeholder="Optional"
+                                                        value={c.credentialId}
+                                                        onChange={v => updateCertification(idx, 'credentialId', v.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button onClick={() => removeCertification(idx)} style={{ marginTop: '12px', color: '#f43f5e', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}>Remove</button>
                                     </div>
                                 ))}
                             </div>
+
+                            {(!cv.certifications || cv.certifications.length === 0) && (
+                                <div className="text-center py-12 bg-neutral-50/50 rounded-2xl border border-dashed border-neutral-200">
+                                    <p className="text-sm text-neutral-400">No certifications added yet.</p>
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {activeSection === 'organizations' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Organizations</h2>
-                                <button onClick={addOrganization} style={{ height: '32px', width: '32px', borderRadius: '50%', background: '#2563eb', color: 'white', border: 'none', cursor: 'pointer' }}>+</button>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Organizations
+                                </h2>
+                                <button
+                                    onClick={addOrganization}
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all font-bold text-xs shadow-md hover:shadow-lg group"
+                                >
+                                    <Icons.add size={16} className="group-hover:rotate-90 transition-transform" />
+                                    <span>Add Organization</span>
+                                </button>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+                            <div className="space-y-6">
                                 {(cv.organizations || []).map((o, idx) => (
-                                    <div key={idx} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                                        <div style={{ display: 'grid', gap: '12px' }}>
-                                            <input
-                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                placeholder="Organization Name"
-                                                value={o.name}
-                                                onChange={v => updateOrganization(idx, 'name', v.target.value)}
-                                            />
-                                            <input
-                                                style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                placeholder="Your Role"
-                                                value={o.role}
-                                                onChange={v => updateOrganization(idx, 'role', v.target.value)}
-                                            />
-                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                    <div
+                                        key={idx}
+                                        className="relative p-6 rounded-2xl border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all group animate-in zoom-in-98 duration-300"
+                                    >
+                                        <button
+                                            onClick={() => removeOrganization(idx)}
+                                            className="absolute top-4 right-4 p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        >
+                                            <Icons.close size={16} />
+                                        </button>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="md:col-span-1">
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Organization Name</label>
                                                 <input
-                                                    type="month"
-                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                    placeholder="Start"
-                                                    value={o.startDate}
-                                                    onChange={v => updateOrganization(idx, 'startDate', v.target.value)}
-                                                />
-                                                <input
-                                                    type="month"
-                                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px' }}
-                                                    placeholder="End"
-                                                    value={o.endDate}
-                                                    onChange={v => updateOrganization(idx, 'endDate', v.target.value)}
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="Organization Name"
+                                                    value={o.name}
+                                                    onChange={v => updateOrganization(idx, 'name', v.target.value)}
                                                 />
                                             </div>
+                                            <div className="md:col-span-1">
+                                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Your Role</label>
+                                                <input
+                                                    className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                    placeholder="e.g. Member, Volunteer"
+                                                    value={o.role}
+                                                    onChange={v => updateOrganization(idx, 'role', v.target.value)}
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">Start Date</label>
+                                                    <input
+                                                        type="month"
+                                                        className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                        value={o.startDate}
+                                                        onChange={v => updateOrganization(idx, 'startDate', v.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 ml-1">End Date</label>
+                                                    <input
+                                                        type="month"
+                                                        className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all"
+                                                        value={o.endDate}
+                                                        onChange={v => updateOrganization(idx, 'endDate', v.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button onClick={() => removeOrganization(idx)} style={{ marginTop: '12px', color: '#f43f5e', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px' }}>Remove</button>
                                     </div>
                                 ))}
                             </div>
+
+                            {(!cv.organizations || cv.organizations.length === 0) && (
+                                <div className="text-center py-12 bg-neutral-50/50 rounded-2xl border border-dashed border-neutral-200">
+                                    <p className="text-sm text-neutral-400">No organizations added yet.</p>
+                                </div>
+                            )}
                         </div>
                     )}
 
