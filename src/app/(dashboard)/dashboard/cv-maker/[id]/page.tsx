@@ -970,19 +970,8 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                 {/* Form Side */}
                 <div className={`flex flex-col gap-6 lg:h-[calc(100vh-160px)] lg:overflow-y-auto lg:pr-2 scrollbar-thin transition-all duration-300 ${mobileView === 'preview' ? 'hidden lg:flex' : 'flex'}`}>
 
-                    {/* Navigation Tabs */}
-                    <div style={{
-                        background: 'white',
-                        borderRadius: '16px',
-                        padding: '16px',
-                        marginBottom: '16px',
-                        boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
-                    }}>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
-                            gap: '8px'
-                        }}>
+                    <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm border border-neutral-100">
+                        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2">
                             {orderedSections.map(s => s && (
                                 <button
                                     key={s.id}
@@ -992,25 +981,15 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                     onDragOver={(e) => handleDragOver(e, s.id)}
                                     onDrop={(e) => handleDrop(e, s.id)}
                                     onDragEnd={handleDragEnd}
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        padding: '12px 8px',
-                                        borderRadius: '12px',
-                                        border: draggedSection === s.id ? '2px dashed #2563eb' : 'none',
-                                        background: activeSection === s.id ? '#1a1a1a' : draggedSection === s.id ? '#eff6ff' : 'transparent',
-                                        color: activeSection === s.id ? 'white' : '#6b7280',
-                                        cursor: 'grab',
-                                        transition: 'all 0.15s ease',
-                                        fontWeight: '500',
-                                        fontSize: '12px',
-                                        opacity: draggedSection === s.id ? 0.5 : 1
-                                    }}
+                                    className={`flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl transition-all font-semibold text-[10px] md:text-xs cursor-grab active:cursor-grabbing border ${activeSection === s.id
+                                            ? 'bg-neutral-900 border-neutral-900 text-white shadow-md transform scale-105 z-10'
+                                            : draggedSection === s.id
+                                                ? 'bg-primary-50 border-primary-200 border-dashed opacity-50'
+                                                : 'bg-transparent border-transparent text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'
+                                        }`}
                                 >
-                                    <span style={{ fontSize: '20px', opacity: activeSection === s.id ? 1 : 0.7 }}>{s.icon}</span>
-                                    <span>{s.label}</span>
+                                    <span className={`text-lg md:text-xl transition-opacity ${activeSection === s.id ? 'opacity-100' : 'opacity-70'}`}>{s.icon}</span>
+                                    <span className="truncate w-full text-center px-1">{s.label}</span>
                                 </button>
                             ))}
                         </div>
