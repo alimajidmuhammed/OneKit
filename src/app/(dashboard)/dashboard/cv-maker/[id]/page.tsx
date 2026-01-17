@@ -1128,23 +1128,49 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                     )}
 
                     {activeSection === 'summary' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Summary</h2>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Professional Summary
+                                </h2>
                                 <button
                                     onClick={handleGenerateSummary}
                                     disabled={generatingSummary}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white rounded-xl transition-all font-bold text-xs shadow-md hover:shadow-lg disabled:opacity-50 group overflow-hidden relative"
                                 >
-                                    {generatingSummary ? <Icons.spinner /> : <Icons.magic />} AI Write
+                                    {generatingSummary ? (
+                                        <>
+                                            <Icons.spinner size={16} className="animate-spin" />
+                                            <span>Generating...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Icons.magic size={16} className="group-hover:rotate-12 transition-transform" />
+                                            <span>AI Write</span>
+                                        </>
+                                    )}
+                                    <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                                 </button>
                             </div>
-                            <textarea
-                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px', lineHeight: '1.5', minHeight: '150px' }}
-                                value={cv.summary || ''}
-                                onChange={e => updateField('summary', e.target.value)}
-                                placeholder="Describe your professional journey..."
-                            />
+
+                            <div className="relative group">
+                                <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-2 ml-1">Summary Content</label>
+                                <textarea
+                                    className="w-full px-4 py-3 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all min-h-[180px] leading-relaxed resize-none"
+                                    placeholder="Briefly describe your professional background, key achievements, and what you bring to the table..."
+                                    value={cv.summary || ''}
+                                    onChange={e => updateField('summary', e.target.value)}
+                                />
+                                <div className="absolute bottom-3 right-3 text-[10px] font-bold text-neutral-300 group-focus-within:text-primary-300 transition-colors">
+                                    {cv.summary?.length || 0} characters
+                                </div>
+                            </div>
+
+                            <p className="mt-4 text-[11px] text-neutral-400 italic flex items-start gap-2">
+                                <span className="text-primary-500 font-bold text-lg leading-none">💡</span>
+                                A strong summary is usually 3-5 sentences that highlight your most relevant skills and career goals.
+                            </p>
                         </div>
                     )}
 
