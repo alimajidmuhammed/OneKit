@@ -1349,24 +1349,51 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                     )}
 
                     {activeSection === 'skills' && (
-                        <div className={styles.formSection}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Skills</h2>
-                                <button onClick={addSkill} style={{ height: '32px', width: '32px', borderRadius: '50%', background: '#2563eb', color: 'white', border: 'none', cursor: 'pointer' }}>+</button>
+                        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-neutral-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <div className="flex justify-between items-center mb-8">
+                                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                                    <Icons.pdf size={20} className="text-primary-600" />
+                                    Skills
+                                </h2>
+                                <button
+                                    onClick={addSkill}
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all font-bold text-xs shadow-md hover:shadow-lg group"
+                                >
+                                    <Icons.add size={16} className="group-hover:rotate-90 transition-transform" />
+                                    <span>Add Skill</span>
+                                </button>
                             </div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+
+                            <div className="flex flex-wrap gap-3">
                                 {(cv.skills || []).map((s, idx) => (
-                                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', border: '1px solid #e2e8f0', transition: 'all 0.2s' }}>
+                                    <div
+                                        key={idx}
+                                        className="group flex items-center gap-2 bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-primary-200 hover:shadow-md px-4 py-2 rounded-xl transition-all"
+                                    >
                                         <input
-                                            style={{ border: 'none', background: 'transparent', width: 'auto', minWidth: '60px', flex: '1', fontSize: '13px', fontWeight: '700' }}
+                                            className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm font-bold text-neutral-900 placeholder:text-neutral-400 w-24 md:w-auto"
                                             value={s.name}
                                             onChange={v => updateSkill(idx, 'name', v.target.value)}
-                                            placeholder="Skill..."
+                                            placeholder="Skill e.g. React"
                                         />
-                                        <button onClick={() => removeSkill(idx)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>×</button>
+                                        <button
+                                            onClick={() => removeSkill(idx)}
+                                            className="text-neutral-300 hover:text-red-500 transition-colors p-0.5"
+                                        >
+                                            <Icons.close size={14} />
+                                        </button>
                                     </div>
                                 ))}
+
+                                {(cv.skills || []).length === 0 && (
+                                    <p className="text-sm text-neutral-400 italic">No skills added yet. Click "Add Skill" to start listing your talents.</p>
+                                )}
                             </div>
+
+                            <p className="mt-8 text-[11px] text-neutral-400 italic flex items-start gap-2 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
+                                <span className="text-primary-500 font-bold text-lg leading-none">💡</span>
+                                List your top technical and soft skills. Group them logically if possible (e.g., Programming: Javascript, Python).
+                            </p>
                         </div>
                     )}
 
