@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBusinessCard } from '@/lib/hooks/useBusinessCard';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -9,10 +9,13 @@ import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import {
     Type, Share2, Layers,
     Check, X, ChevronRight, Download, Save, RefreshCw, Layout,
-    Upload, Trash2, Languages
+    Upload, Trash2, Languages, Plus, Info,
+    User, Mail, Phone, Globe, MapPin, Linkedin, Instagram, Twitter, Github,
+    Briefcase, Building
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import styles from './editor.module.css';
+import jsPDF from 'jspdf';
 
 const SECTIONS = [
     { id: 'branding', label: 'Branding', icon: '🎨' },
@@ -183,7 +186,7 @@ const CardFace = ({ side, card, template, exportMode = false }) => {
         height: '40px',
         width: 'auto',
         maxWidth: '200px',
-        objectFit: 'contain',
+        objectFit: 'contain' as const,
         transform: isFront
             ? `scale(${logoSize / 100}) translate(${logoX}px, ${logoY}px)`
             : `scale(${logoSize / 100})`, // Center by default on back, ignore offsets
@@ -359,7 +362,7 @@ const CardFace = ({ side, card, template, exportMode = false }) => {
     );
 };
 
-export default function BusinessCardEditor({ params }) {
+export default function BusinessCardEditor({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const { id } = resolvedParams;
     const router = useRouter();
