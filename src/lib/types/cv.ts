@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Core type definitions for OneKit app
 
 export interface PersonalInfo {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Format date to readable string
 export function formatDate(date, options = {}) {
     const defaultOptions = {

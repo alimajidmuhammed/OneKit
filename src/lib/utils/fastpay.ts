@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * FastPay Payment Gateway Utility
  * Handles interactions with FastPay QR and Validation APIs

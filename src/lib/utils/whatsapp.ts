@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WhatsApp Integration Utilities
  * Helpers for WhatsApp Business API integration

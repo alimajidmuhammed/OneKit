@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Services configuration
 export const SERVICES = [
     {

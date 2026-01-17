@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 /**

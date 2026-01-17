@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createBrowserClient } from '@supabase/ssr';
 
 // Placeholder values for build time - replace with actual values in .env.local

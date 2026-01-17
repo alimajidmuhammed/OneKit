@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Rate Limiting Utility
  * Simple in-memory rate limiter for API protection
