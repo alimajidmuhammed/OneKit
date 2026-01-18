@@ -892,11 +892,11 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                             {activeSection === 'personal' && (
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex items-center gap-4 mb-10">
-                                        <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                            <User size={24} />
+                                        <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                            <User size={20} />
                                         </div>
                                         <div>
-                                            <h2 className="text-2xl font-black text-neutral-900 leading-tight">Identity Matrix</h2>
+                                            <h2 className="text-xl font-black text-neutral-900 leading-tight">Identity Matrix</h2>
                                             <p className="text-sm text-neutral-400 font-medium">Define your professional core</p>
                                         </div>
                                     </div>
@@ -970,7 +970,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                             <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Legal Full Name</label>
                                             <div className="relative group">
                                                 <input
-                                                    className="w-full pl-12 pr-4 py-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
+                                                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
                                                     placeholder="e.g., Alexander Sterling"
                                                     value={cv.personal_info?.fullName || ''}
                                                     onChange={e => updatePersonalInfo('fullName', e.target.value)}
@@ -983,7 +983,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                             <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Professional Designation</label>
                                             <div className="relative group">
                                                 <input
-                                                    className="w-full pl-12 pr-4 py-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
+                                                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
                                                     placeholder="e.g., Senior Systems Architect"
                                                     value={cv.personal_info?.jobTitle || ''}
                                                     onChange={e => updatePersonalInfo('jobTitle', e.target.value)}
@@ -996,7 +996,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                             <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Dispatch Gateway (Email)</label>
                                             <div className="relative group">
                                                 <input
-                                                    className="w-full pl-12 pr-4 py-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
+                                                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
                                                     placeholder="alexander@sterling.io"
                                                     value={cv.personal_info?.email || ''}
                                                     onChange={e => updatePersonalInfo('email', e.target.value)}
@@ -1052,12 +1052,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <FileText size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <FileText size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Career Manifesto</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Your professional narrative summarized</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Career Manifesto</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Your professional narrative summarized</p>
                                             </div>
                                         </div>
 
@@ -1077,7 +1077,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                     <div className="relative group">
                                         <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-4 ml-1">Narrative Content</label>
                                         <textarea
-                                            className="w-full px-8 py-8 bg-neutral-50 border border-neutral-200 rounded-[32px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all min-h-[300px] leading-relaxed resize-none scrollbar-thin"
+                                            className="w-full px-6 py-6 bg-neutral-50 border border-neutral-200 rounded-[28px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all min-h-[250px] leading-relaxed resize-none scrollbar-thin"
                                             placeholder="Write a high-impact summary of your professional journey..."
                                             value={cv.summary || ''}
                                             onChange={e => updateField('summary', e.target.value)}
@@ -1101,12 +1101,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <Briefcase size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <Briefcase size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Experience History</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Your professional trajectory</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Experience History</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Your professional trajectory</p>
                                             </div>
                                         </div>
 
@@ -1213,12 +1213,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <GraduationCap size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <GraduationCap size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Education Matrix</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Your academic foundations</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Education Matrix</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Your academic foundations</p>
                                             </div>
                                         </div>
 
@@ -1239,7 +1239,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                             >
                                                 <div className="absolute -left-4 top-0 bottom-0 w-1 bg-neutral-100 rounded-full group-hover/edu:bg-primary-200 transition-colors" />
 
-                                                <div className="bg-neutral-50/50 rounded-[32px] p-8 border border-neutral-100 group-hover/edu:bg-white group-hover/edu:shadow-xl group-hover/edu:border-primary-100 transition-all duration-500 relative">
+                                                <div className="bg-neutral-50/50 rounded-[24px] p-6 border border-neutral-100 group-hover/edu:bg-white group-hover/edu:shadow-xl group-hover/edu:border-primary-100 transition-all duration-500 relative">
                                                     <button
                                                         onClick={() => removeEducation(idx)}
                                                         className="absolute top-6 right-6 p-2 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover/edu:opacity-100"
@@ -1298,12 +1298,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <Sparkles size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <Sparkles size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Capabilities</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Your professional toolkit</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Capabilities</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Your professional toolkit</p>
                                             </div>
                                         </div>
 
@@ -1363,12 +1363,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <Languages size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <Languages size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Linguistic Frameworks</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Your communication protocols</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Linguistic Frameworks</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Your communication protocols</p>
                                             </div>
                                         </div>
 
@@ -1385,7 +1385,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                         {(cv.languages || []).map((lang, idx) => (
                                             <div
                                                 key={idx}
-                                                className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-neutral-50/50 p-6 rounded-[24px] border border-neutral-100 transition-all hover:bg-white hover:shadow-xl hover:border-primary-100 group/lang"
+                                                className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-neutral-50/50 p-5 rounded-[20px] border border-neutral-100 transition-all hover:bg-white hover:shadow-xl hover:border-primary-100 group/lang"
                                             >
                                                 <div className="flex-1">
                                                     <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 mb-2 block">Language</label>
@@ -1399,7 +1399,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                                 <div className="w-full md:w-64">
                                                     <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 mb-2 block">Proficiency Level</label>
                                                     <select
-                                                        className="w-full px-6 py-4 bg-white border border-neutral-200 rounded-2xl text-sm font-bold text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-50 transition-all cursor-pointer appearance-none"
+                                                        className="w-full px-5 py-3 bg-white border border-neutral-200 rounded-xl text-sm font-bold text-neutral-900 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-50 transition-all cursor-pointer appearance-none"
                                                         value={lang.level}
                                                         onChange={v => updateLanguage(idx, 'level', v.target.value)}
                                                     >
@@ -1433,12 +1433,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <Award size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <Award size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Credentials</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Verify your expertise</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Credentials</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Verify your expertise</p>
                                             </div>
                                         </div>
 
@@ -1455,7 +1455,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                         {(cv.certifications || []).map((cert, idx) => (
                                             <div
                                                 key={idx}
-                                                className="relative p-8 rounded-[32px] border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all duration-500 group/cert animate-in zoom-in-98 duration-500"
+                                                className="relative p-6 rounded-[24px] border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all duration-500 group/cert animate-in zoom-in-98 duration-500"
                                             >
                                                 <button
                                                     onClick={() => removeCertification(idx)}
@@ -1510,12 +1510,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <Users size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <Users size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Professional Guilds</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Your industry affiliations</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Professional Guilds</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Your industry affiliations</p>
                                             </div>
                                         </div>
 
@@ -1532,7 +1532,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                         {(cv.organizations || []).map((org, idx) => (
                                             <div
                                                 key={idx}
-                                                className="relative p-8 rounded-[32px] border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all duration-500 group/org animate-in zoom-in-98 duration-500"
+                                                className="relative p-6 rounded-[24px] border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-xl hover:border-primary-100 transition-all duration-500 group/org animate-in zoom-in-98 duration-500"
                                             >
                                                 <button
                                                     onClick={() => removeOrganization(idx)}
@@ -1596,12 +1596,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 <div className="bg-white rounded-[32px] p-6 lg:p-10 shadow-premium-layered border border-neutral-200/50 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div className="flex justify-between items-center mb-10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
-                                                <Palette size={24} />
+                                            <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 border border-primary-100 shadow-inner">
+                                                <Palette size={20} />
                                             </div>
                                             <div>
-                                                <h2 className="text-2xl font-black text-neutral-900 leading-tight">Visuals & Branding</h2>
-                                                <p className="text-sm text-neutral-400 font-medium">Calibrate your document's aesthetic</p>
+                                                <h2 className="text-xl font-black text-neutral-900 leading-tight">Visuals & Branding</h2>
+                                                <p className="text-xs text-neutral-400 font-medium">Calibrate your document's aesthetic</p>
                                             </div>
                                         </div>
 
@@ -1647,7 +1647,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="p-8 rounded-[32px] border border-neutral-100 bg-neutral-50/50 space-y-4">
+                                            <div className="p-6 rounded-[24px] border border-neutral-100 bg-neutral-50/50 space-y-4">
                                                 <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Primary Color Palette</label>
                                                 <div className="flex items-center gap-6">
                                                     <div className="relative group/picker cursor-pointer w-16 h-16">
@@ -1669,7 +1669,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                                 </div>
                                             </div>
 
-                                            <div className="p-8 rounded-[32px] border border-neutral-100 bg-neutral-50/50 space-y-4">
+                                            <div className="p-6 rounded-[24px] border border-neutral-100 bg-neutral-50/50 space-y-4">
                                                 <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Accent Highlight</label>
                                                 <div className="flex items-center gap-6">
                                                     <div className="relative group/picker cursor-pointer w-16 h-16">
@@ -1741,12 +1741,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 {/* Modal Header */}
                                 <div className="px-12 py-10 border-b border-neutral-100 flex justify-between items-center bg-white sticky top-0 z-10">
                                     <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 bg-neutral-900 rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-neutral-900/20">
-                                            <Palette size={32} />
+                                        <div className="w-12 h-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-neutral-900/20">
+                                            <Palette size={24} />
                                         </div>
                                         <div>
-                                            <h3 className="text-4xl font-black text-neutral-900 tracking-tight leading-none">Blueprint Selection</h3>
-                                            <p className="text-base text-neutral-400 mt-2 font-medium">Select a high-fidelity architecture for your career narrative</p>
+                                            <h3 className="text-2xl font-black text-neutral-900 tracking-tight leading-none">Blueprint Selection</h3>
+                                            <p className="text-sm text-neutral-400 mt-2 font-medium">Select a high-fidelity architecture for your career narrative</p>
                                         </div>
                                     </div>
                                     <button
@@ -1758,7 +1758,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                 </div>
 
                                 {/* Modal Content - Grid of Premium Blueprints */}
-                                <div className="flex-1 overflow-y-auto p-12 scrollbar-hide bg-neutral-50/30">
+                                <div className="flex-1 overflow-y-auto p-6 lg:p-10 scrollbar-hide bg-neutral-50/30">
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                         {CV_TEMPLATES.map(t => (
                                             <div
@@ -1840,8 +1840,8 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                         <DialogContent className="max-w-xl rounded-[40px] p-0 overflow-hidden shadow-2xl">
                             {/* Modal Header */}
                             <DialogHeader className="px-10 pt-10 pb-6 text-center">
-                                <DialogTitle className="text-3xl font-black text-neutral-900 leading-tight">Photo Studio</DialogTitle>
-                                <DialogDescription className="text-sm text-neutral-500 mt-2 font-medium">Perfect your profile picture for a professional look</DialogDescription>
+                                <DialogTitle className="text-xl font-black text-neutral-900 leading-tight">Photo Studio</DialogTitle>
+                                <DialogDescription className="text-xs text-neutral-500 mt-2 font-medium">Perfect your profile picture for a professional look</DialogDescription>
                             </DialogHeader>
 
                             {/* Studio Content */}

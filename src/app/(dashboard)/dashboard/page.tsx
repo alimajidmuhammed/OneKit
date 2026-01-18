@@ -57,17 +57,17 @@ export default function DashboardPage() {
     });
 
     return (
-        <div className="p-6 md:p-10 lg:p-16 max-w-7xl mx-auto space-y-12 animate-reveal">
+        <div className="p-6 md:p-8 lg:p-12 max-w-7xl mx-auto space-y-12 animate-reveal">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
                 <div className="space-y-4">
                     <span className="inline-block px-4 py-1 bg-primary-100 text-primary-700 text-[10px] font-black uppercase tracking-[0.3em] rounded-full border border-primary-200/50">
                         Control Center
                     </span>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-neutral-900 tracking-tighter leading-none">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-neutral-900 tracking-tighter leading-none">
                         Welcome, <span className="bg-brand-gradient bg-clip-text text-transparent italic">{profile?.full_name?.split(' ')[0] || 'Member'}</span>
                     </h1>
-                    <p className="text-xl text-neutral-400 font-medium max-w-lg">
+                    <p className="text-base text-neutral-400 font-medium max-w-lg">
                         Manage your professional infrastructure with OneKit's ecosystem tools.
                     </p>
                 </div>
@@ -169,8 +169,8 @@ function StatCard({ icon, value, label, color, alert }) {
     };
 
     return (
-        <div className={`p-8 bg-white border border-neutral-100 rounded-[32px] shadow-sm flex items-center gap-6 group transition-all duration-500 hover:shadow-premium-layered hover:-translate-y-1 ${alert ? 'ring-2 ring-red-100' : ''}`}>
-            <div className={`w-16 h-16 rounded-[22px] flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-6 ${colorClasses[color]}`}>
+        <div className={`p-6 bg-white border border-neutral-100 rounded-[24px] shadow-sm flex items-center gap-6 group transition-all duration-500 hover:shadow-premium-layered hover:-translate-y-1 ${alert ? 'ring-2 ring-red-100' : ''}`}>
+            <div className={`w-14 h-14 rounded-[18px] flex items-center justify-center transition-all group-hover:scale-110 group-hover:rotate-6 ${colorClasses[color]}`}>
                 {icon}
             </div>
             <div className="flex flex-col min-w-0">
@@ -189,9 +189,9 @@ function ActivityCard({ href, icon, value, label, color, cta }) {
     };
 
     return (
-        <Link href={href} className="p-8 bg-white border border-neutral-100 rounded-[32px] shadow-sm group transition-all duration-500 hover:shadow-premium-layered hover:border-primary-200 relative overflow-hidden block">
+        <Link href={href} className="p-6 bg-white border border-neutral-100 rounded-[24px] shadow-sm group transition-all duration-500 hover:shadow-premium-layered hover:border-primary-200 relative overflow-hidden block">
             <div className="flex items-center gap-5 relative z-10">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${colorIcons[color] || 'bg-neutral-50'}`}>
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${colorIcons[color] || 'bg-neutral-50'}`}>
                     {icon}
                 </div>
                 <div className="flex flex-col">

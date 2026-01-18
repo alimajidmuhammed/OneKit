@@ -639,17 +639,17 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
             <div className="flex-1 flex overflow-hidden">
                 {/* Sidebar Controls */}
                 <aside className="w-[420px] bg-white border-r border-neutral-200 flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10">
-                    <div className="p-6 border-b border-neutral-100 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
-                        <h2 className="text-sm font-black text-neutral-900 tracking-wide uppercase mb-1">Configuration Matrix</h2>
-                        <p className="text-xs font-medium text-neutral-400">Customize your digital asset parameters.</p>
+                    <div className="p-5 border-b border-neutral-100 bg-white/50 backdrop-blur-sm sticky top-0 z-20">
+                        <h2 className="text-xs font-black text-neutral-900 tracking-wide uppercase mb-1">Configuration Matrix</h2>
+                        <p className="text-[10px] font-medium text-neutral-400">Customize your digital asset parameters.</p>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-0 scroll-smooth">
-                        <div className="flex flex-wrap gap-2 p-6 pb-2 sticky top-[73px] bg-white z-10 border-b border-neutral-50 transition-all">
+                        <div className="flex flex-wrap gap-2 p-5 pb-2 sticky top-[69px] bg-white z-10 border-b border-neutral-50 transition-all">
                             {SECTIONS.map(s => (
                                 <button
                                     key={s.id}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${activeSection === s.id
+                                    className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border ${activeSection === s.id
                                         ? 'bg-neutral-900 text-white border-neutral-900 shadow-lg shadow-neutral-900/10'
                                         : 'bg-white text-neutral-400 border-neutral-100 hover:border-primary-200 hover:text-primary-600'}`}
                                     onClick={() => setActiveSection(s.id)}

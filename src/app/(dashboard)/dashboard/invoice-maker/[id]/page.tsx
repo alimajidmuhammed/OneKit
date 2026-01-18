@@ -1005,7 +1005,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
 
             <main className="flex-1 flex overflow-hidden">
                 {/* OneKit 3.0: Sidebar Navigation */}
-                <aside className="hidden lg:flex flex-col w-80 bg-white border-r border-neutral-200/50 p-8 overflow-y-auto scrollbar-hide">
+                <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-neutral-200/50 p-6 overflow-y-auto scrollbar-hide">
                     <div className="mb-10">
                         <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-6">Discovery Engine</h2>
                         <nav className="space-y-2">
@@ -1013,7 +1013,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                                 <button
                                     key={section.id}
                                     onClick={() => setActiveSection(section.id)}
-                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                                    className={`w-full flex items-center gap-4 px-5 py-3 rounded-2xl transition-all duration-300 group ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
                                 >
                                     <div className={`p-2 rounded-xl transition-all duration-300 ${activeSection === section.id ? 'bg-white/10 text-white scale-110' : 'bg-neutral-100 text-neutral-400 group-hover:bg-white group-hover:text-neutral-900'}`}>
                                         {section.icon}
@@ -1028,7 +1028,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                     </div>
 
                     <div className="mt-auto space-y-6">
-                        <div className="p-6 bg-neutral-50 rounded-[32px] border border-neutral-200/50 relative overflow-hidden group">
+                        <div className="p-5 bg-neutral-50 rounded-3xl border border-neutral-200/50 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -mr-12 -mt-12 transition-transform duration-700 group-hover:scale-150" />
                             <h3 className="text-xs font-black text-neutral-900 mb-2 relative">Financial Suite</h3>
                             <p className="text-[10px] text-neutral-500 leading-relaxed mb-4 relative">Calibrate multi-currency protocols and secure logs.</p>
@@ -1055,16 +1055,16 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
 
                         {activeSection === 'identity' && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                <section className="p-6 lg:p-10 bg-white rounded-3xl border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
 
-                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
-                                        <div className="p-3 bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/20">
-                                            <User size={24} />
+                                    <div className="flex items-center gap-4 mb-8 pb-6 border-b border-neutral-100">
+                                        <div className="p-2.5 bg-blue-500 text-white rounded-xl shadow-lg shadow-blue-500/20">
+                                            <User size={20} />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">Identity Matrix</h3>
-                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Core Branding & Authentication</p>
+                                            <h3 className="text-base lg:text-lg font-black text-neutral-900 uppercase tracking-tight">Identity Matrix</h3>
+                                            <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Core Branding & Authentication</p>
                                         </div>
                                     </div>
 
@@ -1078,7 +1078,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                                                     </div>
                                                     <input
                                                         type="text"
-                                                        className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                                                        className="w-full pl-12 pr-6 py-3 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
                                                         value={data.labels?.company_name_en ?? ''}
                                                         onChange={e => updateField('labels.company_name_en', e.target.value)}
                                                         placeholder={DEFAULT_LABELS.company_name_en}
@@ -1526,6 +1526,6 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                     <InvoiceContent data={data} labels={labels} template_id={invoice.template_id} isExport={true} contentRef={exportRef} />
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -376,7 +376,7 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
 
             <main className="flex-1 flex overflow-hidden">
                 {/* OneKit 3.0: Sidebar Navigation */}
-                <aside className="hidden lg:flex flex-col w-80 bg-white border-r border-neutral-200/50 p-8 overflow-y-auto scrollbar-hide">
+                <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-neutral-200/50 p-6 overflow-y-auto scrollbar-hide">
                     <div className="mb-10">
                         <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-6">Discovery Engine</h2>
                         <nav className="space-y-2">
@@ -384,12 +384,12 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
                                 <button
                                     key={section.id}
                                     onClick={() => setActiveSection(section.id)}
-                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                                    className={`w-full flex items-center gap-4 px-5 py-3 rounded-2xl transition-all duration-300 group ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
                                 >
                                     <div className={`transition-transform duration-500 ${activeSection === section.id ? 'scale-110 rotate-3' : 'group-hover:scale-110'}`}>
                                         {section.icon}
                                     </div>
-                                    <span className="text-sm font-black uppercase tracking-widest">{section.label}</span>
+                                    <span className="text-[11px] font-black uppercase tracking-widest">{section.label}</span>
                                     {activeSection === section.id && (
                                         <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500 shadow-[0_0_10px_#6366f1]" />
                                     )}
@@ -429,8 +429,8 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="flex justify-between items-center mb-8">
                                     <div>
-                                        <h2 className="text-2xl font-black text-neutral-900 leading-tight">Identity Matrix</h2>
-                                        <p className="text-sm text-neutral-400 font-medium">Define your digital presence</p>
+                                        <h2 className="text-xl font-black text-neutral-900 leading-tight">Identity Matrix</h2>
+                                        <p className="text-xs text-neutral-400 font-medium whitespace-nowrap">Define your digital presence</p>
                                     </div>
                                     {qr.logo_url && (
                                         <button
@@ -451,7 +451,7 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
 
                                 {/* Logo Studio Control Panel */}
                                 {isLogoStudioOpen && qr.logo_url && (
-                                    <div className="mt-6 bg-neutral-900 rounded-[32px] p-8 border border-neutral-800 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500">
+                                    <div className="mt-6 bg-neutral-900 rounded-3xl p-6 border border-neutral-800 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500">
                                         <div className="flex justify-between items-center mb-8">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center text-primary-400">
@@ -515,7 +515,7 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
                                         <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-4 ml-1 block">Display Designation</label>
                                         <input
                                             type="text"
-                                            className="w-full px-6 py-5 bg-white border border-neutral-200 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
+                                            className="w-full px-5 py-3.5 bg-white border border-neutral-200 rounded-2xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
                                             value={qr.display_name || ''}
                                             onChange={(e) => updateField('display_name', e.target.value)}
                                             placeholder="Identity Name"
@@ -525,7 +525,7 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
                                     <div className="group">
                                         <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-4 ml-1 block">Narrative Directive (Bio)</label>
                                         <textarea
-                                            className="w-full px-6 py-5 bg-white border border-neutral-200 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all min-h-[120px] resize-none"
+                                            className="w-full px-5 py-3.5 bg-white border border-neutral-200 rounded-2xl text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all min-h-[120px] resize-none"
                                             value={qr.bio || ''}
                                             onChange={(e) => updateField('bio', e.target.value.slice(0, 150))}
                                             placeholder="Provide a brief context (Max 150 characters)"
@@ -543,8 +543,8 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 <div className="flex justify-between items-center mb-8">
                                     <div>
-                                        <h2 className="text-2xl font-black text-neutral-900 leading-tight">Protocol Discovery</h2>
-                                        <p className="text-sm text-neutral-400 font-medium">Map your digital routing nodes</p>
+                                        <h2 className="text-xl font-black text-neutral-900 leading-tight">Protocol Discovery</h2>
+                                        <p className="text-xs text-neutral-400 font-medium whitespace-nowrap">Map your digital routing nodes</p>
                                     </div>
                                     <button
                                         onClick={addLink}
@@ -837,6 +837,6 @@ export default function QREditorPage({ params }: { params: Promise<{ id: string 
                     </div>
                 </div>
             </main>
-        </div>
+        </div >
     );
 }

@@ -27,28 +27,28 @@ export default function SubscriptionsPage() {
     const expiredCount = subscriptions.filter(s => s.status === 'expired').length;
 
     return (
-        <div className="p-6 md:p-10 lg:p-16 max-w-7xl mx-auto space-y-12 animate-reveal">
+        <div className="p-6 md:p-8 lg:p-12 max-w-7xl mx-auto space-y-10 animate-reveal">
             {/* Header Section */}
             <div className="space-y-4 mb-12">
                 <span className="inline-block px-4 py-1 bg-primary-100 text-primary-700 text-[10px] font-black uppercase tracking-[0.3em] rounded-full border border-primary-200/50">
                     Account Management
                 </span>
-                <h1 className="text-4xl md:text-5xl font-black text-neutral-900 tracking-tighter leading-none">
+                <h1 className="text-3xl md:text-4xl font-black text-neutral-900 tracking-tighter leading-none">
                     My <span className="bg-brand-gradient bg-clip-text text-transparent italic">Subscriptions</span>
                 </h1>
-                <p className="text-lg text-neutral-400 font-medium max-w-lg">
+                <p className="text-base text-neutral-400 font-medium max-w-lg">
                     Manage your service subscriptions
                 </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-8 bg-white border border-neutral-100 rounded-[32px] shadow-sm flex items-center gap-6 group transition-all duration-500 hover:shadow-premium-layered hover:-translate-y-1">
-                    <div className="w-16 h-16 rounded-[22px] flex items-center justify-center bg-green-50 text-green-600 transition-all group-hover:scale-110 group-hover:rotate-6">
+                <div className="p-6 bg-white border border-neutral-100 rounded-3xl shadow-sm flex items-center gap-6 group transition-all duration-500 hover:shadow-premium-layered hover:-translate-y-1">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-green-50 text-green-600 transition-all group-hover:scale-110 group-hover:rotate-6">
                         <CheckCircle2 size={24} />
                     </div>
                     <div className="flex flex-col min-w-0">
-                        <span className="text-3xl font-black text-neutral-900 leading-none mb-1">{activeCount}</span>
+                        <span className="text-2xl font-black text-neutral-900 leading-none mb-1">{activeCount}</span>
                         <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Active</span>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ export default function SubscriptionsPage() {
                         <Clock size={24} />
                     </div>
                     <div className="flex flex-col min-w-0">
-                        <span className="text-3xl font-black text-neutral-900 leading-none mb-1">{expiredCount}</span>
+                        <span className="text-2xl font-black text-neutral-900 leading-none mb-1">{expiredCount}</span>
                         <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Expired</span>
                     </div>
                 </div>
@@ -68,7 +68,7 @@ export default function SubscriptionsPage() {
                         <Calendar size={24} />
                     </div>
                     <div className="flex flex-col min-w-0">
-                        <span className="text-3xl font-black text-neutral-900 leading-none mb-1">{subscriptions.length}</span>
+                        <span className="text-2xl font-black text-neutral-900 leading-none mb-1">{subscriptions.length}</span>
                         <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">Total</span>
                     </div>
                 </div>
@@ -86,7 +86,7 @@ export default function SubscriptionsPage() {
                         const service = sub.service;
                         const daysLeft = getDaysRemaining(sub.expires_at);
                         const isExpiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 7;
-                        
+
                         const iconColors = {
                             primary: 'bg-primary-50 text-primary-600',
                             accent: 'bg-accent-50 text-accent-600',
@@ -96,7 +96,7 @@ export default function SubscriptionsPage() {
                         };
 
                         return (
-                            <div key={sub.id} className="bg-white border border-neutral-100 rounded-[32px] overflow-hidden shadow-sm hover:shadow-premium-layered transition-all duration-500">
+                            <div key={sub.id} className="bg-white border border-neutral-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-premium-layered transition-all duration-500">
                                 <div className="px-8 py-6 border-b border-neutral-100 flex justify-between items-center">
                                     <div className="flex items-center gap-4">
                                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${iconColors[service?.color || 'primary']}`}>
@@ -139,8 +139,8 @@ export default function SubscriptionsPage() {
 
                                 <div className="px-8 py-6 bg-neutral-50 border-t border-neutral-100">
                                     {sub.status === 'active' ? (
-                                        <Link 
-                                            href={`/services/${service?.slug}`} 
+                                        <Link
+                                            href={`/services/${service?.slug}`}
                                             className="btn-premium inline-flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-lg hover:shadow-xl transition-all active:scale-95"
                                         >
                                             Use Service
@@ -167,14 +167,14 @@ export default function SubscriptionsPage() {
                         );
                     })
                 ) : (
-                    <div className="text-center py-20 bg-white border border-neutral-100 rounded-[32px]">
+                    <div className="text-center py-20 bg-white border border-neutral-100 rounded-3xl">
                         <div className="w-16 h-16 flex items-center justify-center bg-neutral-100 text-neutral-400 rounded-full mx-auto mb-6">
                             <Calendar size={32} />
                         </div>
                         <h3 className="text-lg font-black text-neutral-900 mb-2">No subscriptions yet</h3>
                         <p className="text-neutral-400 mb-8">Subscribe to a service to get started</p>
-                        <Link 
-                            href="/#services" 
+                        <Link
+                            href="/#services"
                             className="btn-premium inline-flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-lg hover:shadow-xl transition-all active:scale-95"
                         >
                             Browse Services

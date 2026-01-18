@@ -169,21 +169,21 @@ export default function SettingsPage() {
 
 
     return (
-        <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-screen">
-            <div className="mb-10">
-                <h1 className="text-3xl font-bold text-neutral-900 mb-2">Settings</h1>
-                <p className="text-neutral-500">Manage your account settings and profile</p>
+        <div className="p-6 md:p-8 max-w-5xl mx-auto min-h-screen">
+            <div className="mb-8">
+                <h1 className="text-2xl font-black text-neutral-900 mb-1">Settings</h1>
+                <p className="text-sm text-neutral-400 font-medium">Manage your account settings and profile</p>
             </div>
 
             <div className="space-y-8">
                 {/* Profile Section */}
-                <section className="bg-white border border-neutral-100 rounded-[32px] overflow-hidden shadow-sm">
-                    <div className="p-8 border-b border-neutral-100 bg-neutral-50/50">
-                        <h2 className="text-xl font-bold text-neutral-900">Profile Information</h2>
-                        <p className="text-sm text-neutral-500">Update your personal information</p>
+                <section className="bg-white border border-neutral-100 rounded-3xl overflow-hidden shadow-sm">
+                    <div className="p-6 border-b border-neutral-100 bg-neutral-50/50">
+                        <h2 className="text-lg font-black text-neutral-900">Profile Information</h2>
+                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none mt-1">Update your personal information</p>
                     </div>
 
-                    <div className="p-8">
+                    <div className="p-6 lg:p-10">
                         {success && (
                             <div className="mb-6 p-4 bg-green-50 text-green-700 rounded-2xl flex items-center gap-3 border border-green-100 animate-in fade-in slide-in-from-top-2 duration-300">
                                 <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
@@ -291,13 +291,13 @@ export default function SettingsPage() {
                 </section>
 
                 {/* Security Section */}
-                <section className="bg-white border border-neutral-100 rounded-[32px] overflow-hidden shadow-sm">
-                    <div className="p-8 border-b border-neutral-100 bg-neutral-50/50">
-                        <h2 className="text-xl font-bold text-neutral-900">Security</h2>
-                        <p className="text-sm text-neutral-500">Manage your password and security settings</p>
+                <section className="bg-white border border-neutral-100 rounded-3xl overflow-hidden shadow-sm">
+                    <div className="p-6 border-b border-neutral-100 bg-neutral-50/50">
+                        <h2 className="text-lg font-black text-neutral-900">Security</h2>
+                        <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none mt-1">Manage your password and security settings</p>
                     </div>
 
-                    <div className="p-8 space-y-6">
+                    <div className="p-6 lg:p-10 space-y-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-neutral-50 rounded-2xl gap-4">
                             <div className="space-y-1">
                                 <h3 className="font-bold text-neutral-900">Password</h3>

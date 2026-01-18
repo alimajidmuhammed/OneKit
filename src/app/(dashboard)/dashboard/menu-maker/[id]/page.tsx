@@ -297,8 +297,8 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-[0.1em] whitespace-nowrap transition-all duration-500 ${activeTab === tab.id
-                                    ? 'bg-primary-950 text-white shadow-premium-layered'
-                                    : 'text-neutral-400 hover:bg-primary-50 hover:text-primary-600'
+                                ? 'bg-primary-950 text-white shadow-premium-layered'
+                                : 'text-neutral-400 hover:bg-primary-50 hover:text-primary-600'
                                 }`}
                         >
                             <tab.icon size={16} strokeWidth={isActive === tab.id ? 3 : 2} />
@@ -313,14 +313,14 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                             {canEdit && (
                                 <button
                                     onClick={() => openCategoryModal()}
-                                    className="w-full group p-10 bg-white border-2 border-dashed border-neutral-100 rounded-[40px] flex flex-col items-center justify-center gap-4 hover:border-primary-500 hover:bg-primary-50/20 transition-all duration-500 active:scale-[0.99] shadow-sm"
+                                    className="w-full group p-6 bg-white border-2 border-dashed border-neutral-100 rounded-[32px] flex flex-col items-center justify-center gap-4 hover:border-primary-500 hover:bg-primary-50/20 transition-all duration-500 active:scale-[0.99] shadow-sm"
                                 >
-                                    <div className="w-16 h-16 rounded-3xl bg-primary-50 text-primary-500 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-transform">
-                                        <Plus size={32} />
+                                    <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-500 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-transform">
+                                        <Plus size={24} />
                                     </div>
                                     <div className="text-center">
-                                        <h3 className="text-lg font-black text-neutral-900 tracking-tight">Expand Infrastructure</h3>
-                                        <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mt-1">Add new category block</p>
+                                        <h3 className="text-md font-black text-neutral-900 tracking-tight">Expand Infrastructure</h3>
+                                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mt-1">Add new category block</p>
                                     </div>
                                 </button>
                             )}
@@ -330,10 +330,10 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                     <section key={cat.id} className="space-y-8 animate-reveal">
                                         <div className="flex items-center justify-between border-b border-neutral-100 pb-6">
                                             <div className="flex items-center gap-6">
-                                                <div className="w-1.5 h-10 bg-primary-600 rounded-full" />
+                                                <div className="w-1 h-8 bg-primary-600 rounded-full" />
                                                 <div>
-                                                    <h2 className="text-3xl font-black text-neutral-900 tracking-tighter italic">{cat.name}</h2>
-                                                    <p className="text-sm font-medium text-neutral-400">{cat.description || 'Global Protocol Active'}</p>
+                                                    <h2 className="text-xl font-black text-neutral-900 tracking-tighter italic">{cat.name}</h2>
+                                                    <p className="text-xs font-medium text-neutral-400">{cat.description || 'Global Protocol Active'}</p>
                                                 </div>
                                             </div>
                                             {canEdit && (
@@ -346,10 +346,10 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                             {items.filter(i => i.category_id === cat.id).map((item) => (
-                                                <div key={item.id} className="group relative bg-white border border-neutral-100 rounded-[32px] p-6 shadow-sm hover:shadow-premium-layered hover:-translate-y-1 transition-all duration-500">
-                                                    <div className="flex gap-6 items-start">
-                                                        <div className="w-24 h-24 rounded-2xl bg-neutral-50 overflow-hidden border border-neutral-100 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                                                            {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-neutral-200"><ImageIcon size={32} /></div>}
+                                                <div key={item.id} className="group relative bg-white border border-neutral-100 rounded-[28px] p-5 shadow-sm hover:shadow-premium-layered hover:-translate-y-1 transition-all duration-500">
+                                                    <div className="flex gap-5 items-start">
+                                                        <div className="w-20 h-20 rounded-xl bg-neutral-50 overflow-hidden border border-neutral-100 shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                                                            {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-neutral-200"><ImageIcon size={24} /></div>}
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2 mb-1.5">
@@ -376,9 +376,9 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                             {canEdit && (
                                                 <button
                                                     onClick={() => openItemModal(cat.id)}
-                                                    className="p-8 border-2 border-dashed border-neutral-100 rounded-[32px] flex flex-col items-center justify-center gap-3 text-neutral-400 hover:border-primary-200 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 group shadow-sm"
+                                                    className="p-6 border-2 border-dashed border-neutral-100 rounded-[28px] flex flex-col items-center justify-center gap-3 text-neutral-400 hover:border-primary-200 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 group shadow-sm"
                                                 >
-                                                    <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform"><Plus size={24} /></div>
+                                                    <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform"><Plus size={20} /></div>
                                                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">Deploy Content</span>
                                                 </button>
                                             )}
@@ -391,9 +391,9 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
 
                     {activeTab === 'theme' && (
                         <div className="space-y-12 animate-reveal">
-                            <div className="flex flex-col gap-3">
-                                <h1 className="text-4xl font-black text-neutral-900 tracking-tighter italic">Vibe Architecture</h1>
-                                <p className="text-lg text-neutral-400 font-medium max-w-lg">Transform your brand's digital presence with high-fidelity blueprints.</p>
+                            <div className="flex flex-col gap-2">
+                                <h1 className="text-2xl font-black text-neutral-900 tracking-tighter italic">Vibe Architecture</h1>
+                                <p className="text-sm text-neutral-400 font-medium max-w-lg">Transform your brand's digital presence with high-fidelity blueprints.</p>
                             </div>
 
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -402,9 +402,9 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                         key={theme.id}
                                         onClick={() => { setMenu(prev => ({ ...prev, template_id: theme.id })); setHasChanges(true); }}
                                         disabled={!canEdit}
-                                        className={`group relative flex flex-col items-center gap-6 p-8 border-2 rounded-[40px] transition-all duration-500 active:scale-95 ${menu.template_id === theme.id
-                                                ? 'border-primary-600 bg-white shadow-premium-layered scale-105 z-10'
-                                                : 'border-neutral-50 bg-white shadow-sm hover:border-primary-200 hover:scale-[1.02]'
+                                        className={`group relative flex flex-col items-center gap-4 p-6 border-2 rounded-[32px] transition-all duration-500 active:scale-95 ${menu.template_id === theme.id
+                                            ? 'border-primary-600 bg-white shadow-premium-layered scale-105 z-10'
+                                            : 'border-neutral-50 bg-white shadow-sm hover:border-primary-200 hover:scale-[1.02]'
                                             }`}
                                     >
                                         <div
@@ -431,12 +431,12 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
 
                     {activeTab === 'settings' && (
                         <div className="max-w-3xl mx-auto space-y-12 animate-reveal">
-                            <div className="space-y-4">
-                                <h2 className="text-3xl font-black text-neutral-900 tracking-tighter">Global Protocol Configuration</h2>
-                                <p className="text-neutral-400 font-medium">Fine-tune the central nodes of your hospitality infrastructure.</p>
+                            <div className="space-y-2">
+                                <h2 className="text-2xl font-black text-neutral-900 tracking-tighter">Global Protocol Configuration</h2>
+                                <p className="text-sm text-neutral-400 font-medium">Fine-tune the central nodes of your hospitality infrastructure.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-10 bg-white border border-neutral-100 rounded-[48px] p-10 shadow-sm relative overflow-hidden">
+                            <div className="grid grid-cols-1 gap-8 bg-white border border-neutral-100 rounded-[32px] p-6 lg:p-8 shadow-sm relative overflow-hidden">
                                 <div className="texture-noise absolute inset-0 opacity-[0.02] pointer-events-none" />
 
                                 <div className="space-y-3 relative z-10">
@@ -444,7 +444,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                     <div className="relative group">
                                         <Type className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-300 group-focus-within:text-primary-500 transition-colors" size={20} />
                                         <input
-                                            className="w-full pl-16 pr-6 py-5 bg-neutral-50 border border-neutral-100 rounded-[24px] font-black text-neutral-900 focus:bg-white focus:border-primary-500 outline-none transition-all placeholder:text-neutral-200"
+                                            className="w-full pl-16 pr-6 py-3 bg-neutral-50 border border-neutral-100 rounded-[16px] font-black text-neutral-900 focus:bg-white focus:border-primary-500 outline-none transition-all placeholder:text-neutral-200"
                                             value={menu.name}
                                             onChange={(e) => { setMenu(prev => ({ ...prev, name: e.target.value })); setHasChanges(true); }}
                                             disabled={!canEdit}
@@ -463,7 +463,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                                 </>
                                             ) : (
                                                 <div className="flex flex-col items-center gap-3">
-                                                    <div className="w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center text-primary-500"><Upload size={28} /></div>
+                                                    <div className="w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center text-primary-500"><Upload size={24} /></div>
                                                     <span className="text-[9px] font-black uppercase tracking-widest text-neutral-300">Upload Logo</span>
                                                     <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={async (e) => { const f = e.target.files?.[0]; if (f && canEdit) { const url = await uploadImage(f, { folder: 'logos' }); if (url) { setMenu(prev => ({ ...prev, logo_url: url })); setHasChanges(true); } } }} />
                                                 </div>
@@ -474,7 +474,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                     <div className="space-y-6 flex flex-col">
                                         <div className="space-y-3">
                                             <label className="text-[10px] font-black text-primary-600 uppercase tracking-widest ml-1">Currency Matrix</label>
-                                            <select className="w-full p-5 bg-neutral-50 border border-neutral-100 rounded-[24px] font-black text-neutral-900 outline-none appearance-none cursor-pointer hover:bg-neutral-100 transition-all" value={menu.currency} onChange={(e) => { setMenu(prev => ({ ...prev, currency: e.target.value })); setHasChanges(true); }}>
+                                            <select className="w-full p-3 bg-neutral-50 border border-neutral-100 rounded-[16px] font-black text-neutral-900 outline-none appearance-none cursor-pointer hover:bg-neutral-100 transition-all" value={menu.currency} onChange={(e) => { setMenu(prev => ({ ...prev, currency: e.target.value })); setHasChanges(true); }}>
                                                 <option value="IQD">IQD - Iraqi Dinar</option>
                                                 <option value="USD">USD - US Dollar</option>
                                             </select>
@@ -497,15 +497,15 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                         <div className="space-y-16 animate-reveal">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
                                 {/* Interactive QR Terminal */}
-                                <div className="lg:col-span-5 bg-white rounded-[48px] shadow-2xl border border-neutral-100 overflow-hidden sticky top-32 group" ref={qrCardRef}>
-                                    <div className="p-10 text-center text-white relative flex flex-col items-center gap-4" style={{ background: currentTheme.colors.primary }}>
+                                <div className="lg:col-span-5 bg-white rounded-[40px] shadow-2xl border border-neutral-100 overflow-hidden sticky top-32 group" ref={qrCardRef}>
+                                    <div className="p-6 text-center text-white relative flex flex-col items-center gap-3" style={{ background: currentTheme.colors.primary }}>
                                         <div className="texture-noise absolute inset-0 opacity-10 pointer-events-none" />
-                                        <div className="text-7xl group-hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all duration-700">{currentTheme.preview}</div>
-                                        <h3 className="text-3xl font-black italic tracking-tighter">{menu.name}</h3>
-                                        <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.3em]">Production Endpoint Live</div>
+                                        <div className="text-5xl group-hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all duration-700">{currentTheme.preview}</div>
+                                        <h3 className="text-xl font-black italic tracking-tighter">{menu.name}</h3>
+                                        <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.3em]">Production Endpoint Live</div>
                                     </div>
-                                    <div className="p-16 bg-white flex justify-center relative">
-                                        <div className="w-full aspect-square bg-neutral-50 rounded-[40px] p-8 border-[12px] border-neutral-100 shadow-inner flex items-center justify-center cursor-none group">
+                                    <div className="p-10 bg-white flex justify-center relative">
+                                        <div className="w-full aspect-square bg-neutral-50 rounded-[32px] p-6 border-[8px] border-neutral-100 shadow-inner flex items-center justify-center cursor-none group">
                                             <img src={getQRCodeUrl()} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-700" crossOrigin="anonymous" />
                                             <div className="absolute opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none flex flex-col items-center gap-2">
                                                 <div className="w-12 h-12 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-xl shadow-primary-600/40 animate-bounce"><MousePointer2 size={24} /></div>
@@ -520,12 +520,12 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
 
                                 {/* Deployment Controls */}
                                 <div className="lg:col-span-7 space-y-12 py-8">
-                                    <div className="space-y-6">
+                                    <div className="space-y-4">
                                         <span className="text-[10px] font-black text-green-600 uppercase tracking-[0.4em]">Ready for Production</span>
-                                        <h2 className="text-5xl md:text-6xl font-black text-neutral-900 leading-[0.95] tracking-tighter italic">
+                                        <h2 className="text-3xl font-black text-neutral-900 leading-tight tracking-tighter italic">
                                             Release your <span className="bg-brand-gradient bg-clip-text text-transparent">masterpiece.</span>
                                         </h2>
-                                        <p className="text-xl text-neutral-400 font-medium leading-relaxed max-w-xl">
+                                        <p className="text-base text-neutral-400 font-medium leading-relaxed max-w-xl">
                                             Your infrastructure is optimized. Download your high-resolution deployment assets to globalize your hospitality experience.
                                         </p>
                                     </div>
@@ -575,11 +575,11 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                 <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setShowCategoryModal(false)} />
                     <div className="relative w-full max-w-xl bg-white rounded-[40px] shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 overflow-hidden flex flex-col border border-neutral-100">
-                        <div className="p-8 border-b border-neutral-50 flex items-center justify-between">
-                            <h2 className="text-2xl font-black text-neutral-900 tracking-tighter italic">{editingCategory ? 'Modify Category' : 'Initialize Category'}</h2>
+                        <div className="p-6 border-b border-neutral-50 flex items-center justify-between">
+                            <h2 className="text-xl font-black text-neutral-900 tracking-tighter italic">{editingCategory ? 'Modify Category' : 'Initialize Category'}</h2>
                             <button onClick={() => setShowCategoryModal(false)} className="w-10 h-10 rounded-xl bg-neutral-50 text-neutral-400 hover:text-neutral-900 transition-colors"><X /></button>
                         </div>
-                        <div className="p-10 space-y-8 overflow-y-auto no-scrollbar">
+                        <div className="p-6 lg:p-8 space-y-6 overflow-y-auto no-scrollbar">
                             <div className="space-y-3">
                                 <label className="text-[9px] font-black text-primary-600 uppercase tracking-widest ml-1">Block Identifer</label>
                                 <input className="w-full p-5 bg-neutral-50 border border-neutral-100 rounded-[20px] font-black text-lg focus:bg-white focus:border-primary-500 outline-none transition-all placeholder:text-neutral-200" value={categoryForm.name} onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })} placeholder="e.g., Main Nodes" autoFocus />
@@ -601,20 +601,20 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                 <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-md animate-in fade-in duration-500" onClick={() => setShowItemModal(false)} />
                     <div className="relative w-full max-w-4xl bg-white rounded-[48px] shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-8 duration-500 overflow-hidden flex flex-col border border-neutral-100 h-[90vh]">
-                        <div className="p-8 border-b border-neutral-50 flex items-center justify-between">
-                            <h2 className="text-2xl font-black text-neutral-900 tracking-tighter italic">{editingItem ? 'Item Overhaul' : 'Deploy New Item'}</h2>
+                        <div className="p-6 border-b border-neutral-50 flex items-center justify-between">
+                            <h2 className="text-xl font-black text-neutral-900 tracking-tighter italic">{editingItem ? 'Item Overhaul' : 'Deploy New Item'}</h2>
                             <button onClick={() => setShowItemModal(false)} className="w-10 h-10 rounded-xl bg-neutral-50 text-neutral-400 hover:text-neutral-900 transition-colors"><X /></button>
                         </div>
-                        <div className="flex-1 overflow-y-auto no-scrollbar p-10 lg:p-14">
+                        <div className="flex-1 overflow-y-auto no-scrollbar p-6 lg:p-10">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                                 <section className="space-y-10">
                                     <div className="space-y-3">
                                         <label className="text-[9px] font-black text-primary-600 uppercase tracking-widest ml-1">Asset Designation</label>
-                                        <input className="w-full p-6 bg-neutral-50 border border-neutral-100 rounded-[24px] font-black text-xl focus:bg-white focus:border-primary-500 outline-none transition-all placeholder:text-neutral-200" value={itemForm.name} onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })} placeholder="e.g., Prime Ribsteak" />
+                                        <input className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-[16px] font-black text-lg focus:bg-white focus:border-primary-500 outline-none transition-all placeholder:text-neutral-200" value={itemForm.name} onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })} placeholder="e.g., Prime Ribsteak" />
                                     </div>
                                     <div className="space-y-3">
                                         <label className="text-[9px] font-black text-neutral-400 uppercase tracking-widest ml-1">Asset Specification</label>
-                                        <textarea className="w-full p-6 bg-neutral-50 border border-neutral-100 rounded-[24px] font-bold text-sm focus:bg-white focus:border-primary-500 outline-none transition-all resize-none h-32 leading-relaxed" value={itemForm.description} onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })} placeholder="Detailed item specification..." />
+                                        <textarea className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-[16px] font-bold text-sm focus:bg-white focus:border-primary-500 outline-none transition-all resize-none h-32 leading-relaxed" value={itemForm.description} onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })} placeholder="Detailed item specification..." />
                                     </div>
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-3">
