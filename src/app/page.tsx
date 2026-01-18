@@ -96,12 +96,12 @@ export default function HomePage() {
         <ServicesSection />
 
         {/* --- VALUE PROPOSITION --- */}
-        <section className="py-24 lg:py-40 bg-neutral-950 text-white overflow-hidden rounded-[80px_80px_0_0] lg:rounded-[120px_120px_0_0]">
+        <section className="py-24 lg:py-40 bg-neutral-950 text-white overflow-hidden rounded-t-[80px] lg:rounded-t-[120px]">
           <div className="container mx-auto px-6">
-            <div className="grid lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 auto-rows-fr">
 
               {/* Feature Big Card */}
-              <div className="lg:col-span-8 bg-white/5 backdrop-blur-xl border border-white/10 p-10 lg:p-16 rounded-[64px] relative overflow-hidden group">
+              <div className="lg:col-span-8 bg-white/5 backdrop-blur-xl border border-white/10 p-10 lg:p-16 rounded-[64px] relative overflow-hidden group z-10">
                 <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/10 blur-[100px] rounded-full -mr-40 -mt-40 group-hover:bg-primary-500/20 transition-colors" />
                 <Zap className="text-accent-400 w-12 h-12 mb-8" />
                 <h3 className="text-3xl md:text-5xl font-black mb-6 leading-tight">Lightning Fast Output. <br /> Zero Compromise.</h3>
