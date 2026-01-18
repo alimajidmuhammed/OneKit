@@ -78,12 +78,13 @@ function RegisterForm() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="fullName" className="text-sm font-semibold text-neutral-900 ml-1">Full Name</label>
                     <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={18} />
                         <input
                             type="text"
                             id="fullName"
                             name="fullName"
-                            className="w-full pl-11 pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            className="w-full pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            style={{ paddingLeft: '3rem' }}
                             placeholder="John Doe"
                             required
                             autoComplete="name"
@@ -94,12 +95,13 @@ function RegisterForm() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="email" className="text-sm font-semibold text-neutral-900 ml-1">Email</label>
                     <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={18} />
                         <input
                             type="email"
                             id="email"
                             name="email"
-                            className="w-full pl-11 pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            className="w-full pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            style={{ paddingLeft: '3rem' }}
                             placeholder="you@example.com"
                             required
                             autoComplete="email"
@@ -111,12 +113,13 @@ function RegisterForm() {
                     <div className="flex flex-col gap-2">
                         <label htmlFor="password" className="text-sm font-semibold text-neutral-900 ml-1">Password</label>
                         <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={18} />
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
-                                className="w-full pl-11 pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400 text-sm"
+                                className="w-full pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400 text-sm"
+                                style={{ paddingLeft: '3rem' }}
                                 placeholder="••••••••"
                                 required
                                 minLength={8}
@@ -128,12 +131,13 @@ function RegisterForm() {
                     <div className="flex flex-col gap-2">
                         <label htmlFor="confirmPassword" className="text-sm font-semibold text-neutral-900 ml-1">Confirm</label>
                         <div className="relative">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={18} />
                             <input
                                 type="password"
                                 id="confirmPassword"
                                 name="confirmPassword"
-                                className="w-full pl-11 pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400 text-sm"
+                                className="w-full pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400 text-sm"
+                                style={{ paddingLeft: '3rem' }}
                                 placeholder="••••••••"
                                 required
                                 minLength={8}

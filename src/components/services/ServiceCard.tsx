@@ -6,10 +6,10 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { useSubscription } from '@/lib/hooks/useSubscription';
 import {
     FileText,
-    Menu as MenuIcon,
+    Utensils,
     QrCode,
     Receipt,
-    Compass,
+    Palette,
     CreditCard,
     ArrowRight
 } from 'lucide-react';
@@ -20,10 +20,10 @@ import {
 const ServiceIcon = ({ type, className }: { type: string, className?: string }) => {
     const icons = {
         document: <FileText className={className} />,
-        menu: <MenuIcon className={className} />,
+        menu: <Utensils className={className} />,
         qr: <QrCode className={className} />,
         invoice: <Receipt className={className} />,
-        logo: <Compass className={className} />,
+        logo: <Palette className={className} />,
         card: <CreditCard className={className} />,
     };
 
@@ -71,7 +71,7 @@ export default function ServiceCard({ service, showStatus = false, customPriceLa
                     <ServiceIcon type={service.icon} className="w-8 h-8" />
                 </div>
 
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end gap-1">
                     {customPriceLabel ? (
                         <span className="px-3 py-1 bg-neutral-100 text-neutral-600 text-xs font-bold rounded-full uppercase tracking-wider">{customPriceLabel}</span>
                     ) : service.isFree ? (

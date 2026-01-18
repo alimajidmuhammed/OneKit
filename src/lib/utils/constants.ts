@@ -101,6 +101,27 @@ export const SERVICES = [
             'Custom sizing',
         ],
     },
+    {
+        id: 'logo-maker',
+        name: 'Logo Maker',
+        slug: 'logo-maker',
+        category: 'Branding',
+        description: 'Design unique and professional logos for your brand',
+        image: '/images/previews/logo-maker.png',
+        icon: 'logo',
+        color: 'warning',
+        isFree: false,
+        price_yearly: 20000,
+        priceLabel: '20,000 IQD / Year',
+        dashboardPath: '/dashboard/logo-maker',
+        features: [
+            'AI-assisted logo generation',
+            'Multiple style options',
+            'Vector export (SVG)',
+            'Brand color schemes',
+            'Font pairing suggestions',
+        ],
+    },
 ];
 
 // App configuration

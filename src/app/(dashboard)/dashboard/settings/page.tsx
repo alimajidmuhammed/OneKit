@@ -39,6 +39,15 @@ export default function SettingsPage() {
         });
     };
 
+    const handleReset = () => {
+        setFormData({
+            full_name: profile?.full_name || '',
+            phone: profile?.phone || '',
+        });
+        setError('');
+        setSuccess(false);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -260,7 +269,15 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end pt-4">
+                            <div className="flex justify-end items-center gap-4 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={handleReset}
+                                    className="px-8 py-3.5 rounded-2xl font-bold text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition-all"
+                                    disabled={loading}
+                                >
+                                    Reset
+                                </button>
                                 <button
                                     type="submit"
                                     className="bg-primary-900 hover:bg-primary-800 text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"

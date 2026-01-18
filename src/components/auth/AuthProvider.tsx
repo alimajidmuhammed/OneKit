@@ -2,6 +2,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase/client';
 
 // Get supabase client once at module level
@@ -18,7 +19,8 @@ const AuthContext = createContext({
 export function AuthProvider({ children, initialUser = null, initialProfile = null }) {
     const [user, setUser] = useState(initialUser);
     const [profile, setProfile] = useState(initialProfile);
-    const [loading, setLoading] = useState(false); // Initialized from server, so we know the state immediately
+    const [loading, setLoading] = useState(true); // Start as true to avoid hydration flicker/premature null returns
+    const router = useRouter();
 
     const fetchProfile = useCallback(async (userId) => {
         try {
@@ -79,21 +81,30 @@ export function AuthProvider({ children, initialUser = null, initialProfile = nu
             setLoading(false);
         }
 
+
+
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
                 if (!isMounted) return;
 
-                setUser(session?.user ?? null);
+                console.log('⚡️ Auth state change:', event);
+                setLoading(true); // Set loading true during state transition
 
-                if (session?.user) {
-                    await fetchProfile(session.user.id);
-                } else {
-                    setProfile(null);
-                }
+                try {
+                    setUser(session?.user ?? null);
 
-                if (isMounted) {
-                    setLoading(false);
+                    if (session?.user) {
+                        await fetchProfile(session.user.id);
+                    } else {
+                        setProfile(null);
+                    }
+                } catch (error) {
+                    console.error('❌ Error processing auth state change:', error);
+                } finally {
+                    if (isMounted) {
+                        setLoading(false);
+                    }
                 }
             }
         );
@@ -102,7 +113,7 @@ export function AuthProvider({ children, initialUser = null, initialProfile = nu
             isMounted = false;
             subscription.unsubscribe();
         };
-    }, [fetchProfile]);
+    }, [fetchProfile, initialUser]); // Added initialUser to dependency array
 
     const updateProfile = useCallback(async (updates) => {
         try {
@@ -133,17 +144,27 @@ export function AuthProvider({ children, initialUser = null, initialProfile = nu
 
     const signOut = useCallback(async () => {
         try {
+            console.log('🚪 Signing out...');
+            setLoading(true);
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
+
             setUser(null);
             setProfile(null);
-            // Redirect to login
-            window.location.href = '/login';
-            return { error: null };
+
+            console.log('✅ Signed out successfully');
+            router.push('/');
+            router.refresh();
         } catch (error) {
-            return { error };
+            console.error('❌ Error during sign out:', error);
+            // Even if Supabase signout fails, clear local state and redirect
+            setUser(null);
+            setProfile(null);
+            window.location.href = '/login';
+        } finally {
+            setLoading(false);
         }
-    }, []);
+    }, [router]);
 
 
     // Memoize the context value to prevent unnecessary re-renders

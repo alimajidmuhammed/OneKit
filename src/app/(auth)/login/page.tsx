@@ -60,12 +60,13 @@ function LoginForm() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="email" className="text-sm font-semibold text-neutral-900 ml-1">Email</label>
                     <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={18} />
                         <input
                             type="email"
                             id="email"
                             name="email"
-                            className="w-full pl-11 pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            className="w-full pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            style={{ paddingLeft: '3rem' }}
                             placeholder="you@example.com"
                             required
                             autoComplete="email"
@@ -81,12 +82,13 @@ function LoginForm() {
                         </Link>
                     </div>
                     <div className="relative">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={18} />
                         <input
                             type="password"
                             id="password"
                             name="password"
-                            className="w-full pl-11 pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            className="w-full pr-4 py-3 text-neutral-900 bg-white border border-neutral-200 rounded-xl transition-all focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 placeholder:text-neutral-400"
+                            style={{ paddingLeft: '3rem' }}
                             placeholder="••••••••"
                             required
                             autoComplete="current-password"

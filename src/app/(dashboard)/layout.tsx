@@ -25,17 +25,13 @@ export default function DashboardLayout({ children }) {
         setSidebarOpen(false);
     }, [pathname]);
 
-    if (loading) {
+    if (loading || (!user && pathname.startsWith('/dashboard'))) {
         return (
             <div className={styles.loadingContainer}>
                 <div className={styles.spinner} />
-                <p>Loading...</p>
+                <p>Verifying session...</p>
             </div>
         );
-    }
-
-    if (!user) {
-        return null;
     }
 
     return (
