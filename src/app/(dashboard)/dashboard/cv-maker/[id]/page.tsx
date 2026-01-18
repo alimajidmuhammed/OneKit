@@ -808,7 +808,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                 <div className="flex items-center gap-2 lg:gap-4">
                     <div className="flex lg:hidden bg-neutral-100 p-1 rounded-2xl border border-neutral-200/50">
                         <button onClick={() => setMobileView('edit')} className={`p-2 rounded-xl transition-all ${mobileView === 'edit' ? 'bg-white text-primary-600 shadow-md' : 'text-neutral-400'}`}><Icons.edit size={18} /></button>
-                        <button onClick={() => setMobileView('preview')} className={`p-2 rounded-xl transition-all ${mobileView === 'preview' ? 'bg-white text-primary-600 shadow-md' : 'text-neutral-400'}`}><Icons.FileType size={18} /></button>
+                        <button onClick={() => setMobileView('preview')} className={`p-2 rounded-xl transition-all ${mobileView === 'preview' ? 'bg-white text-primary-600 shadow-md' : 'text-neutral-400'}`}><FileType size={18} /></button>
                     </div>
                     <div className="h-8 w-px bg-neutral-200 hidden lg:block" />
                     <div className="relative group/export">
@@ -865,7 +865,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                         </div>
                                         <span className="flex-1 text-sm font-bold text-left">{section.label}</span>
                                         <div className={`opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing p-1 ${activeSection === sectionId ? 'text-white/40' : 'text-neutral-300'}`}>
-                                            <Icons.Layout size={14} />
+                                            <Layout size={14} />
                                         </div>
                                     </button>
                                 );
