@@ -5,6 +5,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Menu, LogOut, X } from 'lucide-react';
 import { DASHBOARD_NAV } from '@/lib/utils/constants';
 
 /**
@@ -69,6 +70,12 @@ export default function DashboardLayout({ children }) {
                         </div>
                         <span className="font-display font-black text-2xl text-neutral-900 tracking-tighter">OneKit</span>
                     </Link>
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden w-8 h-8 flex items-center justify-center rounded-xl bg-neutral-50 text-neutral-400 hover:text-neutral-900"
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
 
                 <nav className="flex-1 px-4 py-6 overflow-y-auto no-scrollbar space-y-1">
