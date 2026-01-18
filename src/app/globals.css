@@ -219,3 +219,259 @@
 .btn-premium:hover::before {
   opacity: 1;
 }
+
+/* OneKit 3.0: CV Preview Architecture */
+.cvPreview {
+  --cv-text: #1e293b;
+  --cv-secondary: #64748b;
+  --cv-bg: #ffffff;
+
+  color: var(--cv-text);
+  background: var(--cv-bg);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+.cvSection h3 {
+  color: var(--template-primary);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 2px solid var(--template-primary);
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  margin-top: 24px;
+}
+
+.cvItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+
+.cvItemHeader strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cvItemHeader span {
+  font-size: 11px;
+  color: var(--cv-secondary);
+  font-weight: 600;
+}
+
+.cvItem p {
+  font-size: 11px;
+  color: var(--cv-secondary);
+  margin-bottom: 4px;
+}
+
+.skillList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skillItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.skillName {
+  font-size: 11px;
+  font-weight: 600;
+  width: 40%;
+}
+
+.skillBar {
+  flex: 1;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.skillFill {
+  height: 100%;
+  background: var(--template-primary);
+  transition: width 0.5s ease;
+}
+
+.skillTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skillTag {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--cv-text);
+}
+
+/* Template: Sydney (Sidebar Layout) */
+.template_sydney .cvInner {
+  display: flex;
+  min-height: 1123px;
+  /* A4 height approx */
+}
+
+.template_sydney .cvSidebar {
+  width: 280px;
+  background: #f8fafc;
+  padding: 50px 35px;
+  border-right: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.template_sydney .cvMain {
+  flex: 1;
+  padding: 50px 50px;
+  background: white;
+}
+
+.template_sydney .cvPhoto {
+  width: 140px;
+  height: 140px;
+  border-radius: 0;
+  margin-bottom: 30px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.template_sydney .sidebarName {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.template_sydney .sidebarTitle {
+  font-size: 14px;
+  color: var(--template-primary);
+  font-weight: 800;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.template_sydney .sidebarSection h4 {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 15px;
+  margin-top: 30px;
+  color: var(--cv-text);
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 5px;
+}
+
+.template_sydney .contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.template_sydney .contactItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--cv-secondary);
+  font-weight: 500;
+}
+
+.template_sydney .contactItem .icon {
+  color: var(--template-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  flex-shrink: 0;
+}
+
+/* Template: London (Modern Header) */
+.template_london .cvInner {
+  padding: 60px 80px;
+}
+
+.template_london .cvHeader {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 50px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.template_london .cvPhoto {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 5px solid var(--template-primary);
+  flex-shrink: 0;
+}
+
+.template_london h1 {
+  font-size: 40px;
+  font-weight: 900;
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.template_london .jobTitle {
+  font-size: 18px;
+  color: var(--template-primary);
+  font-weight: 800;
+  margin-bottom: 15px;
+  letter-spacing: 0.05em;
+}
+
+.template_london .contactInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.template_london .contactItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--cv-secondary);
+  font-weight: 500;
+}
+
+.template_london .contactItem .icon {
+  color: var(--template-primary);
+}
+
+/* Export specific tweaks */
+.export-item {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  visibility: hidden;
+}
+
+.export-item.visible,
+.export-item[style*="visibility: visible"] {
+  visibility: visible !important;
+}
+
+.exportItem .skillFill {
+  border-radius: 2px;
+}

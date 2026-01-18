@@ -1,102 +1,89 @@
-// @ts-nocheck
-'use client';
-
 import { useState, useEffect, use, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQRCode } from '@/lib/hooks/useQRCode';
 import { useTrial } from '@/lib/hooks/useTrial';
 import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { APP_CONFIG } from '@/lib/utils/constants';
-import { ChevronLeft, Check, Loader2, X, Download, QrCode, User, Link2, Palette, Plus, ChevronUp, ChevronDown, Trash2, Upload, Sparkles, RotateCcw, ExternalLink } from 'lucide-react';
+import {
+    ChevronLeft, Check, Loader2, X, Download, QrCode, User,
+    Link2, Palette, Plus, ChevronUp, ChevronDown, Trash2,
+    Upload as UploadIcon, Sparkles, RotateCcw, ExternalLink,
+    ArrowLeft, Globe, MapPin, Phone, Mail, Instagram,
+    Facebook, Twitter, Linkedin, Youtube, Music2,
+    MessageSquare, Eye, Layout, Type, MousePointer2,
+    Image as ImageIcon, MoreVertical, GripVertical, CheckCircle2
+} from 'lucide-react';
+import {
+    Dialog, DialogContent, DialogHeader, DialogTitle,
+    DialogDescription, DialogFooter, DialogClose,
+} from '@/components/ui/dialog';
 
-
-// Preset Icons with SVG
+// Protocol Icons Catalog
 const PRESET_ICONS = {
-    instagram: { name: 'Instagram', color: '#E4405F', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg> },
-    facebook: { name: 'Facebook', color: '#1877F2', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg> },
-    whatsapp: { name: 'WhatsApp', color: '#25D366', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg> },
-    telegram: { name: 'Telegram', color: '#26A5E4', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg> },
-    youtube: { name: 'YouTube', color: '#FF0000', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg> },
-    tiktok: { name: 'TikTok', color: '#000000', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" /></svg> },
-    twitter: { name: 'X (Twitter)', color: '#000000', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg> },
-    linkedin: { name: 'LinkedIn', color: '#0A66C2', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg> },
-    snapchat: { name: 'Snapchat', color: '#FFFC00', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301a.603.603 0 01.272-.052c.223 0 .463.067.686.183.262.135.475.346.56.676a.628.628 0 01-.027.468c-.137.323-.449.475-.626.536-.08.027-.169.054-.255.082a6.59 6.59 0 00-.627.222c-.16.067-.27.135-.313.195a.324.324 0 00-.029.179c.005.074.003.146-.007.22l.002.003c.08.28.127.567.127.855 0 .251-.022.494-.065.73l.001.003c-.3 1.662-1.406 3.032-2.85 3.861-.586.335-1.226.595-1.905.773a6.8 6.8 0 01-1.696.21c-.527 0-1.046-.064-1.544-.187-1.08-.267-2.069-.77-2.893-1.463a5.732 5.732 0 01-1.516-2.06 5.08 5.08 0 01-.41-1.986 4.95 4.95 0 01.128-.855c-.011-.074-.012-.147-.006-.22a.328.328 0 00-.03-.18c-.042-.06-.152-.128-.313-.195a6.497 6.497 0 00-.627-.222 2.79 2.79 0 01-.255-.082c-.177-.06-.489-.213-.626-.536a.628.628 0 01-.027-.468c.085-.33.299-.54.56-.676.223-.116.463-.183.686-.183a.603.603 0 01.272.052c.374.18.732.317 1.032.3.199 0 .327-.044.402-.09a6.88 6.88 0 01-.03-.51l-.002-.06c-.105-1.628-.231-3.654.298-4.847C7.86 1.069 11.217.793 12.206.793z" /></svg> },
-    spotify: { name: 'Spotify', color: '#1DB954', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" /></svg> },
-    email: { name: 'Email', color: '#EA4335', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" /><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" /></svg> },
-    phone: { name: 'Phone', color: '#34B7F1', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" /></svg> },
-    website: { name: 'Website', color: '#5B6EF2', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" /></svg> },
-    googlemaps: { name: 'Google Maps', color: '#EA4335', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg> },
-    github: { name: 'GitHub', color: '#181717', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg> },
-    discord: { name: 'Discord', color: '#5865F2', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" /></svg> },
-    pinterest: { name: 'Pinterest', color: '#BD081C', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z" /></svg> },
-    custom: { name: 'Custom', color: '#6B7280', svg: <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" /></svg> },
+    instagram: { name: 'Instagram', color: '#E4405F', icon: <Instagram size={18} /> },
+    facebook: { name: 'Facebook', color: '#1877F2', icon: <Facebook size={18} /> },
+    whatsapp: { name: 'WhatsApp', color: '#25D366', icon: <MessageSquare size={18} /> },
+    telegram: { name: 'Telegram', color: '#26A5E4', icon: <MessageSquare size={18} /> },
+    youtube: { name: 'YouTube', color: '#FF0000', icon: <Youtube size={18} /> },
+    tiktok: { name: 'TikTok', color: '#000000', icon: <Music2 size={18} /> },
+    twitter: { name: 'X', color: '#000000', icon: <Twitter size={18} /> },
+    linkedin: { name: 'LinkedIn', color: '#0A66C2', icon: <Linkedin size={18} /> },
+    email: { name: 'Email', color: '#EA4335', icon: <Mail size={18} /> },
+    phone: { name: 'Phone', color: '#34B7F1', icon: <Phone size={18} /> },
+    website: { name: 'Website', color: '#5B6EF2', icon: <Globe size={18} /> },
+    location: { name: 'Location', color: '#EA4335', icon: <MapPin size={18} /> },
+    github: { name: 'GitHub', color: '#181717', icon: <Globe size={18} /> },
+    pinterest: { name: 'Pinterest', color: '#BD081C', icon: <X size={18} /> },
+    spotify: { name: 'Spotify', color: '#1DB954', icon: <Music2 size={18} /> },
+    custom: { name: 'Custom', color: '#6B7280', icon: <ImageIcon size={18} /> },
 };
 
-// Themes - 20 Options
+// Curated Design Matrix
 const THEMES = [
-    // Gradient Themes
-    { id: 'aurora', name: 'Aurora', colors: ['#667eea', '#764ba2'], textColor: '#ffffff' },
-    { id: 'sunset', name: 'Sunset', colors: ['#f093fb', '#f5576c'], textColor: '#ffffff' },
-    { id: 'ocean', name: 'Ocean', colors: ['#4facfe', '#00f2fe'], textColor: '#ffffff' },
-    { id: 'forest', name: 'Forest', colors: ['#11998e', '#38ef7d'], textColor: '#ffffff' },
-    { id: 'candy', name: 'Candy', colors: ['#ff9a9e', '#fecfef'], textColor: '#1a1a2e' },
-    { id: 'peach', name: 'Peach', colors: ['#ffecd2', '#fcb69f'], textColor: '#1a1a2e' },
-    { id: 'lavender', name: 'Lavender', colors: ['#a18cd1', '#fbc2eb'], textColor: '#ffffff' },
-    { id: 'mint', name: 'Mint', colors: ['#d4fc79', '#96e6a1'], textColor: '#1a1a2e' },
-    { id: 'fire', name: 'Fire', colors: ['#f12711', '#f5af19'], textColor: '#ffffff' },
-    { id: 'royal', name: 'Royal', colors: ['#141E30', '#243B55'], textColor: '#ffffff' },
-    // Dark Themes
-    { id: 'midnight', name: 'Midnight', colors: ['#0f0c29', '#302b63'], textColor: '#ffffff' },
-    { id: 'dark', name: 'Dark', colors: ['#1a1a2e', '#16213e'], textColor: '#ffffff' },
-    { id: 'neon', name: 'Neon', colors: ['#0d0d0d', '#1a0033'], textColor: '#00ff88' },
-    { id: 'gold', name: 'Gold', colors: ['#1a1a2e', '#2d2d44'], textColor: '#d4af37' },
-    { id: 'cyber', name: 'Cyber', colors: ['#0a0a0f', '#1a0a2e'], textColor: '#ff00ff' },
-    // Light Themes
-    { id: 'minimal', name: 'Minimal', colors: ['#ffffff', '#f8f9fa'], textColor: '#1a1a2e' },
-    { id: 'cream', name: 'Cream', colors: ['#fdf6e3', '#f5e6d3'], textColor: '#5d4e37' },
-    { id: 'sky', name: 'Sky', colors: ['#e0f7fa', '#b2ebf2'], textColor: '#00695c' },
-    { id: 'rose', name: 'Rose', colors: ['#fce4ec', '#f8bbd9'], textColor: '#880e4f' },
-    { id: 'snow', name: 'Snow', colors: ['#f5f7fa', '#c3cfe2'], textColor: '#2c3e50' },
+    { id: 'aurora', name: 'Aurora', colors: ['#6366f1', '#a855f7'], textColor: '#ffffff', description: 'Northern light gradient' },
+    { id: 'sunset', name: 'Sunset', colors: ['#f43f5e', '#fb923c'], textColor: '#ffffff', description: 'Warm evening glow' },
+    { id: 'ocean', name: 'Ocean', colors: ['#0ea5e9', '#2dd4bf'], textColor: '#ffffff', description: 'Deep sea depth' },
+    { id: 'midnight', name: 'Midnight', colors: ['#0f172a', '#1e293b'], textColor: '#ffffff', description: 'Premium nocturnal' },
+    { id: 'glass', name: 'Frost', colors: ['#ffffff', '#f8fafc'], textColor: '#0f172a', description: 'Glassmorphism 2.0' },
+    { id: 'cyber', name: 'Neon', colors: ['#000000', '#0a0a0a'], textColor: '#22c55e', description: 'Digital hacker' },
 ];
 
-// Button Styles - 8 Options
 const BUTTON_STYLES = [
-    { id: 'filled', name: 'Filled', style: 'filled' },
-    { id: 'outline', name: 'Outline', style: 'outline' },
-    { id: 'shadow', name: 'Shadow', style: 'shadow' },
-    { id: 'glass', name: 'Glass', style: 'glass' },
-    { id: 'rounded', name: 'Rounded', style: 'rounded' },
-    { id: 'pill', name: 'Pill', style: 'pill' },
-    { id: 'gradient', name: 'Gradient', style: 'gradient' },
-    { id: 'neon', name: 'Neon', style: 'neon' },
+    { id: 'filled', name: 'Massive', icon: <Layout size={14} />, description: 'Solid background' },
+    { id: 'glass', name: 'Ethereal', icon: <Sparkles size={14} />, description: 'Translucent blur' },
+    { id: 'outline', name: 'Linear', icon: <Type size={14} />, description: 'Border focus' },
+    { id: 'gradient', name: 'Iridescent', icon: <Palette size={14} />, description: 'Dynamic flow' },
 ];
 
-export default function QREditorPage({ params }) {
+const SECTIONS = [
+    { id: 'identity', label: 'Identity', icon: <User size={18} /> },
+    { id: 'protocol', label: 'Protocol', icon: <Link2 size={18} /> },
+    { id: 'visuals', label: 'Visuals', icon: <Palette size={18} /> },
+];
+
+export default function QREditorPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const { id } = resolvedParams;
     const router = useRouter();
     const { fetchQRCode, updateQRCode, saving } = useQRCode();
     const { isTrialActive, isTrialExpired } = useTrial('qr-generator');
-    const { uploadImage } = useImageUpload();
-    const fileInputRef = useRef(null);
-    const customIconInputRef = useRef(null);
+    const { uploadImage, uploading: uploadingLogo } = useImageUpload();
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const previewRef = useRef<HTMLDivElement>(null);
+    const isMounted = useRef(true);
+    const lastSavedStateRef = useRef<string | null>(null);
 
     const [qr, setQR] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [activeSection, setActiveSection] = useState<string>('identity');
     const [hasChanges, setHasChanges] = useState(false);
-    const [activeTab, setActiveTab] = useState('profile');
-    const [editingLinkIcon, setEditingLinkIcon] = useState(null);
-    const [downloading, setDownloading] = useState(false);
+    const [saveStatus, setSaveStatus] = useState('idle');
     const [isLogoStudioOpen, setIsLogoStudioOpen] = useState(false);
-    const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'saving', 'saved'
-    const [logoSettings, setLogoSettings] = useState({
-        zoom: 1,
-        x: 0,
-        y: 0
-    });
-
-    const isMounted = useRef(true);
-    const lastSavedStateRef = useRef(null);
+    const [logoSettings, setLogoSettings] = useState({ zoom: 1, x: 0, y: 0, rotation: 0 });
+    const [previewScale, setPreviewScale] = useState(1);
+    const [downloading, setDownloading] = useState(false);
+    const [editingLinkIcon, setEditingLinkIcon] = useState(null);
 
     useEffect(() => {
         isMounted.current = true;
@@ -111,6 +98,9 @@ export default function QREditorPage({ params }) {
                     setLogoSettings(data.theme.logo_settings);
                 }
                 setQR(data);
+                if (data.theme?.logo_settings) {
+                    setLogoSettings(data.theme.logo_settings);
+                }
             } else {
                 router.push('/dashboard/qr-generator');
             }
@@ -121,7 +111,7 @@ export default function QREditorPage({ params }) {
         return () => {
             isMounted.current = false;
         };
-    }, [id]);
+    }, [id, fetchQRCode, router]);
 
     const handleSave = useCallback(async () => {
         if (!qr || saveStatus === 'saving') return;
@@ -141,6 +131,8 @@ export default function QREditorPage({ params }) {
         };
 
         const stateToSaveStr = JSON.stringify(stateToSave);
+        if (stateToSaveStr === lastSavedStateRef.current) return;
+
         setSaveStatus('saving');
 
         try {
@@ -149,32 +141,13 @@ export default function QREditorPage({ params }) {
             if (!isMounted.current) return;
 
             if (error) {
-                if (error.name === 'AbortError') return;
                 console.error('Save error:', error);
                 setSaveStatus('idle');
                 return;
             }
 
             lastSavedStateRef.current = stateToSaveStr;
-
-            const currentStateStr = JSON.stringify({
-                name: qr.name,
-                display_name: qr.display_name,
-                bio: qr.bio,
-                logo_url: qr.logo_url,
-                template_id: qr.template_id,
-                links: qr.links,
-                button_style: qr.button_style,
-                theme: {
-                    ...(qr.theme || {}),
-                    logo_settings: logoSettings
-                },
-            });
-
-            if (currentStateStr === stateToSaveStr) {
-                setHasChanges(false);
-            }
-
+            setHasChanges(false);
             setSaveStatus('saved');
             const statusTimer = setTimeout(() => {
                 if (isMounted.current) setSaveStatus('idle');
@@ -183,7 +156,6 @@ export default function QREditorPage({ params }) {
             return () => clearTimeout(statusTimer);
         } catch (error) {
             if (!isMounted.current) return;
-            if (error.name === 'AbortError') return;
             console.error('Save error:', error);
             setSaveStatus('idle');
         }
@@ -192,11 +164,7 @@ export default function QREditorPage({ params }) {
     // Auto-save effect
     useEffect(() => {
         if (!hasChanges || !qr) return;
-
-        const timer = setTimeout(() => {
-            handleSave();
-        }, 2000);
-
+        const timer = setTimeout(() => handleSave(), 2000);
         return () => clearTimeout(timer);
     }, [hasChanges, qr, handleSave]);
 
@@ -212,8 +180,8 @@ export default function QREditorPage({ params }) {
             template_id: themeId,
             theme: {
                 ...(prev.theme || {}),
-                primaryColor: theme?.colors[0] || '#667eea',
-                secondaryColor: theme?.colors[1] || '#764ba2',
+                primaryColor: theme?.colors?.[0] || '#6366f1',
+                secondaryColor: theme?.colors?.[1] || '#a855f7',
                 textColor: theme?.textColor || '#ffffff',
             }
         }));
@@ -223,10 +191,7 @@ export default function QREditorPage({ params }) {
     const updateTextColor = (color) => {
         setQR(prev => ({
             ...prev,
-            theme: {
-                ...(prev.theme || {}),
-                textColor: color,
-            }
+            theme: { ...(prev.theme || {}), textColor: color }
         }));
         setHasChanges(true);
     };
@@ -236,7 +201,7 @@ export default function QREditorPage({ params }) {
         setHasChanges(true);
     };
 
-    // Links Management
+    // Protocol Management
     const addLink = () => {
         setQR(prev => ({
             ...prev,
@@ -279,31 +244,26 @@ export default function QREditorPage({ params }) {
         setHasChanges(true);
     };
 
-    // Logo Upload
+    // Terminal Intelligence: Logo Upload
     const handleLogoUpload = async (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
         if (!file) return;
 
-        // Show immediate preview
+        // Immediate Visual Feedback
         const reader = new FileReader();
         reader.onload = (event) => {
             updateField('logo_url', event.target.result);
         };
         reader.readAsDataURL(file);
 
-        // Upload to R2 for persistent storage
         const publicUrl = await uploadImage(file, { folder: 'qr-logos', type: 'logo' });
-        if (publicUrl) {
-            updateField('logo_url', publicUrl);
-        }
+        if (publicUrl) updateField('logo_url', publicUrl);
     };
 
-    // Custom Icon Upload
     const handleCustomIconUpload = async (e, linkIndex) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
         if (!file) return;
 
-        // Show immediate preview
         const reader = new FileReader();
         reader.onload = (event) => {
             updateLink(linkIndex, 'customIcon', event.target.result);
@@ -312,20 +272,15 @@ export default function QREditorPage({ params }) {
         };
         reader.readAsDataURL(file);
 
-        // Upload to R2 for persistent storage
         const publicUrl = await uploadImage(file, { folder: 'qr-logos', type: 'logo' });
-        if (publicUrl) {
-            updateLink(linkIndex, 'customIcon', publicUrl);
-        }
+        if (publicUrl) updateLink(linkIndex, 'customIcon', publicUrl);
     };
 
-    // Get QR URL
     const getQRCodeUrl = () => {
         const pageUrl = `${APP_CONFIG.url}/qr/${qr?.slug}`;
-        return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pageUrl)}`;
+        return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(pageUrl)}`;
     };
 
-    // Download QR as PNG
     const downloadQRCodeAsPNG = async () => {
         if (!qr) return;
         setDownloading(true);
@@ -335,135 +290,146 @@ export default function QREditorPage({ params }) {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `${qr.slug}-qr.png`;
+            link.download = `${qr.slug}-protocol.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Failed to download QR code:', error);
-            alert('Failed to download QR code. Please try again.');
         } finally {
             setDownloading(false);
         }
     };
 
-    // Get theme styles
-    const getThemeStyles = () => {
-        const theme = THEMES.find(t => t.id === qr?.template_id) || THEMES[0];
-        return {
-            background: `linear-gradient(135deg, ${theme.colors[0]}, ${theme.colors[1]})`,
-            color: theme.textColor,
-        };
-    };
+    const themeStyles = qr ? {
+        background: THEMES.find(t => t.id === qr.template_id)?.id === 'glass' ? '#ffffff' : `linear-gradient(135deg, ${qr.theme?.primaryColor || '#6366f1'}, ${qr.theme?.secondaryColor || '#a855f7'})`,
+        color: qr.theme?.textColor || '#ffffff',
+    } : {};
 
-    if (loading) {
+    if (loading || !qr) {
         return (
-            <div className="flex flex-col items-center justify-center h-screen gap-4 text-neutral-500">
-                <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-                <span>Loading...</span>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center">
+                <div className="relative mb-8">
+                    <div className="w-20 h-20 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <Sparkles size={24} className="text-primary-600 animate-pulse" />
+                    </div>
+                </div>
+                <h2 className="text-2xl font-black text-neutral-900 mb-2">Syncing Your Digital Protocol</h2>
+                <p className="text-neutral-500 font-medium">Preparing your OneKit 3.0 workspace...</p>
             </div>
         );
     }
 
-    if (!qr) return null;
-
     const canEdit = isTrialActive || !isTrialExpired;
-    const themeStyles = getThemeStyles();
-
     const logoStyle = {
-        transform: `scale(${logoSettings.zoom}) translate(${logoSettings.x}%, ${logoSettings.y}%)`,
+        transform: `scale(${logoSettings.zoom}) translate(${logoSettings.x}%, ${logoSettings.y}%) rotate(${logoSettings.rotation}deg)`,
         transition: 'transform 0.1s ease-out'
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-neutral-50">
-            {/* Header */}
-            <header className="flex items-center gap-4 px-6 py-4 bg-white border-b border-neutral-200 sticky top-0 z-50">
-                <button
-                    className="flex items-center gap-2 px-3 py-2 bg-neutral-100 text-neutral-600 rounded-lg hover:bg-neutral-200 transition-colors"
-                    onClick={() => router.push('/dashboard/qr-generator')}
-                >
-                    <ChevronLeft size={18} />
-                    <span className="hidden sm:inline">Back</span>
-                </button>
-                <h1 className="flex-1 text-lg font-bold text-neutral-900 truncate">{qr.name}</h1>
-                <div className="flex items-center gap-3">
-                    {saveStatus === 'saving' && (
-                        <span className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full">
-                            <Loader2 size={14} className="animate-spin" /> Saving...
-                        </span>
+        <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans selection:bg-primary-100 selection:text-primary-900 overflow-hidden">
+            {/* OneKit 3.0: Workspace Header */}
+            <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-2xl border-b border-neutral-200/50 px-4 lg:px-8 py-3 lg:py-4 flex items-center justify-between shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] flex-shrink-0">
+                <div className="flex items-center gap-3 lg:gap-6">
+                    <button
+                        onClick={() => router.push('/dashboard/qr-generator')}
+                        className="group flex items-center justify-center w-10 h-10 lg:w-11 lg:h-11 bg-white border border-neutral-200 rounded-2xl text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 hover:shadow-xl hover:shadow-neutral-200/40 transition-all active:scale-95"
+                    >
+                        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <h1 className="text-sm lg:text-base font-black text-neutral-900 uppercase tracking-tight truncate max-w-[150px] lg:max-w-none">
+                                {qr.name}
+                            </h1>
+                        </div>
+                        <p className="hidden lg:block text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none">Protocol Node v3.0</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 lg:gap-6">
+                    {saveStatus !== 'idle' && (
+                        <div className={`flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-500 ${saveStatus === 'saving' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+                            {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                            <span className="text-[10px] font-black uppercase tracking-widest">{saveStatus === 'saving' ? 'Syncing...' : 'Encrypted'}</span>
+                        </div>
                     )}
-                    {saveStatus === 'saved' && (
-                        <span className="flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
-                            <Check size={14} /> Saved
-                        </span>
-                    )}
+
+                    <button
+                        onClick={downloadQRCodeAsPNG}
+                        disabled={downloading}
+                        className="group relative flex items-center gap-3 px-6 lg:px-8 py-3 lg:py-4 bg-neutral-900 hover:bg-black text-white rounded-2xl transition-all font-black text-xs shadow-2xl shadow-neutral-900/20 active:scale-95 disabled:opacity-50"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                        <div className="relative flex items-center gap-3">
+                            {downloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                            <span className="hidden sm:inline">EXPORT PROTOCOL</span>
+                        </div>
+                    </button>
                 </div>
             </header>
 
-            {isTrialExpired && (
-                <div className="py-3 px-4 bg-amber-50 text-amber-800 text-center text-sm">
-                    Your trial has expired. <a href="/dashboard/subscriptions" className="text-primary-600 font-semibold hover:underline">Upgrade now</a> to continue editing.
-                </div>
-            )}
-
-            {/* Tabs */}
-            <div className="flex gap-1 px-6 py-3 bg-white border-b border-neutral-200 overflow-x-auto">
-                {['profile', 'links', 'design'].map(tab => (
-                    <button
-                        key={tab}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-colors ${activeTab === tab ? 'bg-primary-500 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'}`}
-                        onClick={() => setActiveTab(tab)}
-                    >
-                        {tab === 'profile' && <User size={16} />}
-                        {tab === 'links' && <Link2 size={16} />}
-                        {tab === 'design' && <Palette size={16} />}
-                        <span>{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
-                    </button>
-                ))}
-            </div>
-
-            <div className="flex-1 grid lg:grid-cols-[1fr_400px] overflow-hidden">
-                {/* Form */}
-                <div className="p-6 sm:p-8 overflow-y-auto lg:max-h-[calc(100vh-130px)] space-y-6 bg-white">
-                    {/* Profile Tab */}
-                    {activeTab === 'profile' && (
-                        <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                            <div className="flex items-center gap-2 mb-2 text-neutral-900">
-                                <User size={20} className="text-primary-500" />
-                                <h3 className="text-base font-black uppercase tracking-wider">Profile</h3>
-                            </div>
-                            <p className="text-sm text-neutral-500 mb-6">Set up your profile information</p>
-
-                            {/* Logo Upload */}
-                            <div className="mb-6">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-3 block">Logo / Profile Photo</label>
-                                <div className="flex flex-col items-center gap-4">
-                                    {qr.logo_url ? (
-                                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary-500">
-                                            <img
-                                                src={qr.logo_url}
-                                                alt="Logo"
-                                                style={logoStyle}
-                                                className="w-full h-full object-cover"
-                                            />
-                                            <button
-                                                className="absolute top-0 right-0 w-6 h-6 bg-red-500 text-white rounded-full border-2 border-white text-sm hover:bg-red-600"
-                                                onClick={() => updateField('logo_url', null)}
-                                            >
-                                                <X size={12} className="mx-auto" />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className="w-24 h-24 rounded-full bg-neutral-100 border-2 border-dashed border-neutral-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        >
-                                            <Upload size={24} className="text-neutral-400" />
-                                            <span className="text-[10px] text-neutral-500 mt-1">Upload</span>
-                                        </div>
+            <main className="flex-1 flex overflow-hidden">
+                {/* OneKit 3.0: Sidebar Navigation */}
+                <aside className="hidden lg:flex flex-col w-80 bg-white border-r border-neutral-200/50 p-8 overflow-y-auto scrollbar-hide">
+                    <div className="mb-10">
+                        <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-6">Discovery Engine</h2>
+                        <nav className="space-y-2">
+                            {SECTIONS.map((section) => (
+                                <button
+                                    key={section.id}
+                                    onClick={() => setActiveSection(section.id)}
+                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                                >
+                                    <div className={`transition-transform duration-500 ${activeSection === section.id ? 'scale-110 rotate-3' : 'group-hover:scale-110'}`}>
+                                        {section.icon}
+                                    </div>
+                                    <span className="text-sm font-black uppercase tracking-widest">{section.label}</span>
+                                    {activeSection === section.id && (
+                                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500 shadow-[0_0_10px_#6366f1]" />
                                     )}
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
+
+                    <div className="mt-auto">
+                        <div className="p-6 bg-neutral-50 rounded-[32px] border border-neutral-200/50 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-primary-500/5 rounded-full -mr-12 -mt-12 transition-transform duration-700 group-hover:scale-150" />
+                            <h3 className="text-xs font-black text-neutral-900 mb-2 relative">Pro Protocol</h3>
+                            <p className="text-[10px] text-neutral-500 leading-relaxed mb-4 relative">Unlock custom IR codes and unlimited dynamic routing.</p>
+                            <button className="w-full py-3 bg-white border border-neutral-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-neutral-300 transition-all active:scale-95">Upgrade</button>
+                        </div>
+                    </div>
+                </aside>
+
+                <div className="flex-1 overflow-y-auto bg-[#f8fafc] p-4 lg:p-10 scrollbar-hide">
+                    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+                        {/* Mobile Navigation */}
+                        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+                            {SECTIONS.map((section) => (
+                                <button
+                                    key={section.id}
+                                    onClick={() => setActiveSection(section.id)}
+                                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl whitespace-nowrap font-black text-[10px] uppercase tracking-widest transition-all ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-lg' : 'bg-white text-neutral-500 border border-neutral-200'}`}
+                                >
+                                    {section.icon}
+                                    {section.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Identity Tab */}
+                        {activeSection === 'identity' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex justify-between items-center mb-8">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-neutral-900 leading-tight">Identity Matrix</h2>
+                                        <p className="text-sm text-neutral-400 font-medium">Define your digital presence</p>
+                                    </div>
                                     {qr.logo_url && (
                                         <button
                                             className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 border border-primary-200 rounded-full text-sm font-semibold hover:bg-primary-100 transition-colors"
@@ -472,395 +438,375 @@ export default function QREditorPage({ params }) {
                                             <Sparkles size={14} /> Logo Studio
                                         </button>
                                     )}
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleLogoUpload}
+                                        style={{ display: 'none' }}
+                                        accept="image/*"
+                                    />
                                 </div>
-                                <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleLogoUpload}
-                                    style={{ display: 'none' }}
-                                    accept="image/*"
-                                />
-                            </div>
 
-                            {isLogoStudioOpen && qr.logo_url && (
-                                <div className="mt-6 bg-neutral-50 border border-neutral-200 rounded-xl overflow-hidden">
-                                    <div className="flex justify-between items-center px-4 py-3 bg-white border-b border-neutral-200">
-                                        <h4 className="text-sm font-bold text-neutral-900">Logo Studio</h4>
-                                        <button className="text-neutral-400 hover:text-neutral-600" onClick={() => setIsLogoStudioOpen(false)}>
-                                            <X size={18} />
-                                        </button>
-                                    </div>
-                                    <div className="p-4 space-y-4">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-xs font-semibold text-neutral-500">Zoom</label>
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="3"
-                                                step="0.01"
-                                                value={logoSettings.zoom}
-                                                onChange={(e) => handleLogoSettingChange('zoom', parseFloat(e.target.value))}
-                                                className="w-full accent-primary-500"
-                                            />
+                                {/* Logo Studio Control Panel */}
+                                {isLogoStudioOpen && qr.logo_url && (
+                                    <div className="mt-6 bg-neutral-900 rounded-[32px] p-8 border border-neutral-800 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500">
+                                        <div className="flex justify-between items-center mb-8">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center text-primary-400">
+                                                    <Sparkles size={16} />
+                                                </div>
+                                                <h4 className="text-sm font-black text-white uppercase tracking-widest">Logo Studio</h4>
+                                            </div>
+                                            <button onClick={() => setIsLogoStudioOpen(false)} className="text-neutral-500 hover:text-white transition-colors">
+                                                <X size={20} />
+                                            </button>
                                         </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-xs font-semibold text-neutral-500">X Position</label>
-                                            <input
-                                                type="range"
-                                                min="-50"
-                                                max="50"
-                                                step="1"
-                                                value={logoSettings.x}
-                                                onChange={(e) => handleLogoSettingChange('x', parseInt(e.target.value))}
-                                                className="w-full accent-primary-500"
-                                            />
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-xs font-semibold text-neutral-500">Y Position</label>
-                                            <input
-                                                type="range"
-                                                min="-50"
-                                                max="50"
-                                                step="1"
-                                                value={logoSettings.y}
-                                                onChange={(e) => handleLogoSettingChange('y', parseInt(e.target.value))}
-                                                className="w-full accent-primary-500"
-                                            />
-                                        </div>
-                                        <button
-                                            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition-colors"
-                                            onClick={() => setLogoSettings({ zoom: 1, x: 0, y: 0 })}
-                                        >
-                                            <RotateCcw size={14} /> Reset Studio
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
 
-                            {/* Display Name */}
-                            <div className="mb-5 mt-6">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-2 block">Display Name</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                    value={qr.display_name || ''}
-                                    onChange={(e) => updateField('display_name', e.target.value)}
-                                    placeholder="Your name or brand"
-                                    disabled={!canEdit}
-                                />
-                            </div>
-
-                            {/* Bio */}
-                            <div>
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-2 block">Short Description</label>
-                                <textarea
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none resize-none"
-                                    value={qr.bio || ''}
-                                    onChange={(e) => updateField('bio', e.target.value.slice(0, 150))}
-                                    placeholder="Brief description about you or your business"
-                                    rows={3}
-                                    disabled={!canEdit}
-                                />
-                                <span className="block text-right text-xs text-neutral-400 mt-1">{(qr.bio || '').length}/150</span>
-                            </div>
-                        </section>
-                    )}
-
-                    {/* Links Tab */}
-                    {activeTab === 'links' && (
-                        <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1 text-neutral-900">
-                                        <Link2 size={20} className="text-primary-500" />
-                                        <h3 className="text-base font-black uppercase tracking-wider">Your Links</h3>
-                                    </div>
-                                    <p className="text-sm text-neutral-500">Add links with icons</p>
-                                </div>
-                                <button
-                                    className="flex items-center justify-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-xl font-semibold text-sm hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    onClick={addLink}
-                                    disabled={!canEdit}
-                                >
-                                    <Plus size={16} /> Add Link
-                                </button>
-                            </div>
-
-                            <div className="space-y-3">
-                                {(!qr.links || qr.links.length === 0) ? (
-                                    <div className="text-center py-12 px-6 bg-neutral-50 rounded-2xl border-2 border-dashed border-neutral-200">
-                                        <Link2 size={40} className="mx-auto text-neutral-300 mb-3" />
-                                        <p className="font-semibold text-neutral-900 mb-1">No links yet</p>
-                                        <span className="text-sm text-neutral-500">Add your first link to get started</span>
-                                    </div>
-                                ) : (
-                                    qr.links.map((link, index) => (
-                                        <div key={link.id} className="relative flex items-center gap-3 p-4 bg-neutral-50 border border-neutral-200 rounded-xl group">
-                                            {/* Move Buttons */}
-                                            <div className="hidden sm:flex flex-col gap-1">
-                                                <button
-                                                    className="w-7 h-6 bg-white border border-neutral-200 rounded text-neutral-400 text-xs hover:bg-neutral-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                                                    onClick={() => moveLink(index, -1)}
-                                                    disabled={index === 0}
-                                                >
-                                                    <ChevronUp size={14} className="mx-auto" />
-                                                </button>
-                                                <button
-                                                    className="w-7 h-6 bg-white border border-neutral-200 rounded text-neutral-400 text-xs hover:bg-neutral-100 disabled:opacity-30 disabled:cursor-not-allowed"
-                                                    onClick={() => moveLink(index, 1)}
-                                                    disabled={index === qr.links.length - 1}
-                                                >
-                                                    <ChevronDown size={14} className="mx-auto" />
-                                                </button>
+                                        <div className="space-y-8">
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between text-[10px] font-black text-neutral-500 uppercase tracking-widest">
+                                                    <span>Magnification</span>
+                                                    <span className="text-primary-400">{Math.round(logoSettings.zoom * 100)}%</span>
+                                                </div>
+                                                <input
+                                                    type="range" min="0.5" max="3" step="0.01"
+                                                    value={logoSettings.zoom}
+                                                    onChange={(e) => handleLogoSettingChange('zoom', parseFloat(e.target.value))}
+                                                    className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-primary-500"
+                                                />
                                             </div>
 
-                                            {/* Icon Selector */}
-                                            <div className="relative">
-                                                <button
-                                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white transition-transform hover:scale-105"
-                                                    style={{ background: PRESET_ICONS[link.icon]?.color || '#6B7280' }}
-                                                    onClick={() => setEditingLinkIcon(editingLinkIcon === index ? null : index)}
-                                                >
-                                                    {link.customIcon ? (
-                                                        <img src={link.customIcon} alt="icon" className="w-6 h-6 rounded object-cover" />
-                                                    ) : (
-                                                        <span className="w-5 h-5">{PRESET_ICONS[link.icon]?.svg || PRESET_ICONS.website.svg}</span>
-                                                    )}
-                                                </button>
+                                            <div className="grid grid-cols-2 gap-8">
+                                                <div className="space-y-4">
+                                                    <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest block">Latitude (X)</label>
+                                                    <input
+                                                        type="range" min="-100" max="100"
+                                                        value={logoSettings.x}
+                                                        onChange={(e) => handleLogoSettingChange('x', parseInt(e.target.value))}
+                                                        className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-primary-500"
+                                                    />
+                                                </div>
+                                                <div className="space-y-4">
+                                                    <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest block">Longitude (Y)</label>
+                                                    <input
+                                                        type="range" min="-100" max="100"
+                                                        value={logoSettings.y}
+                                                        onChange={(e) => handleLogoSettingChange('y', parseInt(e.target.value))}
+                                                        className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-primary-500"
+                                                    />
+                                                </div>
+                                            </div>
 
-                                                {/* Icon Picker Dropdown */}
-                                                {editingLinkIcon === index && (
-                                                    <div className="absolute top-full left-0 mt-2 p-3 bg-white border border-neutral-200 rounded-xl shadow-2xl z-50 w-72">
-                                                        <div className="grid grid-cols-6 gap-1.5 mb-3">
-                                                            {Object.entries(PRESET_ICONS).map(([key, icon]) => (
-                                                                <button
-                                                                    key={key}
-                                                                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white transition-transform hover:scale-110"
-                                                                    style={{ background: icon.color }}
-                                                                    onClick={() => {
-                                                                        updateLink(index, 'icon', key);
-                                                                        updateLink(index, 'customIcon', null);
-                                                                        setEditingLinkIcon(null);
-                                                                    }}
-                                                                    title={icon.name}
-                                                                >
-                                                                    <span className="w-4 h-4">{icon.svg}</span>
-                                                                </button>
-                                                            ))}
+                                            <button
+                                                onClick={() => setLogoSettings({ zoom: 1, x: 0, y: 0, rotation: 0 })}
+                                                className="w-full py-4 bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                                            >
+                                                Reset Architecture
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Identity Fields */}
+                                <div className="space-y-6 mt-10">
+                                    <div className="group">
+                                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-4 ml-1 block">Display Designation</label>
+                                        <input
+                                            type="text"
+                                            className="w-full px-6 py-5 bg-white border border-neutral-200 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all"
+                                            value={qr.display_name || ''}
+                                            onChange={(e) => updateField('display_name', e.target.value)}
+                                            placeholder="Identity Name"
+                                        />
+                                    </div>
+
+                                    <div className="group">
+                                        <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-4 ml-1 block">Narrative Directive (Bio)</label>
+                                        <textarea
+                                            className="w-full px-6 py-5 bg-white border border-neutral-200 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all min-h-[120px] resize-none"
+                                            value={qr.bio || ''}
+                                            onChange={(e) => updateField('bio', e.target.value.slice(0, 150))}
+                                            placeholder="Provide a brief context (Max 150 characters)"
+                                        />
+                                        <div className="flex justify-end mt-2 px-2">
+                                            <span className="text-[10px] font-black text-neutral-300 uppercase">{(qr.bio || '').length} / 150 Channels</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Protocol Management (Links) */}
+                        {activeSection === 'protocol' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex justify-between items-center mb-8">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-neutral-900 leading-tight">Protocol Discovery</h2>
+                                        <p className="text-sm text-neutral-400 font-medium">Map your digital routing nodes</p>
+                                    </div>
+                                    <button
+                                        onClick={addLink}
+                                        className="group flex items-center gap-3 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl transition-all font-black text-xs shadow-xl shadow-primary-500/20 active:scale-95"
+                                    >
+                                        <Plus size={18} className="group-hover:rotate-90 transition-transform duration-500" />
+                                        ADD NODE
+                                    </button>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {(!qr.links || qr.links.length === 0) ? (
+                                        <div className="bg-white rounded-[32px] p-20 border-2 border-dashed border-neutral-200 flex flex-col items-center text-center">
+                                            <div className="w-20 h-20 bg-neutral-50 rounded-full flex items-center justify-center text-neutral-300 mb-6">
+                                                <Link2 size={40} />
+                                            </div>
+                                            <h3 className="text-lg font-black text-neutral-900 mb-2">No active protocols</h3>
+                                            <p className="text-sm text-neutral-400 mb-8 max-w-xs">Initialize your first digital node to start building your profile.</p>
+                                            <button onClick={addLink} className="px-8 py-3 bg-neutral-900 text-white rounded-xl text-xs font-black uppercase tracking-widest">Deploy Node</button>
+                                        </div>
+                                    ) : (
+                                        qr.links.map((link, index) => (
+                                            <div key={link.id} className="group bg-white rounded-[32px] p-6 border border-neutral-200/50 shadow-premium-layered hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
+                                                <div className="absolute top-0 left-0 w-1.5 h-full bg-neutral-100 group-hover:bg-primary-500 transition-colors duration-500" />
+
+                                                <div className="flex flex-col lg:flex-row gap-6">
+                                                    {/* Control Cluster */}
+                                                    <div className="flex items-center lg:flex-col gap-2">
+                                                        <div className="p-2 text-neutral-300 cursor-grab active:cursor-grabbing">
+                                                            <GripVertical size={20} />
                                                         </div>
-                                                        <div className="pt-3 border-t border-neutral-200">
-                                                            <label className="flex items-center justify-center gap-2 py-2.5 bg-neutral-100 rounded-lg cursor-pointer text-sm font-medium text-neutral-600 hover:bg-neutral-200 transition-colors">
-                                                                <Upload size={14} /> Upload Custom Icon
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    onChange={(e) => handleCustomIconUpload(e, index)}
-                                                                    className="hidden"
-                                                                />
-                                                            </label>
+                                                        <div className="flex lg:flex-col gap-1">
+                                                            <button onClick={() => moveLink(index, -1)} disabled={index === 0} className="p-2 bg-neutral-50 text-neutral-400 rounded-lg hover:bg-primary-50 hover:text-primary-600 disabled:opacity-20 transition-all">
+                                                                <ChevronUp size={16} />
+                                                            </button>
+                                                            <button onClick={() => moveLink(index, 1)} disabled={index === qr.links.length - 1} className="p-2 bg-neutral-50 text-neutral-400 rounded-lg hover:bg-primary-50 hover:text-primary-600 disabled:opacity-20 transition-all">
+                                                                <ChevronDown size={16} />
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                )}
-                                            </div>
 
-                                            {/* Link Fields */}
-                                            <div className="flex-1 flex flex-col gap-2 min-w-0">
-                                                <input
-                                                    type="text"
-                                                    className="w-full px-3 py-2.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium focus:outline-none focus:border-primary-500 transition-colors"
-                                                    value={link.title}
-                                                    onChange={(e) => updateLink(index, 'title', e.target.value)}
-                                                    placeholder="Link Title (e.g. My Instagram)"
-                                                    disabled={!canEdit}
-                                                />
-                                                <input
-                                                    type="url"
-                                                    className="w-full px-3 py-2.5 bg-white border border-neutral-200 rounded-lg text-sm font-medium focus:outline-none focus:border-primary-500 transition-colors"
-                                                    value={link.url}
-                                                    onChange={(e) => updateLink(index, 'url', e.target.value)}
-                                                    placeholder="https://..."
-                                                    disabled={!canEdit}
-                                                />
-                                            </div>
+                                                    {/* Node Identity */}
+                                                    <div className="relative">
+                                                        <button
+                                                            onClick={() => setEditingLinkIcon(editingLinkIcon === index ? null : index)}
+                                                            className="w-20 h-20 rounded-[24px] flex items-center justify-center text-white transition-all duration-500 hover:scale-105 active:scale-95 shadow-xl relative overflow-hidden group/icon"
+                                                            style={{ background: PRESET_ICONS[link.icon]?.color || '#6B7280' }}
+                                                        >
+                                                            <div className="absolute inset-0 bg-black/0 group-hover/icon:bg-black/10 transition-colors" />
+                                                            {link.customIcon ? (
+                                                                <img src={link.customIcon} alt="icon" className="w-10 h-10 rounded-xl object-cover" />
+                                                            ) : (
+                                                                <div className="scale-125">{PRESET_ICONS[link.icon]?.icon || PRESET_ICONS.website.icon}</div>
+                                                            )}
+                                                            <div className="absolute bottom-1 right-1 w-5 h-5 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center">
+                                                                <Plus size={10} />
+                                                            </div>
+                                                        </button>
 
-                                            {/* Remove Button */}
-                                            <button
-                                                className="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                                onClick={() => removeLink(index)}
-                                                disabled={!canEdit}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </section>
-                    )}
+                                                        {/* Protocol Portal (Icon Picker) */}
+                                                        {editingLinkIcon === index && (
+                                                            <div className="absolute top-24 left-0 w-[320px] bg-white rounded-[32px] p-6 border border-neutral-200 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-300">
+                                                                <div className="grid grid-cols-5 gap-3 mb-6">
+                                                                    {Object.entries(PRESET_ICONS).map(([key, icon]) => (
+                                                                        <button
+                                                                            key={key}
+                                                                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white transition-all hover:scale-110 active:scale-90 shadow-md group/btn"
+                                                                            style={{ background: icon.color }}
+                                                                            onClick={() => {
+                                                                                updateLink(index, 'icon', key);
+                                                                                updateLink(index, 'customIcon', null);
+                                                                                setEditingLinkIcon(null);
+                                                                            }}
+                                                                        >
+                                                                            {icon.icon}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                                <label className="flex items-center justify-center gap-3 py-4 bg-neutral-50 rounded-2xl cursor-pointer text-xs font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-all border border-dashed border-neutral-200">
+                                                                    <UploadIcon size={16} /> CUSTOM ICON
+                                                                    <input type="file" accept="image/*" onChange={(e) => handleCustomIconUpload(e, index)} className="hidden" />
+                                                                </label>
+                                                            </div>
+                                                        )}
+                                                    </div>
 
-                    {/* Design Tab */}
-                    {activeTab === 'design' && (
-                        <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                            <div className="flex items-center gap-2 mb-2 text-neutral-900">
-                                <Palette size={20} className="text-primary-500" />
-                                <h3 className="text-base font-black uppercase tracking-wider">Design</h3>
-                            </div>
-                            <p className="text-sm text-neutral-500 mb-6">Customize appearance</p>
+                                                    {/* Node Parameters */}
+                                                    <div className="flex-1 space-y-4">
+                                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                                            <input
+                                                                type="text"
+                                                                className="w-full px-5 py-4 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-900 focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                                                value={link.title}
+                                                                onChange={(e) => updateLink(index, 'title', e.target.value)}
+                                                                placeholder="Node Title"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                className="w-full px-5 py-4 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-900 focus:bg-white focus:border-primary-500 transition-all outline-none"
+                                                                value={link.url}
+                                                                onChange={(e) => updateLink(index, 'url', e.target.value)}
+                                                                placeholder="Routing Address (URL)"
+                                                            />
+                                                        </div>
+                                                    </div>
 
-                            {/* Theme */}
-                            <div className="mb-6">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-3 block">Theme</label>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                    {THEMES.map(theme => (
-                                        <button
-                                            key={theme.id}
-                                            className={`flex flex-col items-center gap-2 p-2 bg-white border-2 rounded-xl cursor-pointer transition-all ${qr.template_id === theme.id ? 'border-primary-500 ring-2 ring-primary-100' : 'border-transparent hover:border-neutral-200'}`}
-                                            onClick={() => updateTheme(theme.id)}
-                                            disabled={!canEdit}
-                                        >
-                                            <div
-                                                className="w-full h-12 rounded-lg"
-                                                style={{ background: `linear-gradient(135deg, ${theme.colors[0]}, ${theme.colors[1]})` }}
-                                            />
-                                            <span className="text-xs font-medium text-neutral-600">{theme.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Button Style */}
-                            <div className="mb-6">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-3 block">Button Style</label>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    {BUTTON_STYLES.map(style => {
-                                        const previewStyles: Record<string, string> = {
-                                            filled: 'bg-primary-500 text-white',
-                                            outline: 'bg-transparent border-2 border-primary-500 text-primary-500',
-                                            shadow: 'bg-white text-neutral-900 shadow-lg',
-                                            glass: 'bg-white/20 backdrop-blur border border-white/30 text-neutral-900',
-                                            rounded: 'bg-primary-500 text-white rounded-2xl',
-                                            pill: 'bg-primary-500 text-white rounded-full',
-                                            gradient: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
-                                            neon: 'bg-transparent border-2 border-green-400 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]'
-                                        };
-                                        return (
-                                            <button
-                                                key={style.id}
-                                                className={`flex flex-col items-center gap-2 p-3 bg-white border-2 rounded-xl cursor-pointer transition-all ${qr.button_style === style.id ? 'border-primary-500 ring-2 ring-primary-100' : 'border-transparent hover:border-neutral-200'}`}
-                                                onClick={() => updateField('button_style', style.id)}
-                                                disabled={!canEdit}
-                                            >
-                                                <div className={`w-full py-2 px-3 text-xs font-medium text-center rounded-lg ${previewStyles[style.style]}`}>
-                                                    Button
+                                                    <button
+                                                        onClick={() => removeLink(index)}
+                                                        className="lg:ml-auto p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all self-start"
+                                                    >
+                                                        <Trash2 size={20} />
+                                                    </button>
                                                 </div>
-                                                <span className="text-xs font-medium text-neutral-600">{style.name}</span>
-                                            </button>
-                                        );
-                                    })}
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
                             </div>
+                        )}
 
-                            {/* Text Color */}
-                            <div>
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider mb-2 block">Text Color</label>
-                                <p className="text-sm text-neutral-500 mb-3">Customize name and description color</p>
-                                <div className="flex gap-3 items-center">
-                                    <input
-                                        type="color"
-                                        value={qr.theme?.textColor || '#ffffff'}
-                                        onChange={(e) => updateTextColor(e.target.value)}
-                                        disabled={!canEdit}
-                                        className="w-14 h-10 border border-neutral-200 rounded-lg cursor-pointer"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={qr.theme?.textColor || '#ffffff'}
-                                        onChange={(e) => updateTextColor(e.target.value)}
-                                        disabled={!canEdit}
-                                        className="flex-1 p-3 border border-neutral-200 rounded-lg text-sm font-mono focus:outline-none focus:border-primary-500"
-                                        placeholder="#ffffff"
-                                    />
+                        {/* Visual Matrix (Design) */}
+                        {activeSection === 'visuals' && (
+                            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="bg-white rounded-[40px] p-8 lg:p-12 border border-neutral-200 shadow-premium-layered">
+                                    <div className="flex items-center gap-4 mb-10">
+                                        <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 border border-primary-100">
+                                            <Palette size={24} />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-black text-neutral-900 leading-tight">Visual Matrix</h2>
+                                            <p className="text-sm text-neutral-400 font-medium">Calibrate high-fidelity aesthetics</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-12">
+                                        <div className="space-y-6">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 block">Spectrum Profiles (Themes)</label>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {THEMES.map((theme) => (
+                                                    <button
+                                                        key={theme.id}
+                                                        onClick={() => updateTheme(theme.id)}
+                                                        className={`group relative flex flex-col items-start p-5 rounded-[32px] border-2 transition-all duration-500 ${qr.template_id === theme.id ? 'border-neutral-900 ring-4 ring-neutral-900/5' : 'border-neutral-100 hover:border-neutral-200'}`}
+                                                    >
+                                                        <div
+                                                            className="w-full h-24 rounded-2xl mb-4 transition-transform duration-700 group-hover:scale-[1.02]"
+                                                            style={{ background: theme.id === 'glass' ? '#ffffff' : `linear-gradient(135deg, ${theme.colors[0]}, ${theme.colors[1]})`, border: theme.id === 'glass' ? '1px solid #e5e7eb' : 'none' }}
+                                                        />
+                                                        <span className="text-xs font-black uppercase tracking-widest text-neutral-900 mb-1">{theme.name}</span>
+                                                        <span className="text-[10px] text-neutral-400 font-medium leading-none">{theme.description}</span>
+                                                        {qr.template_id === theme.id && <CheckCircle2 size={20} className="absolute top-4 right-4 text-white drop-shadow-lg" />}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 block">Interaction Archetypes (Buttons)</label>
+                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                                {BUTTON_STYLES.map((style) => (
+                                                    <button
+                                                        key={style.id}
+                                                        onClick={() => updateField('button_style', style.id)}
+                                                        className={`p-6 rounded-[32px] border-2 transition-all duration-500 flex flex-col items-center gap-3 ${qr.button_style === style.id ? 'border-neutral-900 bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'border-neutral-100 text-neutral-500 hover:border-neutral-200'}`}
+                                                    >
+                                                        <div className={`transition-transform duration-500 ${qr.button_style === style.id ? 'scale-110' : ''}`}>
+                                                            {style.icon}
+                                                        </div>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest">{style.name}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 block">Chromatic Precision (Text)</label>
+                                            <div className="flex flex-col sm:flex-row gap-4">
+                                                <div className="flex-1 flex items-center gap-4 bg-white border border-neutral-200 rounded-[24px] p-4 group focus-within:ring-4 focus-within:ring-primary-500/10 transition-all">
+                                                    <input
+                                                        type="color"
+                                                        value={qr.theme?.textColor || '#ffffff'}
+                                                        onChange={(e) => updateTextColor(e.target.value)}
+                                                        className="w-12 h-12 rounded-xl border-none p-0 cursor-pointer overflow-hidden bg-transparent"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={qr.theme?.textColor || '#ffffff'}
+                                                        onChange={(e) => updateTextColor(e.target.value)}
+                                                        className="flex-1 bg-transparent border-none text-sm font-black text-neutral-900 focus:outline-none placeholder:text-neutral-300"
+                                                        placeholder="#000000"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </section>
-                    )}
+                        )}
+                    </div>
                 </div>
 
-                {/* Preview */}
-                <div className="bg-neutral-100 border-l border-neutral-200 flex flex-col overflow-hidden lg:order-last order-first">
-                    <div className="px-4 py-3 bg-white border-b border-neutral-200 flex justify-between items-center">
-                        <span className="font-semibold text-sm text-neutral-700">Preview</span>
-                        <a
-                            href={`/qr/${qr.slug}`}
-                            target="_blank"
-                            className="flex items-center gap-1 text-sm text-primary-500 hover:underline"
-                        >
-                            Open Page <ExternalLink size={14} />
+                {/* Perspective Preview Container */}
+                <div className="hidden lg:flex flex-col w-[480px] bg-neutral-50 border-l border-neutral-200/50 p-8 overflow-hidden">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-neutral-900 rounded-xl flex items-center justify-center text-white">
+                                <Eye size={16} />
+                            </div>
+                            <span className="text-xs font-black uppercase tracking-[0.2em] text-neutral-900">High-Fidelity Preview</span>
+                        </div>
+                        <a href={`/qr/${qr.slug}`} target="_blank" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 transition-colors">
+                            LIVE PROTOCOL <ExternalLink size={14} />
                         </a>
                     </div>
 
-                    <div className="flex-1 flex justify-center items-start p-6 overflow-y-auto">
-                        <div className="w-[300px] bg-neutral-900 rounded-[40px] p-4 shadow-2xl">
-                            <div className="w-20 h-1.5 bg-neutral-700 rounded-full mx-auto mb-3" />
-                            <div className="rounded-[28px] overflow-hidden h-[600px]" style={themeStyles}>
-                                <div className="h-full px-5 py-8 flex flex-col items-center overflow-y-auto">
-                                    {/* Logo */}
-                                    {qr.logo_url ? (
-                                        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-white/30">
-                                            <img
-                                                src={qr.logo_url}
-                                                alt={qr.display_name}
-                                                style={logoStyle}
-                                                className="w-full h-full object-cover"
-                                            />
+                    <div className="flex-1 flex items-center justify-center perspective-[2000px] relative">
+                        {/* Interactive Scale Controller */}
+                        <div className="absolute top-0 right-0 flex flex-col gap-2 bg-white/50 backdrop-blur-md p-2 rounded-2xl border border-white z-50">
+                            <button onClick={() => setPreviewScale(p => Math.min(1.2, p + 0.1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm"><ChevronUp size={16} /></button>
+                            <span className="text-[10px] font-black text-center text-neutral-500 py-1">{Math.round(previewScale * 100)}%</span>
+                            <button onClick={() => setPreviewScale(p => Math.max(0.5, p - 0.1))} className="p-2 hover:bg-white rounded-xl transition-all shadow-sm"><ChevronDown size={16} /></button>
+                        </div>
+
+                        <div
+                            className="w-[320px] bg-neutral-900 rounded-[50px] p-5 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] transition-transform duration-700 hover:rotate-y-12"
+                            style={{ transform: `scale(${previewScale}) rotateY(15deg) rotateX(5deg)` }}
+                        >
+                            <div className="w-24 h-1.5 bg-neutral-800 rounded-full mx-auto mb-5" />
+                            <div
+                                className="rounded-[35px] overflow-hidden h-[600px] relative shadow-inner"
+                                style={themeStyles}
+                            >
+                                <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none" />
+                                <div className="h-full px-6 py-12 flex flex-col items-center overflow-y-auto scrollbar-hide">
+                                    {/* Logo Matrix */}
+                                    <div className="relative mb-8">
+                                        <div className="w-24 h-24 rounded-full border-4 border-white/20 shadow-2xl relative overflow-hidden group/p">
+                                            {qr.logo_url ? (
+                                                <img src={qr.logo_url} alt="" className="w-full h-full object-cover" style={logoStyle} />
+                                            ) : (
+                                                <div className="w-full h-full bg-white/10 flex items-center justify-center text-3xl font-black text-white italic">
+                                                    {(qr.display_name || 'Q').charAt(0)}
+                                                </div>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold mb-4">
-                                            {(qr.display_name || qr.name || 'A').charAt(0).toUpperCase()}
-                                        </div>
-                                    )}
+                                    </div>
 
-                                    {/* Name */}
-                                    <h2 className="text-xl font-bold mb-2 text-center" style={{ color: qr.theme?.textColor || '#ffffff' }}>
-                                        {qr.display_name || 'Your Name'}
-                                    </h2>
+                                    <h2 className="text-2xl font-black mb-2 text-center drop-shadow-md" style={{ color: qr.theme?.textColor }}>{qr.display_name || 'Protocol Node'}</h2>
+                                    {qr.bio && <p className="text-xs text-center leading-relaxed mb-10 opacity-80 font-medium" style={{ color: qr.theme?.textColor }}>{qr.bio}</p>}
 
-                                    {/* Bio */}
-                                    {qr.bio && (
-                                        <p className="text-sm opacity-90 text-center leading-relaxed mb-6" style={{ color: qr.theme?.textColor || '#ffffff' }}>
-                                            {qr.bio}
-                                        </p>
-                                    )}
-
-                                    {/* Links */}
-                                    <div className="w-full flex flex-col gap-2.5">
-                                        {(qr.links || []).filter(l => l.title && l.url).map((link, i) => {
-                                            const btnStyles: Record<string, string> = {
-                                                filled: 'bg-white/15 backdrop-blur',
-                                                outline: 'bg-transparent border-2 border-current opacity-90',
-                                                shadow: 'bg-white !text-neutral-900 shadow-lg',
-                                                glass: 'bg-white/10 backdrop-blur-xl border border-white/20',
-                                                rounded: 'bg-white/15 rounded-2xl',
-                                                pill: 'bg-white/15 rounded-full',
-                                                gradient: 'bg-gradient-to-r from-white/25 to-white/5 border border-white/20',
-                                                neon: 'bg-transparent border-2 border-current shadow-[0_0_10px_currentColor,0_0_20px_rgba(255,255,255,0.1)]'
+                                    <div className="w-full space-y-3">
+                                        {qr.links?.map((link, i) => {
+                                            const btnStyle: Record<string, string> = {
+                                                filled: 'bg-white/10 backdrop-blur-md border border-white/20',
+                                                glass: 'bg-white/5 backdrop-blur-xl border border-white/10 saturate-150',
+                                                outline: 'bg-transparent border-2 border-white/30',
+                                                gradient: 'bg-gradient-to-r from-white/20 to-transparent border border-white/20'
                                             };
                                             return (
-                                                <div
-                                                    key={i}
-                                                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-transform hover:-translate-y-0.5 ${btnStyles[qr.button_style || 'filled']}`}
-                                                >
-                                                    <span
-                                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white flex-shrink-0"
-                                                        style={{ background: PRESET_ICONS[link.icon]?.color }}
-                                                    >
-                                                        {link.customIcon ? (
-                                                            <img src={link.customIcon} alt="" className="w-5 h-5 rounded object-cover" />
-                                                        ) : (
-                                                            <span className="w-4 h-4">{PRESET_ICONS[link.icon]?.svg || PRESET_ICONS.website.svg}</span>
-                                                        )}
-                                                    </span>
-                                                    <span className="flex-1 text-sm font-semibold">{link.title}</span>
+                                                <div key={i} className={`flex items-center gap-4 p-4 rounded-2xl shadow-lg transition-transform hover:scale-[1.02] ${btnStyle[qr.button_style || 'filled']}`}>
+                                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: PRESET_ICONS[link.icon]?.color || '#6B7280' }}>
+                                                        {link.customIcon ? <img src={link.customIcon} alt="" className="w-6 h-6 rounded-lg object-cover" /> : <div className="text-white scale-110">{PRESET_ICONS[link.icon]?.icon}</div>}
+                                                    </div>
+                                                    <span className="text-sm font-black uppercase tracking-widest truncate" style={{ color: qr.theme?.textColor }}>{link.title || 'Untitled Node'}</span>
                                                 </div>
                                             );
                                         })}
@@ -870,26 +816,25 @@ export default function QREditorPage({ params }) {
                         </div>
                     </div>
 
-                    {/* QR Code */}
-                    <div className="p-4 bg-white border-t border-neutral-200 flex items-center gap-4">
-                        <div className="w-[70px] h-[70px] bg-white rounded-lg overflow-hidden border border-neutral-200 flex-shrink-0">
-                            <img src={getQRCodeUrl()} alt="QR Code" className="w-full h-full" />
+                    {/* QR Protocol Control Block */}
+                    <div className="mt-8 p-6 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered flex items-center gap-6 group">
+                        <div className="w-24 h-24 bg-white p-2 rounded-2xl border border-neutral-100 shadow-inner group-hover:scale-105 transition-transform duration-500">
+                            <img src={getQRCodeUrl()} alt="QR" className="w-full h-full" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-xs text-neutral-500 mb-2">Scan to view your page</p>
+                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-3">Protocol Routing</p>
                             <button
                                 onClick={downloadQRCodeAsPNG}
-                                className="flex items-center gap-2 px-4 py-2 bg-neutral-100 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-200 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                                 disabled={downloading}
+                                className="flex items-center gap-3 px-5 py-3 bg-neutral-900 hover:bg-black text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-neutral-900/10 active:scale-95 disabled:opacity-50"
                             >
-                                <Download size={14} />
-                                {downloading ? 'Downloading...' : 'Download QR'}
+                                {downloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={16} />}
+                                Download QR
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }
-

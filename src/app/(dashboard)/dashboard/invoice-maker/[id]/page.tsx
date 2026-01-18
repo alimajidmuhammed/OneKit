@@ -10,40 +10,29 @@ import { useImageUpload } from '@/lib/hooks/useImageUpload';
 import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import {
-    Packer,
-    Document,
-    Paragraph,
-    TextRun,
-    AlignmentType,
-    Table,
-    TableRow,
-    TableCell,
-    WidthType,
-    BorderStyle,
-    VerticalAlign,
-    ImageRun,
-    ShadingType,
+    Packer, Document, Paragraph, TextRun, AlignmentType,
+    Table, TableRow, TableCell, WidthType, BorderStyle,
+    VerticalAlign, ImageRun, ShadingType,
 } from 'docx';
 import { InvoicePDF } from '@/components/pdf/InvoicePDF';
 import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
 import {
-    Facebook,
-    Instagram,
-    Phone,
-    Mail,
-    MapPin,
-    Music2,
-    Ghost as Snapchat,
-    Download,
-    FileText,
-    ChevronLeft,
-    Layout,
-    Type,
-    Check,
-    Loader2,
-    X,
-    Save
+    Facebook, Instagram, Phone, Mail, MapPin, Music2,
+    Ghost as Snapchat, Download, FileText, ChevronLeft,
+    Layout, Type, Check, Loader2, X, Save, Palette,
+    Plus, ChevronUp, ChevronDown, Trash2, Sparkles,
+    RotateCcw, ExternalLink, ArrowLeft, Globe, User,
+    Eye, LayoutPanelLeft, Hash, DollarSign, MessageSquare,
+    CheckCircle2, Image as ImageIcon
 } from 'lucide-react';
+
+const SECTIONS = [
+    { id: 'identity', label: 'Identity Matrix', icon: <User size={18} /> },
+    { id: 'content', label: 'Protocol Intel', icon: <FileText size={18} /> },
+    { id: 'labels', label: 'Semantic Labels', icon: <Type size={18} /> },
+    { id: 'contact', label: 'Channels', icon: <Globe size={18} /> },
+    { id: 'visuals', label: 'Visual Matrix', icon: <Palette size={18} /> },
+];
 
 const TEMPLATES = [
     { id: 'classic', name: 'Classic', icon: '📄' },
@@ -69,26 +58,22 @@ const ORIENTATIONS = [
 ];
 
 const DEFAULT_LABELS = {
-    header_visa: '✈️ Service Title 1',
-    header_edu: '🎓 Service Title 2',
-    header_law: '⚖️ Service Title 3',
-    company_name_en: 'Company Name',
-    company_name_ku: 'ناوی کۆمپانیا',
-    company_prefix_ku: 'کۆمپانیای',
-    label_no_en: 'No.',
-    label_no_ku: ':ژمارە',
-    label_date_en: 'Date',
-    label_date_ku: ':بەروار',
-    label_usd_ku: 'USD دۆلار',
-    label_iqd_ku: 'IQD دینار',
-    label_received_en: 'Received from',
-    label_received_ku: ':وەرگیرا لە',
-    label_sum_en: 'Sum of',
-    label_sum_ku: ':بـڕی',
-    label_details_en: 'Details',
-    label_details_ku: ':تێبینی',
-    label_buyer_ku: 'Buyer / کریار',
-    label_accountant_ku: 'Accountant / ژمێریار'
+    company_name_en: 'Antigravity Systems',
+    company_name_ku: 'کۆمپانیای ئەنتیگراڤیتی',
+    header_visa: 'Global Distribution Protocol',
+    header_edu: 'Intelligence Hub',
+    header_law: 'Legal Framework',
+    label_usd_ku: 'USD',
+    label_iqd_ku: 'IQD',
+    label_received_en: 'Received From',
+    label_received_ku: 'وەرگیرا لە بەڕێز',
+    label_sum_en: 'The Sum Of',
+    label_sum_ku: 'بڕی پارەی دیاریکراو',
+    label_details_en: 'Transaction Status',
+    label_details_ku: 'تێبینییەکان دەربارەی مامەڵەکە',
+    label_buyer_ku: 'واژووی کڕیار',
+    label_accountant_ku: 'واژووی ژمێریار',
+    company_prefix_ku: 'کۆمپانیای'
 };
 
 export default function InvoiceEditorPage({ params }: { params: Promise<{ id: string }> }) {
@@ -104,6 +89,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
     const [downloading, setDownloading] = useState(false);
     const [saveStatus, setSaveStatus] = useState('idle'); // 'idle', 'saving', 'saved'
     const [hasChanges, setHasChanges] = useState(false);
+    const [activeSection, setActiveSection] = useState<string>('identity');
     const [previewScale, setPreviewScale] = useState(1);
     const [mobileView, setMobileView] = useState('edit'); // 'edit' or 'preview'
     const previewRef = useRef(null);
@@ -201,8 +187,8 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                 backgroundColor: '#ffffff',
                 logging: false,
                 onclone: (clonedDoc) => {
-                    const el = clonedDoc.querySelector(`.${styles.exportItem}`);
-                    if (el) el.style.visibility = 'visible';
+                    const el = clonedDoc.querySelector('.export-item');
+                    if (el) (el as HTMLElement).style.visibility = 'visible';
                 }
             });
             const link = document.createElement('a');
@@ -228,8 +214,8 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                 backgroundColor: '#ffffff',
                 logging: false,
                 onclone: (clonedDoc) => {
-                    const el = clonedDoc.querySelector(`.${styles.exportItem}`);
-                    if (el) el.style.visibility = 'visible';
+                    const el = clonedDoc.querySelector('.export-item');
+                    if (el) (el as HTMLElement).style.visibility = 'visible';
                 }
             });
             const imgData = canvas.toDataURL('image/png');
@@ -273,7 +259,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                 logoImage = new ImageRun({
                     data: buffer,
                     transformation: { width: 60, height: 60 },
-                });
+                } as any);
             } catch (e) { console.error("Logo fetch failed", e); }
         }
 
@@ -439,24 +425,26 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                             children: [
                                 new TableCell({
                                     children: [
-                                        logoImage ? new Paragraph({ children: [new ImageRun({ data: logoImage.options.data, transformation: { width: 30, height: 30 } })] }) : space(),
+                                        logoImage ? new Paragraph({ children: [new ImageRun({ data: (logoImage as any).options.data, transformation: { width: 30, height: 30 } } as any)] }) : space(),
                                     ],
-                                    width: { size: 10, type: WidthType.PERCENTAGE }
+                                    width: { size: 10, type: WidthType.PERCENTAGE },
+                                    shading: { fill: brandColor, type: ShadingType.CLEAR, color: "auto" }
                                 }),
                                 new TableCell({
                                     children: [
                                         new Paragraph({ children: [new TextRun({ text: labels.company_name_en, bold: true, size: 24 })] }),
                                     ],
-                                    width: { size: 45, type: WidthType.PERCENTAGE }
+                                    width: { size: 45, type: WidthType.PERCENTAGE },
+                                    shading: { fill: brandColor, type: ShadingType.CLEAR, color: "auto" }
                                 }),
                                 new TableCell({
                                     children: [
                                         new Paragraph({ children: [new TextRun({ text: labels.company_name_ku, bold: true, size: 24 })], alignment: AlignmentType.RIGHT }),
                                     ],
-                                    width: { size: 45, type: WidthType.PERCENTAGE }
+                                    width: { size: 45, type: WidthType.PERCENTAGE },
+                                    shading: { fill: brandColor, type: ShadingType.CLEAR, color: "auto" }
                                 })
                             ],
-                            shading: { fill: brandColor, type: ShadingType.CLEAR, color: "auto" }
                         })
                     ]
                 });
@@ -628,8 +616,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                             })
                         ]
                     })
-                ],
-                spacing: { before: 1000 }
+                ]
             });
         };
 
@@ -696,10 +683,9 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
     };
 
     if (loading) return (
-
-        <div className={styles.loading}>
-            <div className={styles.spinner} />
-            <span>Loading Editor...</span>
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-6">
+            <div className="w-12 h-12 border-4 border-neutral-100 border-t-blue-500 rounded-full animate-spin" />
+            <span className="text-sm font-black text-neutral-400 uppercase tracking-widest animate-pulse">Initializing Protocol...</span>
         </div>
     );
     if (!invoice) return null;
@@ -749,7 +735,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
 
         return (
             <div
-                className={`bg-white relative text-neutral-900 overflow-hidden flex flex-col shadow-2xl ${isExport ? '' : ''}`}
+                className={`bg-white relative text-neutral-900 overflow-hidden flex flex-col shadow-2xl ${isExport ? 'export-item' : ''}`}
                 style={{
                     width: `${width}px`,
                     height: `${height}px`,
@@ -955,606 +941,577 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
         );
     };
 
-    return (
+    const brandColor = invoice?.invoice_data?.primary_color || '#1e3a8a';
 
-        <div className="min-h-screen bg-neutral-50 flex flex-col">
-            {/* Top Bar */}
-            <div className="sticky top-0 z-[100] flex items-center justify-between gap-4 px-4 py-3 bg-white border-b border-neutral-200">
-                <button
-                    onClick={() => router.push('/dashboard/invoice-maker')}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-neutral-600 hover:bg-neutral-50 rounded-xl border border-neutral-200 transition-all active:scale-95"
-                >
-                    <ChevronLeft size={18} />
-                    Back
-                </button>
-                <h1 className="flex-1 text-lg font-black text-neutral-900 truncate">
-                    {invoice.name}
-                </h1>
-                <div className="flex items-center gap-4">
-                    {/* Mobile View Toggle */}
-                    <div className="lg:hidden flex bg-neutral-100 p-1 rounded-xl border border-neutral-200">
+    return (
+        <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans selection:bg-primary-100 selection:text-primary-900 overflow-hidden">
+            {/* OneKit 3.0: Workspace Header */}
+            <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-2xl border-b border-neutral-200/50 px-4 lg:px-8 py-3 lg:py-4 flex items-center justify-between shadow-[0_2px_20px_-5px_rgba(0,0,0,0.05)] flex-shrink-0">
+                <div className="flex items-center gap-3 lg:gap-6">
+                    <button
+                        onClick={() => router.push('/dashboard/invoice-maker')}
+                        className="group flex items-center justify-center w-10 h-10 lg:w-11 lg:h-11 bg-white border border-neutral-200 rounded-2xl text-neutral-500 hover:text-neutral-900 hover:border-neutral-300 hover:shadow-xl hover:shadow-neutral-200/40 transition-all active:scale-95"
+                    >
+                        <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                            <h1 className="text-sm lg:text-base font-black text-neutral-900 uppercase tracking-tight truncate max-w-[150px] lg:max-w-none">
+                                {invoice.name}
+                            </h1>
+                        </div>
+                        <p className="hidden lg:block text-[10px] font-black text-neutral-400 uppercase tracking-widest leading-none">Financial Protocol v3.0</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3 lg:gap-6">
+                    {saveStatus !== 'idle' && (
+                        <div className={`flex items-center gap-3 px-4 py-2 rounded-2xl border transition-all duration-500 ${saveStatus === 'saving' ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+                            {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                            <span className="text-[10px] font-black uppercase tracking-widest">{saveStatus === 'saving' ? 'Syncing...' : 'Encrypted'}</span>
+                        </div>
+                    )}
+
+                    <div className="flex gap-2">
                         <button
-                            className={`px-4 py-1.5 text-xs font-black rounded-lg transition-all ${mobileView === 'edit' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500'}`}
-                            onClick={() => setMobileView('edit')}
+                            onClick={downloadInvoice}
+                            disabled={downloading}
+                            className="bg-white border border-neutral-200 p-3 rounded-2xl text-neutral-600 hover:bg-neutral-50 hover:border-neutral-300 transition-all active:scale-95 disabled:opacity-50"
                         >
-                            Edit
+                            <ImageIcon size={20} />
                         </button>
                         <button
-                            className={`px-4 py-1.5 text-xs font-black rounded-lg transition-all ${mobileView === 'preview' ? 'bg-white text-primary-600 shadow-sm' : 'text-neutral-500'}`}
-                            onClick={() => setMobileView('preview')}
+                            onClick={downloadDocx}
+                            disabled={downloading}
+                            className="bg-white border border-neutral-200 p-3 rounded-2xl text-neutral-600 hover:bg-neutral-50 hover:border-neutral-300 transition-all active:scale-95 disabled:opacity-50"
                         >
-                            Preview
+                            <FileText size={20} />
+                        </button>
+                        <button
+                            onClick={downloadPdf}
+                            disabled={downloading}
+                            className="group relative flex items-center gap-3 px-6 lg:px-8 py-3 lg:py-4 bg-neutral-900 hover:bg-black text-white rounded-2xl transition-all font-black text-xs shadow-2xl shadow-neutral-900/20 active:scale-95 disabled:opacity-50"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                            <div className="relative flex items-center gap-3">
+                                {downloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                                <span className="hidden sm:inline">EXPORT PROTOCOL</span>
+                            </div>
                         </button>
                     </div>
-
-                    <span className="text-xs font-black text-primary-600">
-                        {saveStatus === 'saving' ? (
-                            <span className="flex items-center gap-2">
-                                <Loader2 size={12} className="animate-spin" />
-                                Saving...
-                            </span>
-                        ) : saveStatus === 'saved' ? (
-                            <span className="flex items-center gap- gap-1">
-                                <Check size={12} />
-                                Saved
-                            </span>
-                        ) : ''}
-                    </span>
-
-                    <button
-                        onClick={downloadDocx}
-                        className="hidden sm:flex items-center gap-2 px-6 py-2 bg-white text-neutral-900 border border-neutral-200 rounded-xl text-sm font-black hover:bg-neutral-50 hover:border-primary-500 transition-all active:scale-95"
-                    >
-                        <FileText size={18} />
-                        DOCX
-                    </button>
-                    <PDFDownloadButton
-                        document={<InvoicePDF invoice={invoice} labels={labels} brandColor={brandColor} />}
-                        fileName={`invoice-${invoice.invoice_id || 'new'}.pdf`}
-                        className="hidden md:flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-xl text-sm font-black hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all active:scale-95"
-                        label="HQ PDF"
-                    />
-                    <button
-                        onClick={downloadInvoice}
-                        disabled={downloading}
-                        className="flex items-center gap-2 px-6 py-2 bg-primary-600 text-white rounded-xl text-sm font-black hover:bg-primary-700 shadow-lg shadow-primary-600/20 transition-all active:scale-95 disabled:opacity-50"
-                    >
-                        {downloading ? (
-                            <Loader2 size={18} className="animate-spin" />
-                        ) : (
-                            <>
-                                <Download size={18} />
-                                PNG
-                            </>
-                        )}
-                    </button>
                 </div>
-            </div>
+            </header>
 
-            <div className="container mx-auto px-4 py-8 max-w-[1800px] flex-1 grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-8">
-                {/* Form Side */}
-                <div className={`flex flex-col gap-6 h-[calc(100vh-160px)] overflow-y-auto pr-2 custom-scrollbar ${mobileView !== 'edit' ? 'hidden lg:flex' : 'flex'}`}>
-                    {/* Layout & Size */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <Layout size={20} className="text-primary-500" />
-                            <h3 className="text-sm font-black uppercase tracking-wider">Layout & Size</h3>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="flex flex-col gap-3">
-                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Template Style</label>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                    {TEMPLATES.map(t => (
-                                        <button
-                                            key={t.id}
-                                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${invoice.template_id === t.id ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-500 hover:border-neutral-300'}`}
-                                            onClick={() => {
-                                                setInvoice(prev => ({ ...prev, template_id: t.id }));
-                                                setHasChanges(true);
-                                            }}
-                                        >
-                                            <span className="text-2xl">{t.icon}</span>
-                                            <span className="text-[11px] font-black">{t.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-3">
-                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Page Size</label>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                    {SIZES.map(s => (
-                                        <button
-                                            key={s.id}
-                                            className={`flex flex-col items-center gap-1 p-3 rounded-2xl border transition-all ${data.page_size === s.id ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-500 hover:border-neutral-300'}`}
-                                            onClick={() => updateField('page_size', s.id)}
-                                        >
-                                            <span className="text-sm font-black">{s.id}</span>
-                                            <span className="text-[10px] font-bold opacity-60 uppercase">{s.desc}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-3">
-                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Orientation</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {ORIENTATIONS.map(orient => (
-                                        <button
-                                            key={orient.id}
-                                            className={`flex flex-col items-center gap-1 p-3 rounded-2xl border transition-all ${data.orientation === orient.id ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-sm' : 'bg-neutral-50 border-neutral-100 text-neutral-500 hover:border-neutral-300'}`}
-                                            onClick={() => updateField('orientation', orient.id)}
-                                        >
-                                            <span className="text-xl">{orient.icon}</span>
-                                            <span className="text-sm font-black">{orient.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-3">
-                                <label className="text-xs font-black text-neutral-500 uppercase tracking-tight">Primary Brand Color</label>
-                                <div className="flex items-center gap-3 p-3 bg-neutral-50 border border-neutral-100 rounded-2xl group hover:border-primary-300 transition-all">
-                                    <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-neutral-200">
-                                        <input
-                                            type="color"
-                                            value={data.primary_color || '#1e3a8a'}
-                                            onChange={e => updateField('primary_color', e.target.value)}
-                                            className="absolute inset-0 w-full h-full cursor-pointer scale-150"
-                                        />
+            <main className="flex-1 flex overflow-hidden">
+                {/* OneKit 3.0: Sidebar Navigation */}
+                <aside className="hidden lg:flex flex-col w-80 bg-white border-r border-neutral-200/50 p-8 overflow-y-auto scrollbar-hide">
+                    <div className="mb-10">
+                        <h2 className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em] mb-6">Discovery Engine</h2>
+                        <nav className="space-y-2">
+                            {SECTIONS.map((section) => (
+                                <button
+                                    key={section.id}
+                                    onClick={() => setActiveSection(section.id)}
+                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-xl shadow-neutral-900/20' : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900'}`}
+                                >
+                                    <div className={`p-2 rounded-xl transition-all duration-300 ${activeSection === section.id ? 'bg-white/10 text-white scale-110' : 'bg-neutral-100 text-neutral-400 group-hover:bg-white group-hover:text-neutral-900'}`}>
+                                        {section.icon}
                                     </div>
-                                    <input
-                                        type="text"
-                                        value={data.primary_color || '#1e3a8a'}
-                                        onChange={e => updateField('primary_color', e.target.value)}
-                                        className="flex-1 bg-transparent border-none text-sm font-black text-neutral-900 focus:ring-0 uppercase font-mono"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Labels & Text */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <Type size={20} className="text-primary-500" />
-                            <h3 className="text-sm font-black uppercase tracking-wider">Labels & Text</h3>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Name (EN)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold placeholder:text-neutral-300 focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.company_name_en ?? ''}
-                                        onChange={e => updateField('labels.company_name_en', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.company_name_en}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Name (KU)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold placeholder:text-neutral-300 focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.company_name_ku ?? ''}
-                                        onChange={e => updateField('labels.company_name_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.company_name_ku}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Header Left 1</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.header_visa ?? ''}
-                                        onChange={e => updateField('labels.header_visa', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.header_visa}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Header Left 2</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.header_edu ?? ''}
-                                        onChange={e => updateField('labels.header_edu', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.header_edu}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Header Left 3</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.header_law ?? ''}
-                                        onChange={e => updateField('labels.header_law', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.header_law}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Prefix (KU)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.company_prefix_ku ?? ''}
-                                        onChange={e => updateField('labels.company_prefix_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.company_prefix_ku}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">USD Label</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.label_usd_ku ?? ''}
-                                        onChange={e => updateField('labels.label_usd_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_usd_ku}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">IQD Label</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.label_iqd_ku ?? ''}
-                                        onChange={e => updateField('labels.label_iqd_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_iqd_ku}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Received From (EN)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.label_received_en ?? ''}
-                                        onChange={e => updateField('labels.label_received_en', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_received_en}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Received From (KU)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.label_received_ku ?? ''}
-                                        onChange={e => updateField('labels.label_received_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_received_ku}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Sum Of Label (EN)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.label_sum_en ?? ''}
-                                        onChange={e => updateField('labels.label_sum_en', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_sum_en}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Sum Of Label (KU)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.label_sum_ku ?? ''}
-                                        onChange={e => updateField('labels.label_sum_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_sum_ku}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Details Label (EN)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.labels?.label_details_en ?? ''}
-                                        onChange={e => updateField('labels.label_details_en', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_details_en}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Details Label (KU)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.label_details_ku ?? ''}
-                                        onChange={e => updateField('labels.label_details_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_details_ku}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Buyer Signature Label</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.label_buyer_ku ?? ''}
-                                        onChange={e => updateField('labels.label_buyer_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_buyer_ku}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2 uppercase tracking-wider">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Accountant Signature Label</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.labels?.label_accountant_ku ?? ''}
-                                        onChange={e => updateField('labels.label_accountant_ku', e.target.value)}
-                                        placeholder={DEFAULT_LABELS.label_accountant_ku}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Logo & Branding */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <Plus size={20} className="text-primary-500" />
-                            <h3 className="text-sm font-black uppercase tracking-wider">Logo & Branding</h3>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="flex flex-col gap-2">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Company Logo</label>
-                                <div className="relative group">
-                                    {data.logo_url ? (
-                                        <div className="relative h-32 rounded-2xl overflow-hidden border border-neutral-200 bg-neutral-50">
-                                            <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain p-4" />
-                                            <button
-                                                className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity active:scale-95"
-                                                onClick={() => updateField('logo_url', '')}
-                                            >
-                                                <X size={16} />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="relative flex flex-col items-center justify-center gap-3 p-8 bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-2xl hover:bg-neutral-100 hover:border-primary-300 transition-all cursor-pointer">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={async (e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (!file) return;
-                                                    try {
-                                                        const publicUrl = await uploadImage(file, { folder: 'invoice-logos', type: 'logo' });
-                                                        if (publicUrl) {
-                                                            updateField('logo_url', publicUrl);
-                                                        }
-                                                    } catch (err) {
-                                                        console.error('Logo upload failed:', err);
-                                                    }
-                                                }}
-                                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                                            />
-                                            <Download className="text-neutral-300 group-hover:text-primary-500 transition-colors" size={32} />
-                                            <span className="text-xs font-bold text-neutral-500">Upload Logo</span>
-                                        </div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{section.label}</span>
+                                    {activeSection === section.id && (
+                                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
                                     )}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                                </button>
+                            ))}
+                        </nav>
+                    </div>
 
-                    {/* Basic Info */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <FileText size={20} className="text-primary-500" />
-                            <h3 className="text-sm font-black uppercase tracking-wider">Basic Info</h3>
+                    <div className="mt-auto space-y-6">
+                        <div className="p-6 bg-neutral-50 rounded-[32px] border border-neutral-200/50 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -mr-12 -mt-12 transition-transform duration-700 group-hover:scale-150" />
+                            <h3 className="text-xs font-black text-neutral-900 mb-2 relative">Financial Suite</h3>
+                            <p className="text-[10px] text-neutral-500 leading-relaxed mb-4 relative">Calibrate multi-currency protocols and secure logs.</p>
+                            <button className="w-full py-3 bg-white border border-neutral-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-neutral-300 transition-all active:scale-95">Upgrade</button>
                         </div>
+                    </div>
+                </aside>
 
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Receipt No / ژمارە</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.receipt_no || ''}
-                                        onChange={e => updateField('receipt_no', e.target.value)}
-                                        placeholder="001"
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Date / بەروار</label>
-                                    <input
-                                        type="date"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.date || ''}
-                                        onChange={e => updateField('date', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Amounts */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <span className="text-xl">💰</span>
-                            <h3 className="text-sm font-black uppercase tracking-wider">Amounts</h3>
+                <div className="flex-1 overflow-y-auto bg-[#f8fafc] p-4 lg:p-10 scrollbar-hide">
+                    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+                        {/* Mobile Navigation */}
+                        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+                            {SECTIONS.map((section) => (
+                                <button
+                                    key={section.id}
+                                    onClick={() => setActiveSection(section.id)}
+                                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl whitespace-nowrap font-black text-[10px] uppercase tracking-widest transition-all ${activeSection === section.id ? 'bg-neutral-900 text-white shadow-lg' : 'bg-white text-neutral-500 border border-neutral-200'}`}
+                                >
+                                    {section.icon}
+                                    {section.label}
+                                </button>
+                            ))}
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">USD Amount</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.amount_usd || ''}
-                                        onChange={e => updateField('amount_usd', e.target.value)}
-                                        placeholder="0.00"
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">IQD Amount</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                        value={data.amount_iqd || ''}
-                                        onChange={e => updateField('amount_iqd', e.target.value)}
-                                        placeholder="0"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                        {activeSection === 'identity' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
 
-                    {/* Content */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <Type size={20} className="text-primary-500" />
-                            <h3 className="text-sm font-black uppercase tracking-wider">Content</h3>
-                        </div>
+                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
+                                        <div className="p-3 bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/20">
+                                            <User size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">Identity Matrix</h3>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Core Branding & Authentication</p>
+                                        </div>
+                                    </div>
 
-                        <div className="space-y-4">
-                            <div className="flex flex-col gap-2 text-right">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Received From / وەرگیرا لە</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                    value={data.received_from || ''}
-                                    onChange={e => updateField('received_from', e.target.value)}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2 text-right">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Sum Of / بڕی</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none text-right"
-                                    value={data.sum_of || ''}
-                                    onChange={e => updateField('sum_of', e.target.value)}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-2 text-right">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Details / تێبینی</label>
-                                <textarea
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none resize-none text-right"
-                                    value={data.details || ''}
-                                    onChange={e => updateField('details', e.target.value)}
-                                    rows={3}
-                                />
-                            </div>
-                        </div>
-                    </section>
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                        <div className="space-y-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Company Entity</label>
+                                                <div className="relative group/input">
+                                                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-blue-500 transition-colors">
+                                                        <Globe size={18} />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                                                        value={data.labels?.company_name_en ?? ''}
+                                                        onChange={e => updateField('labels.company_name_en', e.target.value)}
+                                                        placeholder={DEFAULT_LABELS.company_name_en}
+                                                    />
+                                                </div>
+                                            </div>
 
-                    {/* Contact & Socials */}
-                    <section className="bg-white p-6 rounded-[2rem] border border-neutral-200 shadow-sm mb-8">
-                        <div className="flex items-center gap-2 mb-6 text-neutral-900">
-                            <Phone size={20} className="text-primary-500" />
-                            <h3 className="text-sm font-black uppercase tracking-wider">Contact & Socials</h3>
-                        </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 text-right block">ناوی قەوارە (کوردی)</label>
+                                                <div className="relative group/input">
+                                                    <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-blue-500 transition-colors">
+                                                        <Sparkles size={18} />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full pr-12 pl-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none text-right"
+                                                        value={data.labels?.company_name_ku ?? ''}
+                                                        onChange={e => updateField('labels.company_name_ku', e.target.value)}
+                                                        placeholder={DEFAULT_LABELS.company_name_ku}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Phone</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.contact_info?.phone || ''}
-                                        onChange={e => updateField('contact_info.phone', e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Email</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.contact_info?.email || ''}
-                                        onChange={e => updateField('contact_info.email', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Address</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                    value={data.contact_info?.address || ''}
-                                    onChange={e => updateField('contact_info.address', e.target.value)}
-                                />
-                            </div>
+                                        <div className="space-y-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Protocol Logo</label>
+                                                <div className="relative group/upload h-[134px]">
+                                                    {data.logo_url ? (
+                                                        <div className="relative h-full rounded-[24px] overflow-hidden border border-neutral-100 bg-neutral-50/50 backdrop-blur-sm p-4">
+                                                            <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain" />
+                                                            <button
+                                                                className="absolute top-3 right-3 p-2.5 bg-red-500 text-white rounded-xl shadow-lg opacity-0 group-hover/upload:opacity-100 transition-all hover:bg-red-600 active:scale-95"
+                                                                onClick={() => updateField('logo_url', '')}
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="relative h-full flex flex-col items-center justify-center gap-3 bg-neutral-50 border-2 border-dashed border-neutral-200 rounded-[24px] hover:bg-white hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/5 transition-all cursor-pointer overflow-hidden">
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={async (e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (!file) return;
+                                                                    try {
+                                                                        const publicUrl = await uploadImage(file, { folder: 'invoice-logos', type: 'logo' });
+                                                                        if (publicUrl) updateField('logo_url', publicUrl);
+                                                                    } catch (err) { console.error('Logo upload failed:', err); }
+                                                                }}
+                                                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                            />
+                                                            <div className="p-3 bg-white rounded-2xl shadow-sm text-neutral-400 transition-colors group-hover:text-blue-500">
+                                                                <Download size={24} />
+                                                            </div>
+                                                            <span className="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Inject Brand Asset</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Facebook</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.social_links?.facebook || ''}
-                                        onChange={e => updateField('social_links.facebook', e.target.value)}
-                                        placeholder="@username"
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Instagram</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.social_links?.instagram || ''}
-                                        onChange={e => updateField('social_links.instagram', e.target.value)}
-                                        placeholder="@username"
-                                    />
-                                </div>
-                            </div>
+                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
+                                        <div className="p-3 bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/20">
+                                            <Hash size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">System Metadata</h3>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Receipt Indexing & Time-stamping</p>
+                                        </div>
+                                    </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">Snapchat</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.social_links?.snapchat || ''}
-                                        onChange={e => updateField('social_links.snapchat', e.target.value)}
-                                        placeholder="@username"
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-wider">TikTok</label>
-                                    <input
-                                        type="text"
-                                        className="w-full p-4 bg-neutral-50 border border-neutral-100 rounded-2xl text-sm font-bold focus:bg-white focus:border-primary-500 transition-all outline-none"
-                                        value={data.social_links?.tiktok || ''}
-                                        onChange={e => updateField('social_links.tiktok', e.target.value)}
-                                        placeholder="@username"
-                                    />
-                                </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Sequence Number</label>
+                                            <div className="relative group/input">
+                                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-blue-500 transition-colors">
+                                                    <Hash size={18} />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                                                    value={data.receipt_no || ''}
+                                                    onChange={e => updateField('receipt_no', e.target.value)}
+                                                    placeholder="001"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Execution Date</label>
+                                            <div className="relative group/input">
+                                                <input
+                                                    type="date"
+                                                    className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                                                    value={data.date || ''}
+                                                    onChange={e => updateField('date', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
-                        </div>
-                    </section>
+                        )}
+
+                        {activeSection === 'content' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
+
+                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
+                                        <div className="p-3 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20">
+                                            <LayoutPanelLeft size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">Protocol Intel</h3>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Transaction Details & Logging</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Received From (Subject)</label>
+                                            <div className="relative group/input">
+                                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-emerald-500 transition-colors">
+                                                    <User size={18} />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none"
+                                                    value={data.received_from || ''}
+                                                    onChange={e => updateField('received_from', e.target.value)}
+                                                    placeholder="Client or Entity Name"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">USD Allocation</label>
+                                                <div className="relative group/input">
+                                                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-emerald-500 transition-colors">
+                                                        <DollarSign size={18} />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none"
+                                                        value={data.amount_usd || ''}
+                                                        onChange={e => updateField('amount_usd', e.target.value)}
+                                                        placeholder="0.00"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 text-right block">بڕی دینار (IQD)</label>
+                                                <div className="relative group/input">
+                                                    <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-emerald-500 transition-colors">
+                                                        <Hash size={18} />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full pr-12 pl-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none text-right"
+                                                        value={data.amount_iqd || ''}
+                                                        onChange={e => updateField('amount_iqd', e.target.value)}
+                                                        placeholder="0"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Sum of (Literal)</label>
+                                            <div className="relative group/input">
+                                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-emerald-500 transition-colors">
+                                                    <MessageSquare size={18} />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none"
+                                                    value={data.sum_of || ''}
+                                                    onChange={e => updateField('sum_of', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 text-right block">تێبینییەکان (Details)</label>
+                                            <div className="relative group/input">
+                                                <textarea
+                                                    className="w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all outline-none resize-none text-right min-h-[120px]"
+                                                    value={data.details || ''}
+                                                    onChange={e => updateField('details', e.target.value)}
+                                                    rows={3}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+
+                        {activeSection === 'labels' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
+
+                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
+                                        <div className="p-3 bg-amber-500 text-white rounded-2xl shadow-lg shadow-amber-500/20">
+                                            <Type size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">Semantic Labels</h3>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Interface Translation & Localization</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {[
+                                            { id: 'header_visa', label: 'Header Index 1', placeholder: DEFAULT_LABELS.header_visa },
+                                            { id: 'header_edu', label: 'Header Index 2', placeholder: DEFAULT_LABELS.header_edu },
+                                            { id: 'header_law', label: 'Header Index 3', placeholder: DEFAULT_LABELS.header_law },
+                                            { id: 'label_usd_ku', label: 'Currency Symbol (USD)', placeholder: DEFAULT_LABELS.label_usd_ku },
+                                            { id: 'label_iqd_ku', label: 'Currency Symbol (IQD)', placeholder: DEFAULT_LABELS.label_iqd_ku, rtl: true },
+                                            { id: 'label_received_en', label: 'Receipt Header (EN)', placeholder: DEFAULT_LABELS.label_received_en },
+                                            { id: 'label_received_ku', label: 'Receipt Header (KU)', placeholder: DEFAULT_LABELS.label_received_ku, rtl: true },
+                                            { id: 'label_sum_en', label: 'Allocation Label (EN)', placeholder: DEFAULT_LABELS.label_sum_en },
+                                            { id: 'label_sum_ku', label: 'Allocation Label (KU)', placeholder: DEFAULT_LABELS.label_sum_ku, rtl: true },
+                                            { id: 'label_details_en', label: 'MetaData Label (EN)', placeholder: DEFAULT_LABELS.label_details_en },
+                                            { id: 'label_details_ku', label: 'MetaData Label (KU)', placeholder: DEFAULT_LABELS.label_details_ku, rtl: true },
+                                            { id: 'label_buyer_ku', label: 'Authentic Signature 1', placeholder: DEFAULT_LABELS.label_buyer_ku, rtl: true },
+                                            { id: 'label_accountant_ku', label: 'Authentic Signature 2', placeholder: DEFAULT_LABELS.label_accountant_ku, rtl: true },
+                                        ].map((field) => (
+                                            <div key={field.id} className="space-y-2">
+                                                <label className={`text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 ${field.rtl ? 'text-right block' : ''}`}>{field.label}</label>
+                                                <input
+                                                    type="text"
+                                                    className={`w-full px-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-amber-500 focus:ring-4 focus:ring-amber-500/5 transition-all outline-none ${field.rtl ? 'text-right font-black' : ''}`}
+                                                    value={data.labels?.[field.id] ?? ''}
+                                                    onChange={e => updateField(`labels.${field.id}`, e.target.value)}
+                                                    placeholder={field.placeholder}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+
+                        {activeSection === 'contact' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-fuchsia-500/5 rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
+
+                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
+                                        <div className="p-3 bg-fuchsia-500 text-white rounded-2xl shadow-lg shadow-fuchsia-500/20">
+                                            <Globe size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">Channels</h3>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Global Communication Hooks</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Phone Protocol</label>
+                                                <div className="relative group/input">
+                                                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-fuchsia-500 transition-colors">
+                                                        <Phone size={18} />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/5 transition-all outline-none"
+                                                        value={data.contact_info?.phone || ''}
+                                                        onChange={e => updateField('contact_info.phone', e.target.value)}
+                                                        placeholder="+964 --- ----"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Email Hash</label>
+                                                <div className="relative group/input">
+                                                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-fuchsia-500 transition-colors">
+                                                        <Mail size={18} />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/5 transition-all outline-none"
+                                                        value={data.contact_info?.email || ''}
+                                                        onChange={e => updateField('contact_info.email', e.target.value)}
+                                                        placeholder="node@onekit.ai"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Geo-Location</label>
+                                            <div className="relative group/input">
+                                                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-fuchsia-500 transition-colors">
+                                                    <MapPin size={18} />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    className="w-full pl-12 pr-6 py-4 bg-neutral-50 border border-neutral-100 rounded-[24px] text-sm font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-fuchsia-500 focus:ring-4 focus:ring-fuchsia-500/5 transition-all outline-none"
+                                                    value={data.contact_info?.address || ''}
+                                                    onChange={e => updateField('contact_info.address', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                            {[
+                                                { id: 'facebook', icon: <Facebook size={18} />, color: 'blue' },
+                                                { id: 'instagram', icon: <Instagram size={18} />, color: 'pink' },
+                                                { id: 'snapchat', icon: <Snapchat size={18} />, color: 'yellow' },
+                                                { id: 'tiktok', icon: <Music2 size={18} />, color: 'neutral' },
+                                            ].map((social) => (
+                                                <div key={social.id} className="space-y-2">
+                                                    <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 capitalize">{social.id}</label>
+                                                    <div className="relative group/input">
+                                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400 group-focus-within/input:text-fuchsia-500 transition-colors">
+                                                            {social.icon}
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-100 rounded-2xl text-[10px] font-bold text-neutral-900 placeholder:text-neutral-300 focus:bg-white focus:border-fuchsia-500 transition-all outline-none"
+                                                            value={data.social_links?.[social.id] || ''}
+                                                            onChange={e => updateField(`social_links.${social.id}`, e.target.value)}
+                                                            placeholder="@username"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+
+                        {activeSection === 'visuals' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <section className="p-8 lg:p-12 bg-white rounded-[40px] border border-neutral-200/50 shadow-premium-layered relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110" />
+
+                                    <div className="flex items-center gap-4 mb-10 pb-6 border-b border-neutral-100">
+                                        <div className="p-3 bg-indigo-500 text-white rounded-2xl shadow-lg shadow-indigo-500/20">
+                                            <Palette size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg lg:text-xl font-black text-neutral-900 uppercase tracking-tight">Visual Matrix</h3>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Aesthetic Calibration & Tokens</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-10">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                            <div className="space-y-4">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Template Architecture</label>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    {['standard', 'premium'].map((t) => (
+                                                        <button
+                                                            key={t}
+                                                            onClick={() => setInvoice({ ...invoice, template_id: t })}
+                                                            className={`px-6 py-4 rounded-2xl border transition-all duration-300 text-[10px] font-black uppercase tracking-widest ${invoice.template_id === t ? 'bg-neutral-900 text-white border-neutral-900 shadow-xl' : 'bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50'}`}
+                                                        >
+                                                            {t} Blueprint
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1 text-primary-500">Brand Color Token</label>
+                                                <div className="flex items-center gap-4 p-4 bg-neutral-50 border border-neutral-100 rounded-3xl group/color hover:border-indigo-500 transition-all">
+                                                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-white shadow-premium">
+                                                        <input
+                                                            type="color"
+                                                            onChange={e => updateField('primary_color', e.target.value)}
+                                                            className="absolute inset-0 w-full h-full cursor-pointer scale-150"
+                                                            value={data.primary_color || '#1e3a8a'}
+                                                        />
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        value={data.primary_color || '#1e3a8a'}
+                                                        onChange={e => updateField('primary_color', e.target.value)}
+                                                        className="flex-1 bg-transparent border-none text-sm font-black text-neutral-900 focus:ring-0 uppercase font-mono tracking-tighter"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                            <div className="space-y-4">
+                                                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-widest ml-1">Aspect Ratio</label>
+                                                <div className="flex gap-3">
+                                                    {[
+                                                        { id: 'portrait', icon: <LayoutPanelLeft size={16} /> },
+                                                        { id: 'landscape', icon: <Layout size={16} /> },
+                                                    ].map((o) => (
+                                                        <button
+                                                            key={o.id}
+                                                            onClick={() => updateField('orientation', o.id)}
+                                                            className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-2xl border transition-all duration-300 text-[10px] font-black uppercase tracking-widest ${data.orientation === o.id ? 'bg-neutral-900 text-white border-neutral-900 shadow-xl' : 'bg-white border-neutral-200 text-neutral-500 hover:bg-neutral-50'}`}
+                                                        >
+                                                            {o.icon}
+                                                            {o.id}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Preview Side */}
                 <div
-                    className={`bg-neutral-100 rounded-[2.5rem] border border-neutral-200 shadow-inner overflow-hidden flex flex-col items-center justify-start p-4 sm:p-8 min-h-[600px] lg:h-[calc(100vh-160px)] sticky top-32 ${mobileView !== 'preview' ? 'hidden lg:flex' : 'flex'}`}
+                    className={`hidden lg:flex flex-col w-[45%] bg-neutral-100 border-l border-neutral-200/50 p-8 lg:p-12 overflow-y-auto scrollbar-hide items-center justify-start sticky top-0 h-[calc(100vh-80px)] ${mobileView === 'preview' ? '!flex !w-full' : ''}`}
                     ref={containerRef}
                 >
                     <div
-                        className="bg-white shadow-2xl origin-top transition-transform duration-300 ease-out"
+                        className="bg-white shadow-premium-layered origin-top transition-all duration-500 ease-out rounded-[24px] overflow-hidden"
                         style={{
                             transform: `scale(${previewScale})`,
                         }}
@@ -1562,7 +1519,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                         <InvoiceContent data={data} labels={labels} template_id={invoice.template_id} contentRef={previewRef} />
                     </div>
                 </div>
-            </div>
+            </main>
 
             <div className="fixed inset-0 pointer-events-none opacity-0 overflow-hidden flex items-start justify-center">
                 <div className="bg-white">
