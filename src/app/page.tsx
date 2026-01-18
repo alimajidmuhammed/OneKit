@@ -25,7 +25,7 @@ export default function HomePage() {
     <>
       <ServerAuthHeader />
 
-      <main className="min-h-screen overflow-x-hidden bg-white selection:bg-primary-100 selection:text-primary-900">
+      <main className="min-h-screen overflow-x-hidden bg-white pt-header selection:bg-primary-100 selection:text-primary-900">
 
         {/* --- HERO SECTION: Impact & Clarity --- */}
         <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(10,36,114,0.03),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(20,184,166,0.03),transparent_40%)]">

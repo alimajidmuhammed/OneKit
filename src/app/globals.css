@@ -334,6 +334,7 @@
   --container-xl: 1280px;
   --container-2xl: 1440px;
   --header-height: 72px;
+  --mobile-header-height: 64px;
   --sidebar-width: 280px;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -1007,6 +1008,17 @@ button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Layout Utilities */
+.pt-header {
+  padding-top: var(--header-height);
+}
+
+@media (max-width: 768px) {
+  .pt-header {
+    padding-top: var(--mobile-header-height);
+  }
 }
 
 /* ============================================
