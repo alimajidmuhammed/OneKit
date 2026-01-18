@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, use, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQRCode } from '@/lib/hooks/useQRCode';
