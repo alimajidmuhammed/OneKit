@@ -86,10 +86,12 @@ export default function Header({ initialUser = null, initialProfile = null }) {
     };
 
     return (
-        <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-500 ${isScrolled
-            ? 'bg-white/80 backdrop-blur-xl border-b border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-16'
-            : 'bg-white h-[72px] border-b border-transparent'
+        <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-700 ${isScrolled
+            ? 'bg-white/80 backdrop-blur-2xl border-b border-white shadow-[0_8px_40px_rgba(10,36,114,0.06)] h-16'
+            : 'bg-white h-[76px] border-b border-transparent'
             }`}>
+            {/* Top Border Glass Highlight */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
 
             <div className="w-full max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
                 {/* Logo */}

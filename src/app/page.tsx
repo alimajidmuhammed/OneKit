@@ -15,56 +15,57 @@ import ServicesSection from '@/components/services/ServicesSection';
 import ServerAuthHeader from '@/components/layout/ServerAuthHeader';
 
 /**
- * OneKit 2.0 - The Professional Operating System
- * Rebuilt for Perfect Layout and Visual Excellence.
+ * OneKit 3.0 - The Master Operating System
+ * Rebuilt for Absolute Perfection and Visual Impact.
  */
 export default function HomePage() {
   return (
     <>
       <ServerAuthHeader />
 
-      <main className="min-h-screen overflow-x-hidden bg-white pt-header selection:bg-primary-100 selection:text-primary-900">
+      <main className="min-h-screen overflow-x-hidden bg-white pt-header selection:bg-primary-900 selection:text-white">
 
-        {/* --- HERO SECTION --- 
-            Optimized for high-impact entrance and clarity.
-        */}
-        <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(10,36,114,0.03),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(20,184,166,0.03),transparent_40%)]">
+        {/* --- HERO SECTION --- */}
+        <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(10,36,114,0.04),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(20,184,166,0.04),transparent_50%)]">
+          {/* OneKit 3.0: Texture Overlay */}
+          <div className="texture-noise absolute inset-0 opacity-[0.03] pointer-events-none" />
+
           {/* Animated Background Elements */}
-          <div className="absolute top-20 -right-20 w-96 h-96 bg-primary-100/30 rounded-full blur-[120px] animate-pulse-glow" />
-          <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-accent-100/30 rounded-full blur-[120px] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute top-10 -right-20 w-[500px] h-[500px] bg-primary-200/20 rounded-full blur-[140px] animate-pulse-glow" />
+          <div className="absolute -bottom-20 -left-20 w-[600px] h-[600px] bg-accent-200/20 rounded-full blur-[140px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
           <div className="container mx-auto px-6 relative z-10 text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-neutral-100 rounded-full shadow-sm mb-8 animate-fade-in-up">
-              <span className="flex h-2 w-2 rounded-full bg-accent-500 animate-pulse" />
-              <span className="text-sm font-bold text-neutral-600 uppercase tracking-widest leading-none">Standard of Excellence In Iraq</span>
+            <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-white border border-neutral-100 rounded-full shadow-premium-layered mb-10 animate-fade-in-up">
+              <span className="flex h-2.5 w-2.5 rounded-full bg-accent-500 animate-pulse shadow-[0_0_10px_rgba(20,184,166,0.5)]" />
+              <span className="text-xs font-black text-neutral-800 uppercase tracking-[0.25em] leading-none">The standard of excellence in Iraq</span>
             </div>
 
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-black text-neutral-900 mb-8 leading-[1.1] tracking-tighter animate-reveal">
-              The Professional <br />
-              <span className="bg-brand-gradient bg-clip-text text-transparent italic">Operating System.</span>
+            <h1 className="font-display text-6xl md:text-8xl lg:text-[10rem] font-black text-neutral-900 mb-12 leading-[0.9] tracking-tighter animate-reveal selection:bg-primary-900 selection:text-white lg:-translate-x-2">
+              The Digital <br />
+              <span className="bg-brand-gradient bg-clip-text text-transparent italic px-4">Ecosystem.</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-neutral-500 max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              OneKit provides the high-end digital infrastructure used by Iraq's elite professionals. Build stunning CVs, Menus, and Invoices with mathematical precision.
+            <p className="text-xl md:text-2xl text-neutral-500 max-w-2xl mx-auto mb-16 leading-relaxed animate-fade-in-up font-medium" style={{ animationDelay: '0.2s' }}>
+              OneKit provides the high-end digital infrastructure used by the world's most demanding professionals. Pure precision in every pixel.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-              <Button asChild size="lg" className="h-16 px-10 text-lg rounded-2xl group shadow-2xl">
+            <div className="flex flex-col sm:flex-row gap-8 justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <Button asChild size="lg" className="h-20 px-14 text-xl rounded-[28px] group shadow-premium-layered bg-primary-900 hover:bg-primary-950 transition-all duration-500 btn-premium overflow-hidden">
                 <Link href="/register">
-                  Start Your Journey
-                  <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  Deploy OneKit
+                  <ArrowRight className="ml-3 w-7 h-7 transition-transform group-hover:translate-x-2" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="h-16 px-10 text-lg rounded-2xl bg-white/50 backdrop-blur-sm shadow-xl">
-                <a href="#services">Research Services</a>
+              <Button asChild variant="outline" size="lg" className="h-20 px-14 text-xl rounded-[28px] bg-white/40 backdrop-blur-md shadow-xl border-neutral-200 hover:border-primary-400 transition-all duration-500">
+                <a href="#services">Research Features</a>
               </Button>
             </div>
 
             {/* Hero Showcase */}
-            <div className="mt-20 relative px-4 max-w-6xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-              <div className="relative z-20 rounded-[48px] border border-white/50 bg-white p-2 shadow-[0_50px_100px_-20px_rgba(10,36,114,0.15)] ring-1 ring-neutral-200/50">
-                <div className="rounded-[40px] overflow-hidden bg-neutral-50 aspect-[16/9] lg:aspect-[21/9]">
+            <div className="mt-32 relative px-4 max-w-7xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+              <div className="relative z-20 rounded-[64px] border border-white/50 bg-white p-3 shadow-premium-layered ring-1 ring-neutral-200/50">
+                <div className="rounded-[52px] overflow-hidden bg-neutral-50 aspect-[16/9] lg:aspect-[21/9]">
                   <img
                     src="/images/platform-showcase.png"
                     alt="OneKit Platform Experience"
@@ -72,92 +73,97 @@ export default function HomePage() {
                   />
                 </div>
               </div>
-              <div className="absolute -inset-10 bg-brand-gradient opacity-10 blur-[100px] z-10 pointer-events-none" />
+              <div className="absolute -inset-20 bg-brand-gradient opacity-[0.08] blur-[120px] z-10 pointer-events-none" />
             </div>
           </div>
         </section>
 
         {/* --- TRUST BAR --- */}
-        <div className="py-12 border-y border-neutral-100 bg-white/50 backdrop-blur-md">
+        <div className="py-20 border-y border-neutral-100 bg-white overflow-hidden">
           <div className="container mx-auto px-6">
-            <p className="text-center text-sm font-bold text-neutral-400 uppercase tracking-[0.3em] mb-8">Trusted by industry leaders across Iraq</p>
-            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale group">
-              <div className="h-8 w-32 bg-neutral-300 rounded-md animate-pulse" />
-              <div className="h-8 w-32 bg-neutral-300 rounded-md animate-pulse" style={{ animationDelay: '0.2s' }} />
-              <div className="h-8 w-32 bg-neutral-300 rounded-md animate-pulse" style={{ animationDelay: '0.4s' }} />
-              <div className="h-8 w-32 bg-neutral-300 rounded-md animate-pulse" style={{ animationDelay: '0.6s' }} />
+            <p className="text-center text-sm font-black text-neutral-400 uppercase tracking-[0.4em] mb-12 opacity-80">Trusted by industry leaders across Iraq</p>
+            <div className="flex flex-wrap justify-center items-center gap-16 md:gap-32 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700 cursor-default">
+              <div className="h-10 w-40 bg-neutral-200 rounded-lg animate-pulse" />
+              <div className="h-10 w-40 bg-neutral-200 rounded-lg animate-pulse" style={{ animationDelay: '0.2s' }} />
+              <div className="h-10 w-40 bg-neutral-200 rounded-lg animate-pulse" style={{ animationDelay: '0.4s' }} />
+              <div className="h-10 w-40 bg-neutral-200 rounded-lg animate-pulse" style={{ animationDelay: '0.6s' }} />
             </div>
           </div>
         </div>
 
-        {/* --- FIXED SERVICES SECTION --- 
-            Integrated with the core layout logic.
-        */}
+        {/* --- SERVICES SECTION --- */}
         <ServicesSection />
 
         {/* --- VALUE PROPOSITION --- */}
-        <section className="py-24 lg:py-40 bg-neutral-950 text-white overflow-hidden rounded-t-[80px] lg:rounded-t-[120px]">
+        <section className="py-32 lg:py-56 bg-neutral-950 text-white overflow-hidden rounded-t-[100px] lg:rounded-t-[160px] relative">
+          <div className="texture-noise absolute inset-0 opacity-10 pointer-events-none" />
+
           <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 auto-rows-fr">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 auto-rows-fr">
 
               {/* Feature Big Card */}
-              <div className="lg:col-span-8 bg-white/5 backdrop-blur-xl border border-white/10 p-10 lg:p-16 rounded-[64px] relative overflow-hidden group z-10">
-                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/10 blur-[100px] rounded-full -mr-40 -mt-40 group-hover:bg-primary-500/20 transition-colors" />
-                <Zap className="text-accent-400 w-12 h-12 mb-8" />
-                <h3 className="text-3xl md:text-5xl font-black mb-6 leading-tight">Lightning Fast Output. <br /> Zero Compromise.</h3>
-                <p className="text-xl text-neutral-400 max-w-xl mb-12">OneKit's automated engine handles the complex layout logic, allowing you to focus purely on high-impact content delivery.</p>
+              <div className="lg:col-span-8 bg-white/5 backdrop-blur-3xl border border-white/10 p-12 lg:p-20 rounded-[72px] relative overflow-hidden group z-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.08]">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/20 blur-[120px] rounded-full -mr-40 -mt-40 group-hover:bg-primary-500/30 transition-colors" />
+                <Zap className="text-accent-400 w-16 h-16 mb-10 group-hover:scale-110 transition-transform duration-500" />
+                <h3 className="text-4xl md:text-6xl font-black mb-8 leading-[0.95] tracking-tighter font-display">Lightning Fast Output. <br /> <span className="text-accent-500 italic">Zero Compromise.</span></h3>
+                <p className="text-xl md:text-2xl text-neutral-400 max-w-2xl mb-16 leading-relaxed font-medium">OneKit's automated engine handles the complex layout logic, allowing you to focus purely on high-impact content delivery.</p>
 
-                <div className="grid sm:grid-cols-2 gap-8">
-                  <div className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent-500 w-6 h-6 mt-1" />
+                <div className="grid sm:grid-cols-2 gap-10">
+                  <div className="flex items-start gap-5 group/item">
+                    <div className="p-3 bg-white/5 rounded-2xl group-hover/item:bg-accent-500/20 transition-colors">
+                      <CheckCircle2 className="text-accent-500 w-7 h-7" />
+                    </div>
                     <div>
-                      <h4 className="font-bold text-lg mb-1">Instant PDF Export</h4>
-                      <p className="text-neutral-500 text-sm">Print-ready CMYK files at your fingertips.</p>
+                      <h4 className="font-black text-xl mb-2 tracking-tight">Instant PDF Export</h4>
+                      <p className="text-neutral-500 text-lg">Print-ready CMYK files at your fingertips.</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <CheckCircle2 className="text-accent-500 w-6 h-6 mt-1" />
+                  <div className="flex items-start gap-5 group/item">
+                    <div className="p-3 bg-white/5 rounded-2xl group-hover/item:bg-accent-500/20 transition-colors">
+                      <CheckCircle2 className="text-accent-500 w-7 h-7" />
+                    </div>
                     <div>
-                      <h4 className="font-bold text-lg mb-1">Vector Clarity</h4>
-                      <p className="text-neutral-500 text-sm">Infinite scalability for billboards or business cards.</p>
+                      <h4 className="font-black text-xl mb-2 tracking-tight">Vector Clarity</h4>
+                      <p className="text-neutral-500 text-lg">Infinite scalability for industrial formats.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Stat Card 1 */}
-              <div className="lg:col-span-4 bg-accent-600 p-10 lg:p-12 rounded-[64px] flex flex-col justify-between group cursor-default">
-                <Globe className="text-white w-10 h-10 group-hover:rotate-12 transition-transform" />
+              <div className="lg:col-span-4 bg-accent-600 p-12 lg:p-16 rounded-[72px] flex flex-col justify-between group cursor-default transition-all duration-700 hover:scale-[1.02] hover:shadow-2xl">
+                <Globe className="text-white w-12 h-12 group-hover:rotate-[30deg] transition-transform duration-700" />
                 <div>
-                  <div className="text-6xl lg:text-7xl font-black mb-4 tracking-tighter">99.9%</div>
-                  <p className="text-lg font-bold text-accent-100 uppercase tracking-widest">Uptime for your digital assets</p>
-                </div>
-              </div>
-
-              {/* Stat Card 2 */}
-              <div className="lg:col-span-4 bg-primary-900 p-10 lg:p-12 rounded-[64px] flex flex-col justify-between group border border-white/10 hover:border-primary-500 transition-all">
-                <ShieldCheck className="text-primary-300 w-10 h-10" />
-                <div>
-                  <div className="text-5xl font-black mb-4 tracking-tighter text-white">Bank-Grade</div>
-                  <p className="text-lg font-bold text-primary-300 uppercase tracking-widest">Secure Data Encryption</p>
+                  <div className="text-7xl lg:text-8xl font-black mb-6 tracking-tighter leading-none">99.9%</div>
+                  <p className="text-xl font-black text-accent-100 uppercase tracking-[0.2em] leading-tight">Platform Uptime <br /> Guaranteed</p>
                 </div>
               </div>
 
               {/* Enterprise Feature Card */}
-              <div className="lg:col-span-8 bg-neutral-900 border border-white/5 p-10 lg:p-16 rounded-[64px] relative overflow-hidden group">
-                <div className="flex flex-col md:flex-row items-center gap-12">
+              <div className="lg:col-span-8 bg-neutral-900 border border-white/5 p-12 lg:p-20 rounded-[72px] relative overflow-hidden group transition-all duration-700 hover:border-white/20">
+                <div className="flex flex-col md:flex-row items-center gap-16">
                   <div className="flex-1">
-                    <h3 className="text-3xl font-black mb-6">Built for the <br /> Iraqi Enterprise.</h3>
-                    <p className="text-neutral-400 leading-relaxed mb-8">We've spent years understanding the local business landscape. From IQD currency handling to localized template styles, OneKit is built for YOU.</p>
-                    <div className="flex flex-wrap gap-3">
-                      <span className="px-4 py-2 bg-white/5 rounded-full text-xs font-bold border border-white/10">IQD Support</span>
-                      <span className="px-4 py-2 bg-white/5 rounded-full text-xs font-bold border border-white/10">Bilingual Arabic/English</span>
-                      <span className="px-4 py-2 bg-white/5 rounded-full text-xs font-bold border border-white/10">Local Payments</span>
+                    <h3 className="text-4xl md:text-5xl font-black mb-8 leading-tight tracking-tighter">Built for the <br /> <span className="text-primary-400">Iraqi Enterprise.</span></h3>
+                    <p className="text-xl text-neutral-400 leading-relaxed mb-12 font-medium">Localized IQD pricing, bilingual support, and local payment integration come standard. No workarounds needed.</p>
+                    <div className="flex flex-wrap gap-4">
+                      {['IQD Support', 'Arabic/English', 'Local Payments'].map((tag) => (
+                        <span key={tag} className="px-6 py-2.5 bg-white/5 rounded-full text-xs font-black border border-white/10 uppercase tracking-widest">{tag}</span>
+                      ))}
                     </div>
                   </div>
-                  <div className="w-full md:w-64 aspect-square bg-gradient-to-br from-primary-500 to-accent-500 rounded-[40px] rotate-3 flex items-center justify-center p-8 group-hover:rotate-6 transition-transform">
-                    <Users className="text-white w-24 h-24" />
+                  <div className="w-full md:w-72 aspect-square bg-brand-gradient rounded-[56px] rotate-3 flex items-center justify-center p-12 group-hover:rotate-6 group-hover:scale-105 transition-all duration-700 shadow-2xl relative">
+                    <Users className="text-white w-32 h-32 relative z-10" />
+                    <div className="absolute inset-0 bg-white/20 blur-3xl rounded-full scale-50 group-hover:scale-110 transition-transform" />
                   </div>
+                </div>
+              </div>
+
+              {/* Stat Card 2 */}
+              <div className="lg:col-span-4 bg-primary-900 p-12 lg:p-16 rounded-[72px] flex flex-col justify-between group border border-white/5 hover:border-primary-500/50 transition-all duration-700 shadow-xl">
+                <ShieldCheck className="text-primary-300 w-12 h-12 group-hover:scale-110 transition-transform" />
+                <div>
+                  <div className="text-5xl lg:text-6xl font-black text-white mb-6 tracking-tighter leading-none">Military <br /> Grade</div>
+                  <p className="text-xl font-black text-primary-300 uppercase tracking-[0.2em] leading-tight">Secure Data <br /> Encryption</p>
                 </div>
               </div>
 
@@ -166,118 +172,115 @@ export default function HomePage() {
         </section>
 
         {/* --- PRICING SECTION --- */}
-        <section id="pricing" className="py-24 lg:py-40 bg-white">
+        <section id="pricing" className="py-32 lg:py-56 bg-white relative">
           <div className="container mx-auto px-6">
-            <div className="text-center max-w-3xl mx-auto mb-20">
-              <span className="inline-block px-4 py-1.5 bg-primary-50 text-primary-700 text-sm font-bold rounded-full uppercase tracking-widest border border-primary-100 mb-6">Investment</span>
-              <h2 className="text-4xl md:text-6xl font-black text-neutral-900 mb-8 tracking-tighter leading-tight">Simple Pricing for <br /> Serious Professionals.</h2>
-              <p className="text-xl text-neutral-500">No monthly surprises. One-time yearly subscriptions designed for business growth.</p>
+            <div className="text-center max-w-4xl mx-auto mb-28">
+              <span className="inline-block px-5 py-2 bg-primary-50 text-primary-700 text-xs font-black rounded-full uppercase tracking-[0.3em] border border-primary-100/50 mb-8">Premium Tiers</span>
+              <h2 className="text-5xl md:text-8xl font-black text-neutral-900 mb-10 tracking-tighter leading-[0.9]">Simple Pricing. <br /> High Value.</h2>
+              <p className="text-xl md:text-2xl text-neutral-500 font-medium leading-relaxed max-w-2xl mx-auto">No hidden fees. One-time yearly subscriptions designed for serious business growth.</p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
               {/* Free Tier */}
-              <div className="bg-neutral-50 p-10 lg:p-16 rounded-[64px] border border-neutral-100 hover:border-neutral-200 transition-all group">
-                <div className="flex justify-between items-start mb-12">
+              <div className="bg-neutral-50 p-12 lg:p-20 rounded-[80px] border border-neutral-100 hover:border-neutral-300 transition-all duration-700 group relative overflow-hidden">
+                <div className="texture-noise absolute inset-0 opacity-[0.01]" />
+                <div className="flex justify-between items-start mb-16 relative z-10">
                   <div>
-                    <h3 className="text-2xl font-bold mb-2">Essential</h3>
-                    <p className="text-neutral-500">Perfect for exploring the platform.</p>
+                    <h3 className="text-3xl font-black mb-3 tracking-tight">Essential</h3>
+                    <p className="text-xl text-neutral-500 font-medium">Perfect for exploration.</p>
                   </div>
-                  <span className="px-4 py-1 bg-white border border-neutral-200 rounded-full text-xs font-bold uppercase tracking-widest text-neutral-400">Current</span>
+                  <span className="px-5 py-2 bg-white border border-neutral-200 rounded-full text-[10px] font-black uppercase tracking-widest text-neutral-400">Current Plan</span>
                 </div>
-                <div className="mb-12">
-                  <div className="text-5xl font-black text-neutral-900 mb-1">$0</div>
-                  <p className="text-sm text-neutral-400 font-bold uppercase tracking-widest">Always free</p>
+                <div className="mb-16 relative z-10">
+                  <div className="text-7xl font-black text-neutral-900 mb-2 leading-none">$0</div>
+                  <p className="text-xs text-neutral-400 font-black uppercase tracking-[0.3em]">Forever Free Access</p>
                 </div>
-                <ul className="space-y-4 mb-12">
-                  <li className="flex items-center gap-3 text-neutral-600">
-                    <CheckCircle2 className="text-neutral-300 w-5 h-5 flex-shrink-0" />
-                    <span>Basic CV Templates</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-neutral-600">
-                    <CheckCircle2 className="text-neutral-300 w-5 h-5 flex-shrink-0" />
-                    <span>Single QR Generator</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-neutral-600">
-                    <CheckCircle2 className="text-neutral-300 w-5 h-5 flex-shrink-0" />
-                    <span>Standard PDF Export</span>
-                  </li>
+                <ul className="space-y-6 mb-16 relative z-10">
+                  {['Standard CV Templates', 'Basic QR Generation', 'Platform Access', 'Community Forum'].map((item) => (
+                    <li key={item} className="flex items-center gap-4 text-neutral-600 font-medium text-lg">
+                      <CheckCircle2 className="text-neutral-300 w-6 h-6 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
-                <Button variant="outline" className="w-full h-16 rounded-2xl text-lg group bg-white">
-                  Get Started
-                  <ChevronRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <Button variant="outline" className="w-full h-18 text-lg rounded-[24px] border-neutral-200 text-neutral-400 cursor-not-allowed font-black uppercase tracking-widest relative z-10" disabled>
+                  Active Plan
                 </Button>
               </div>
 
-              {/* Pro Tier */}
-              <div className="bg-neutral-900 p-10 lg:p-16 rounded-[64px] border border-white/5 relative overflow-hidden group hover:scale-[1.02] transition-all duration-500 shadow-2xl">
-                <div className="absolute top-0 right-0 px-8 py-2 bg-accent-500 text-white text-xs font-black uppercase tracking-widest rounded-bl-3xl">Most Popular</div>
-                <div className="flex justify-between items-start mb-12 relative z-10">
+              {/* Premium Tier */}
+              <div className="bg-primary-950 p-12 lg:p-20 rounded-[80px] text-white relative overflow-hidden group shadow-premium-layered transition-all duration-700 hover:-translate-y-4">
+                <div className="texture-noise absolute inset-0 opacity-10" />
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary-500/10 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-primary-500/20 transition-colors" />
+
+                <div className="flex justify-between items-start mb-16 relative z-10">
                   <div>
-                    <h3 className="text-2xl font-bold mb-2 text-white">Genesis Pro</h3>
-                    <p className="text-neutral-400">The complete professional suite.</p>
+                    <h3 className="text-3xl font-black mb-3 tracking-tight">Pro Access</h3>
+                    <p className="text-xl text-primary-200 font-medium opacity-80">Full ecosystem power.</p>
                   </div>
+                  <span className="px-5 py-2 bg-primary-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl animate-pulse">Most Popular</span>
                 </div>
-                <div className="mb-12 relative z-10">
-                  <div className="text-5xl font-black text-white mb-1">$150<span className="text-xl text-neutral-500 font-medium">/yr</span></div>
-                  <p className="text-sm text-accent-400 font-bold uppercase tracking-widest">Best value for experts</p>
+                <div className="mb-16 relative z-10">
+                  <div className="text-7xl font-black mb-2 leading-none">$10<span className="text-2xl opacity-40 font-medium">/yr</span></div>
+                  <p className="text-xs text-primary-300 font-black uppercase tracking-[0.3em]">Full Enterprise Suite</p>
                 </div>
-                <ul className="space-y-4 mb-12 relative z-10">
-                  <li className="flex items-center gap-3 text-neutral-300">
-                    <CheckCircle2 className="text-accent-500 w-5 h-5 flex-shrink-0" />
-                    <span>All Enterprise Editors</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-neutral-300">
-                    <CheckCircle2 className="text-accent-500 w-5 h-5 flex-shrink-0" />
-                    <span>Unlimited Cloud Sync</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-neutral-300">
-                    <CheckCircle2 className="text-accent-500 w-5 h-5 flex-shrink-0" />
-                    <span>Custom Branding & Themes</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-neutral-300">
-                    <CheckCircle2 className="text-accent-500 w-5 h-5 flex-shrink-0" />
-                    <span>Priority Expert Support</span>
-                  </li>
+                <ul className="space-y-6 mb-16 relative z-10">
+                  {['Menu Maker (All Themes)', 'CV Maker (Premium Templates)', 'Invoice Maker (White-label)', 'Bulk QR Generator', 'Priority 24/7 Support'].map((item) => (
+                    <li key={item} className="flex items-center gap-4 text-primary-50 font-medium text-lg">
+                      <CheckCircle2 className="text-accent-500 w-6 h-6 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
-                <Button className="w-full h-16 rounded-2xl text-lg group bg-brand-gradient hover:opacity-90 transition-opacity border-none shadow-xl">
-                  Go Pro Now
-                  <ChevronRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <Button className="w-full h-20 text-xl rounded-[24px] bg-white text-primary-900 hover:bg-white/90 transition-all duration-500 font-black uppercase tracking-widest shadow-2xl btn-premium overflow-hidden border-none transform group-hover:scale-[1.02]">
+                  Upgrade to Pro
                 </Button>
-                {/* Background Accent */}
-                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-accent-500/20 rounded-full blur-[80px] pointer-events-none group-hover:scale-125 transition-transform duration-700" />
               </div>
             </div>
           </div>
         </section>
 
-        {/* --- FINAL CTA SECTION --- */}
-        <section className="py-24 lg:py-40 bg-neutral-950 overflow-hidden">
-          <div className="container mx-auto px-6">
-            <div className="relative bg-brand-gradient rounded-[80px] p-12 lg:p-24 text-center overflow-hidden group">
-              {/* Dynamic Flowing Background */}
-              <div className="absolute inset-0 opacity-20 animate-background-drift" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 0%, transparent 50%), radial-gradient(circle at 80% 50%, white 0%, transparent 50%)' }} />
+        {/* --- FINAL CTA --- */}
+        <section className="py-32 lg:py-56 bg-neutral-950 text-white overflow-hidden relative">
+          <div className="texture-noise absolute inset-0 opacity-10 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,92,255,0.08),transparent_70%)] animate-pulse-glow" />
 
-              <div className="relative z-10">
-                <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter leading-tight">Ready to Elevate Your <br /> Iraqi Enterprise?</h2>
-                <p className="text-xl text-white/90 max-w-2xl mx-auto mb-12 leading-relaxed">Join the 5,000+ professionals who trust OneKit for their high-end digital infrastructure.</p>
-                <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                  <Button asChild size="lg" className="h-16 px-10 rounded-2xl bg-white text-primary-900 hover:bg-neutral-50 transition-colors shadow-2xl">
-                    <Link href="/register">Start Free Trial</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="h-16 px-10 rounded-2xl border-white/30 text-white hover:bg-white/10 transition-colors">
-                    <Link href="/contact">Contact Sales</Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Decorative Orbs */}
-              <div className="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-[80px]" />
-              <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-[80px]" />
-            </div>
+          <div className="container mx-auto px-6 relative z-10 text-center">
+            <h2 className="text-5xl md:text-8xl lg:text-[10rem] font-black mb-12 tracking-tighter leading-[0.85] animate-reveal">
+              Ready to <br />
+              <span className="bg-brand-gradient bg-clip-text text-transparent italic px-4">Innovate?</span>
+            </h2>
+            <p className="text-xl md:text-3xl text-neutral-400 max-w-3xl mx-auto mb-20 leading-relaxed font-medium">
+              Join Iraq's fastest-growing professional ecosystem today. No credit card required to explore.
+            </p>
+            <Button asChild size="lg" className="h-24 px-16 text-2xl rounded-[32px] bg-white text-primary-900 hover:bg-white/90 transition-all duration-500 group shadow-2xl btn-premium border-none">
+              <Link href="/register">
+                Initialize System
+                <ChevronRight className="ml-3 w-8 h-8 transition-transform group-hover:translate-x-3" />
+              </Link>
+            </Button>
           </div>
         </section>
 
       </main>
+
+      {/* --- FOOTER --- */}
+      <footer className="py-20 bg-white border-t border-neutral-100">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-12">
+            <div className="flex items-center gap-4">
+              <img src="/onekit-logo.png" alt="OneKit" className="h-10 w-auto" />
+              <span className="font-display font-black text-3xl text-primary-900 tracking-tighter">OneKit</span>
+            </div>
+            <div className="flex gap-10 text-sm font-black text-neutral-400 uppercase tracking-widest">
+              <Link href="/terms" className="hover:text-primary-600 transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-primary-600 transition-colors">Privacy</Link>
+              <Link href="/contact" className="hover:text-primary-600 transition-colors">Contact</Link>
+            </div>
+            <p className="text-neutral-400 text-sm font-medium">© 2026 OneKit Ecosystem. Built with precision.</p>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
