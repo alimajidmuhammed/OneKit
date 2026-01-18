@@ -301,7 +301,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                 : 'text-neutral-400 hover:bg-primary-50 hover:text-primary-600'
                                 }`}
                         >
-                            <tab.icon size={16} strokeWidth={isActive === tab.id ? 3 : 2} />
+                            <tab.icon size={16} strokeWidth={activeTab === tab.id ? 3 : 2} />
                             {tab.label}
                         </button>
                     ))}
