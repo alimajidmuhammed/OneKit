@@ -1,5 +1,5 @@
-// @ts-nocheck
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import ServerAuthHeader from '@/components/layout/ServerAuthHeader';
 import Footer from '@/components/layout/Footer';
 import ServicesSection from '@/components/services/ServicesSection';
@@ -31,15 +31,17 @@ export default function HomePage() {
                 The premium all-in-one suite for Iraqi professionals. Build high-end CVs, Menus, and Invoices with a platform designed for perfection.
               </p>
               <div className="flex flex-col sm:flex-row gap-5 mb-12 justify-center lg:justify-start">
-                <Link href="/register" className="bg-primary-900 hover:bg-primary-800 text-white px-9 py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 shadow-lg group">
-                  Get Started Free
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5 transition-transform group-hover:translate-x-1">
-                    <path d="M5 12h14m-7-7l7 7-7 7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-                <a href="#services" className="bg-white text-neutral-900 px-9 py-4 rounded-2xl font-bold text-lg border-2 border-neutral-100 transition-all hover:bg-neutral-50 hover:border-neutral-200 hover:-translate-y-0.5 shadow-sm text-center">
-                  Explore Services
-                </a>
+                <Button asChild size="lg" className="rounded-2xl group">
+                  <Link href="/register">
+                    Get Started Free
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5 transition-transform group-hover:translate-x-1">
+                      <path d="M5 12h14m-7-7l7 7-7 7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="rounded-2xl">
+                  <a href="#services">Explore Services</a>
+                </Button>
               </div>
             </div>
 
@@ -61,14 +63,14 @@ export default function HomePage() {
         </div>
 
         {/* Professionals Section - Light Refined */}
-        <section className="py-[120px] bg-neutral-50 border-t border-neutral-100">
+        <section className="py-24 lg:py-32 bg-neutral-50 border-t border-neutral-100">
           <div className="container mx-auto px-6">
             <div className="text-center mb-16">
               <h2 className="font-display text-4xl md:text-5xl font-extrabold text-neutral-900 mb-4 tracking-tight">Engineered for Professionals</h2>
               <p className="text-xl text-neutral-500">Sophisticated tools tailored for the Iraqi business ecosystem.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white p-10 rounded-[32px] border border-neutral-100 transition-all hover:-translate-y-1.5 hover:shadow-xl hover:border-primary-100 group">
+              <div className="bg-white p-10 rounded-[32px] border border-neutral-100 transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-hover hover:border-primary-100 group">
                 <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center text-primary-600 mb-6 transition-colors group-hover:bg-primary-100">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-7 h-7">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -122,14 +124,14 @@ export default function HomePage() {
                   Free Forever
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-6">
-                  <Link href="/services/cv-maker" className="bg-white p-8 border border-neutral-100 rounded-2xl transition-all hover:border-neutral-200 hover:shadow-md group">
+                  <Link href="/services/cv-maker" className="bg-white p-8 border border-neutral-100 rounded-[32px] transition-all duration-500 hover:border-primary-100 hover:shadow-premium-hover group">
                     <div className="flex justify-between items-center mb-4">
                       <h4 className="text-xl font-bold group-hover:text-primary-600 transition-colors">CV Maker</h4>
                       <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full">FREE</span>
                     </div>
                     <p className="text-neutral-500">Professional templates for your career.</p>
                   </Link>
-                  <Link href="/services/invoice-maker" className="bg-white p-8 border border-neutral-100 rounded-2xl transition-all hover:border-neutral-200 hover:shadow-md group">
+                  <Link href="/services/invoice-maker" className="bg-white p-8 border border-neutral-100 rounded-[32px] transition-all duration-500 hover:border-primary-100 hover:shadow-premium-hover group">
                     <div className="flex justify-between items-center mb-4">
                       <h4 className="text-xl font-bold group-hover:text-primary-600 transition-colors">Invoice Maker</h4>
                       <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full">FREE</span>
@@ -146,7 +148,7 @@ export default function HomePage() {
                   Premium Tools
                 </h3>
                 <div className="grid sm:grid-cols-2 gap-6">
-                  <Link href="/services/menu-maker" className="bg-primary-950 p-8 rounded-3xl relative overflow-hidden group shadow-2xl">
+                  <Link href="/services/menu-maker" className="bg-primary-950 p-8 rounded-[32px] relative overflow-hidden group shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-hover">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent-500/10 blur-[60px]"></div>
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-6">
@@ -173,11 +175,11 @@ export default function HomePage() {
                           Multi-language Support
                         </li>
                       </ul>
-                      <div className="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-4 rounded-xl text-center transition-colors">Select Menu Maker</div>
+                      <div className="w-full bg-accent-600 hover:bg-accent-500 text-white font-bold py-4 rounded-2xl text-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-accent-600/20 active:scale-[0.98]">Select Menu Maker</div>
                     </div>
                   </Link>
 
-                  <Link href="/services/qr-generator" className="bg-white p-8 border-2 border-primary-950 rounded-3xl relative overflow-hidden group">
+                  <Link href="/services/qr-generator" className="bg-white p-8 border-2 border-primary-950 rounded-[32px] relative overflow-hidden group transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-hover">
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-6">
                         <div>
@@ -202,7 +204,7 @@ export default function HomePage() {
                           Custom Branding & Colors
                         </li>
                       </ul>
-                      <div className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold py-4 rounded-xl text-center transition-colors">Select QR Generator</div>
+                      <div className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold py-4 rounded-2xl text-center transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary-900/20 active:scale-[0.98]">Select QR Generator</div>
                     </div>
                   </Link>
                 </div>
@@ -219,20 +221,26 @@ export default function HomePage() {
               <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">Ready to Get Started?</h2>
               <p className="text-xl text-primary-200 mb-10">Join thousands of professionals using OneKit to create amazing things.</p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="/register" className="bg-white text-primary-900 px-10 py-4 rounded-2xl font-bold text-lg hover:bg-primary-50 transition-colors shadow-2xl text-center">
-                  Create Free Account
-                </a>
-                <a
-                  href={getWhatsAppLink(APP_CONFIG.whatsapp.number, APP_CONFIG.whatsapp.defaultMessage)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-accent-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-accent-500 transition-colors flex items-center justify-center gap-3 shadow-2xl"
+                <Button asChild size="lg" variant="outline" className="bg-white border-none hover:bg-primary-50 rounded-2xl shadow-2xl">
+                  <Link href="/register">Create Free Account</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="accent"
+                  className="rounded-2xl shadow-2xl"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                  Contact on WhatsApp
-                </a>
+                  <a
+                    href={getWhatsAppLink(APP_CONFIG.whatsapp.number, APP_CONFIG.whatsapp.defaultMessage)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                    </svg>
+                    Contact on WhatsApp
+                  </a>
+                </Button>
               </div>
             </div>
           </div>

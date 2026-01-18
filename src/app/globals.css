@@ -290,11 +290,15 @@
   --shadow-brand: 0 4px 14px 0 rgba(10, 36, 114, 0.25);
   --shadow-accent: 0 4px 14px 0 rgba(20, 184, 166, 0.25);
 
-  /* Expert Shadows - Multi-layered for realistic depth */
   --shadow-premium:
     0 2px 4px rgba(10, 36, 114, 0.04),
-    0 10px 20px rgba(10, 36, 114, 0.08),
-    0 20px 40px rgba(10, 36, 114, 0.12);
+    0 10px 20px rgba(10, 36, 114, 0.06),
+    0 20px 40px rgba(10, 36, 114, 0.1);
+
+  --shadow-premium-hover:
+    0 4px 8px rgba(10, 36, 114, 0.06),
+    0 15px 30px rgba(10, 36, 114, 0.1),
+    0 30px 60px rgba(10, 36, 114, 0.15);
 
   --shadow-glow: 0 0 20px rgba(20, 184, 166, 0.3), 0 0 40px rgba(10, 36, 114, 0.1);
 
@@ -868,9 +872,15 @@ button {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
-.dark .glass-premium {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.glass-premium-hover {
+  transition: all var(--transition-base);
+}
+
+.glass-premium-hover:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow-premium-hover);
+  transform: translateY(-4px);
 }
 
 /* Glow Effects */

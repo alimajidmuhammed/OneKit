@@ -62,7 +62,7 @@ export default function ServiceCard({ service, showStatus = false, customPriceLa
     return (
         <Link
             href={cardLink}
-            className={`flex flex-col w-full bg-white border rounded-[32px] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group ${themeClasses[service.color as keyof typeof themeClasses] || themeClasses.primary
+            className={`flex flex-col w-full bg-white border rounded-[32px] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-premium-hover group ${themeClasses[service.color as keyof typeof themeClasses] || themeClasses.primary
                 }`}
         >
             <div className="flex justify-between items-start mb-8">
