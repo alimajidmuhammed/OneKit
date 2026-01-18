@@ -1037,7 +1037,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
                     </div>
                 </aside>
 
-                <div className="flex-1 overflow-y-auto bg-[#f8fafc] p-4 lg:p-10 scrollbar-hide">
+                <div className="flex-1 overflow-y-auto bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] bg-neutral-50 p-4 lg:p-10 scrollbar-hide">
                     <div className="max-w-4xl mx-auto space-y-10 pb-20">
                         {/* Mobile Navigation */}
                         <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
@@ -1507,7 +1507,7 @@ export default function InvoiceEditorPage({ params }: { params: Promise<{ id: st
 
                 {/* Preview Side */}
                 <div
-                    className={`hidden lg:flex flex-col w-[45%] bg-neutral-100 border-l border-neutral-200/50 p-8 lg:p-12 overflow-y-auto scrollbar-hide items-center justify-start sticky top-0 h-[calc(100vh-80px)] ${mobileView === 'preview' ? '!flex !w-full' : ''}`}
+                    className={`hidden lg:flex flex-col w-[45%] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] bg-neutral-50 border-l border-neutral-200/50 p-8 lg:p-12 overflow-y-auto scrollbar-hide items-center justify-start sticky top-0 h-[calc(100vh-80px)] ${mobileView === 'preview' ? '!flex !w-full' : ''}`}
                     ref={containerRef}
                 >
                     <div

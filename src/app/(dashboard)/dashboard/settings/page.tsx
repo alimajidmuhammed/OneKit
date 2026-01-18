@@ -359,60 +359,30 @@ export default function SettingsPage() {
 
             {/* Password Change Modal */}
             {showPasswordModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0, 0, 0, 0.7)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        background: 'var(--bg-elevated)',
-                        padding: '32px',
-                        borderRadius: '16px',
-                        width: '90%',
-                        maxWidth: '450px',
-                        boxShadow: 'var(--shadow-xl)'
-                    }}>
-                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: '700' }}>Change Password</h2>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white p-8 rounded-3xl w-[90%] max-w-md shadow-2xl animate-in zoom-in-95 duration-200 border border-neutral-100">
+                        <h2 className="text-2xl font-black text-neutral-900 mb-2">Change Password</h2>
+                        <p className="text-neutral-500 mb-6 font-medium">
                             Enter your new password below
                         </p>
 
                         {passwordError && (
-                            <div style={{
-                                padding: '12px',
-                                background: 'var(--error-50)',
-                                color: 'var(--error-700)',
-                                borderRadius: '8px',
-                                marginBottom: '16px',
-                                fontSize: '14px'
-                            }}>
+                            <div className="p-3 bg-red-50 text-red-700 rounded-xl mb-4 text-sm font-medium border border-red-100 flex items-center gap-2">
+                                <AlertTriangle size={16} />
                                 {passwordError}
                             </div>
                         )}
 
                         {passwordSuccess && (
-                            <div style={{
-                                padding: '12px',
-                                background: 'var(--success-50)',
-                                color: 'var(--success-700)',
-                                borderRadius: '8px',
-                                marginBottom: '16px',
-                                fontSize: '14px'
-                            }}>
-                                ✅ Password changed successfully!
+                            <div className="p-3 bg-green-50 text-green-700 rounded-xl mb-4 text-sm font-medium border border-green-100 flex items-center gap-2">
+                                <CheckCircle2 size={16} />
+                                Password changed successfully!
                             </div>
                         )}
 
-                        <form onSubmit={handlePasswordChange}>
-                            <div style={{ marginBottom: '16px' }}>
-                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                        <form onSubmit={handlePasswordChange} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-neutral-700 mb-2 ml-1">
                                     New Password
                                 </label>
                                 <input
@@ -420,19 +390,13 @@ export default function SettingsPage() {
                                     value={passwordData.newPassword}
                                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                                     placeholder="Enter new password (min 6 characters)"
-                                    style={{
-                                        width: '100%',
-                                        padding: '12px',
-                                        border: '1px solid var(--border-light)',
-                                        borderRadius: '8px',
-                                        fontSize: '14px'
-                                    }}
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all font-medium"
                                     required
                                 />
                             </div>
 
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                            <div>
+                                <label className="block text-sm font-bold text-neutral-700 mb-2 ml-1">
                                     Confirm Password
                                 </label>
                                 <input
@@ -440,18 +404,12 @@ export default function SettingsPage() {
                                     value={passwordData.confirmPassword}
                                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                                     placeholder="Confirm new password"
-                                    style={{
-                                        width: '100%',
-                                        padding: '12px',
-                                        border: '1px solid var(--border-light)',
-                                        borderRadius: '8px',
-                                        fontSize: '14px'
-                                    }}
+                                    className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all font-medium"
                                     required
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', gap: '12px' }}>
+                            <div className="flex gap-3 pt-2">
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -459,35 +417,20 @@ export default function SettingsPage() {
                                         setPasswordData({ newPassword: '', confirmPassword: '' });
                                         setPasswordError('');
                                     }}
-                                    style={{
-                                        flex: 1,
-                                        padding: '12px',
-                                        background: 'var(--neutral-200)',
-                                        color: 'var(--text-primary)',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        fontWeight: '600',
-                                        cursor: 'pointer'
-                                    }}
+                                    className="flex-1 py-3 bg-neutral-100 text-neutral-600 rounded-xl font-bold hover:bg-neutral-200 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={passwordLoading}
-                                    style={{
-                                        flex: 1,
-                                        padding: '12px',
-                                        background: 'var(--primary-600)',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        fontWeight: '600',
-                                        cursor: passwordLoading ? 'not-allowed' : 'pointer',
-                                        opacity: passwordLoading ? 0.6 : 1
-                                    }}
+                                    className="flex-1 py-3 bg-primary-900 text-white rounded-xl font-bold hover:bg-primary-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {passwordLoading ? 'Changing...' : 'Change Password'}
+                                    {passwordLoading ? (
+                                        <span className="flex items-center justify-center gap-2">
+                                            <Loader2 size={18} className="animate-spin" /> Changing...
+                                        </span>
+                                    ) : 'Change Password'}
                                 </button>
                             </div>
                         </form>
@@ -497,69 +440,37 @@ export default function SettingsPage() {
 
             {/* Delete Account Modal */}
             {showDeleteModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0, 0, 0, 0.7)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        background: 'var(--bg-elevated)',
-                        padding: '32px',
-                        borderRadius: '16px',
-                        width: '90%',
-                        maxWidth: '450px',
-                        boxShadow: 'var(--shadow-xl)'
-                    }}>
-                        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: '700', color: 'var(--error-600)' }}>
-                            ⚠️ Delete Account
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white p-8 rounded-3xl w-[90%] max-w-md shadow-2xl animate-in zoom-in-95 duration-200 border border-red-100 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1.5 bg-red-500" />
+                        <h2 className="text-2xl font-black text-red-600 mb-2 flex items-center gap-2">
+                            <AlertTriangle className="fill-red-100" /> Delete Account
                         </h2>
-                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-                            This action <strong>CANNOT</strong> be undone. All your data will be permanently deleted.
+                        <p className="text-neutral-500 mb-6 font-medium leading-relaxed">
+                            This action <strong className="text-red-600">CANNOT</strong> be undone. All your data will be permanently deleted.
                         </p>
 
-                        <div style={{ marginBottom: '24px' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
-                                Type <code style={{ background: 'var(--neutral-200)', padding: '2px 8px', borderRadius: '4px' }}>DELETE</code> to confirm:
+                        <div className="mb-6">
+                            <label className="block text-sm font-bold text-neutral-700 mb-2 ml-1">
+                                Type <code className="bg-neutral-100 px-2 py-0.5 rounded text-red-600 font-mono text-xs border border-neutral-200">DELETE</code> to confirm:
                             </label>
                             <input
                                 type="text"
                                 value={deleteConfirmation}
                                 onChange={(e) => setDeleteConfirmation(e.target.value)}
                                 placeholder="Type DELETE"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    border: '2px solid var(--error-500)',
-                                    borderRadius: '8px',
-                                    fontSize: '14px'
-                                }}
+                                className="w-full px-4 py-3 bg-white border-2 border-red-100 rounded-xl focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all font-medium text-red-600 placeholder:text-red-200"
                             />
                         </div>
 
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div className="flex gap-3">
                             <button
                                 type="button"
                                 onClick={() => {
                                     setShowDeleteModal(false);
                                     setDeleteConfirmation('');
                                 }}
-                                style={{
-                                    flex: 1,
-                                    padding: '12px',
-                                    background: 'var(--neutral-200)',
-                                    color: 'var(--text-primary)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer'
-                                }}
+                                className="flex-1 py-3 bg-neutral-100 text-neutral-600 rounded-xl font-bold hover:bg-neutral-200 transition-colors"
                             >
                                 Cancel
                             </button>
@@ -567,19 +478,13 @@ export default function SettingsPage() {
                                 type="button"
                                 onClick={handleDeleteAccount}
                                 disabled={deleteLoading || deleteConfirmation !== 'DELETE'}
-                                style={{
-                                    flex: 1,
-                                    padding: '12px',
-                                    background: 'var(--error-600)',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    fontWeight: '600',
-                                    cursor: (deleteLoading || deleteConfirmation !== 'DELETE') ? 'not-allowed' : 'pointer',
-                                    opacity: (deleteLoading || deleteConfirmation !== 'DELETE') ? 0.4 : 1
-                                }}
+                                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg hover:shadow-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {deleteLoading ? 'Deleting...' : 'Delete My Account'}
+                                {deleteLoading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <Loader2 size={18} className="animate-spin" /> Deleting...
+                                    </span>
+                                ) : 'Delete My Account'}
                             </button>
                         </div>
                     </div>
