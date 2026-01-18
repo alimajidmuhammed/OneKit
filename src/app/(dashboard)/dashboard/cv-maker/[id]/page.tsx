@@ -757,6 +757,16 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
     }
 
     const currentTemplate = CV_TEMPLATES.find(t => t.id === cv.template_id) || CV_TEMPLATES[0];
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <Icons.spinner className="w-10 h-10 animate-spin text-primary-600" />
+            </div>
+        );
+    }
+
+    if (!cv) return null;
+
     const photoStyle = cv.personal_info?.photo ? {
         width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center',
         transform: `translate(${cv.personal_info.photoPosition?.x || 0}px, ${cv.personal_info.photoPosition?.y || 0}px) scale(${cv.personal_info.photoZoom || 1}) rotate(${cv.personal_info.photoRotation || 0}deg)`
