@@ -101,7 +101,6 @@ export const SERVICES = [
             'Custom sizing',
         ],
     },
-
 ];
 
 // App configuration
