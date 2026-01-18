@@ -1271,6 +1271,7 @@ export default function BusinessCardEditor({ params }: { params: Promise<{ id: s
                                 </div>
                             )}
                         </div>
+                    </div>
                 </aside>
 
                 {/* Preview Workspace */}
