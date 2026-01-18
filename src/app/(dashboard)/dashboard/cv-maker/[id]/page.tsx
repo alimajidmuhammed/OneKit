@@ -2,9 +2,6 @@
 'use client';
 
 import { use, useState, useRef, useEffect, useCallback } from 'react';
-import { jsPDF } from 'jspdf';
-import { CVPDF } from '@/components/pdf/CVPDF';
-import { PDFDownloadButton } from '@/components/ui/PDFDownloadButton';
 import { useRouter } from 'next/navigation';
 import { useCV } from '@/lib/hooks/useCV';
 import { useAuth } from '@/components/auth/AuthProvider';
