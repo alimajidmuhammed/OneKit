@@ -85,21 +85,20 @@ export default function MenuMakerPage() {
                     </p>
                 </div>
                 {canAccess && (
-                    <button
-                        onClick={() => setShowCreateModal(true)}
-                        className="btn-premium group flex items-center gap-3 px-8 py-4 bg-primary-950 text-white rounded-[24px] font-black text-sm shadow-premium-layered hover:scale-105 transition-all active:scale-95"
+                    <Link
+                        href="/dashboard/menu-maker/new"
+                        className="flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-primary-500/25 hover:shadow-2xl transition-all active:scale-95"
                     >
-                        <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500" />
-                        Create New Menu
-                    </button>
+                        <Plus size={16} /> New Menu Build
+                    </Link>
                 )}
             </div>
 
             {/* Status Banners: Glassmorphism 2.0 */}
             {(isTrialActive || isTrialExpired) && (
                 <div className={`p-6 rounded-[32px] border backdrop-blur-2xl flex flex-col md:flex-row items-center gap-6 shadow-xl animate-fade-in ${isTrialExpired
-                        ? 'bg-red-50/80 border-red-200/50 text-red-900'
-                        : 'bg-primary-50/80 border-primary-200/50 text-primary-900'
+                    ? 'bg-red-50/80 border-red-200/50 text-red-900'
+                    : 'bg-primary-50/80 border-primary-200/50 text-primary-900'
                     }`}>
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${isTrialExpired ? 'bg-red-100 text-red-600' : 'bg-primary-100 text-primary-600'
                         }`}>
@@ -120,8 +119,8 @@ export default function MenuMakerPage() {
                         href={getWhatsAppLink(APP_CONFIG.whatsapp.number, `Hi! I want to subscribe to Menu Maker. Status: ${isTrialExpired ? 'Expired' : 'Active'}`)}
                         target="_blank"
                         className={`px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-lg active:scale-95 ${isTrialExpired
-                                ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/20'
-                                : 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-600/20'
+                            ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/20'
+                            : 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-600/20'
                             }`}
                     >
                         {isTrialExpired ? 'Subscribe via WhatsApp' : 'Upgrade to Pro'}
@@ -264,8 +263,8 @@ export default function MenuMakerPage() {
                                             key={template.id}
                                             onClick={() => setSelectedTemplate(template.id)}
                                             className={`relative flex flex-col items-center gap-4 p-8 border-2 rounded-[36px] transition-all cursor-pointer group active:scale-95 ${selectedTemplate === template.id
-                                                    ? 'border-primary-600 bg-primary-50/30'
-                                                    : 'border-neutral-50 hover:border-neutral-200 hover:bg-neutral-50'
+                                                ? 'border-primary-600 bg-primary-50/30'
+                                                : 'border-neutral-50 hover:border-neutral-200 hover:bg-neutral-50'
                                                 }`}
                                         >
                                             <div className="text-4xl group-hover:scale-125 transition-transform duration-500">{template.preview}</div>

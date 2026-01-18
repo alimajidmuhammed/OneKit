@@ -127,13 +127,12 @@ export default function QRGeneratorPage() {
                             Archive remains accessible, but forge capabilities are now offline.
                         </p>
                     </div>
-                    <a
-                        href={getWhatsAppLink(APP_CONFIG.whatsapp.number, 'Hi! I want to subscribe to QR Generator')}
-                        target="_blank"
-                        className="px-8 py-4 bg-red-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-red-900/20 hover:scale-105 transition-all"
+                    <Link
+                        href="/dashboard/qr-generator/new"
+                        className="flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-primary-500/25 hover:shadow-2xl transition-all active:scale-95"
                     >
-                        Restore Forge Access
-                    </a>
+                        <Plus size={16} /> New Deployment
+                    </Link>
                 </div>
             )}
 
@@ -264,8 +263,8 @@ export default function QRGeneratorPage() {
                                             key={template.id}
                                             onClick={() => setSelectedTemplate(template.id)}
                                             className={`relative flex flex-col items-center gap-4 p-8 border-2 rounded-[36px] transition-all cursor-pointer group active:scale-95 ${selectedTemplate === template.id
-                                                    ? 'border-primary-600 bg-primary-50/30'
-                                                    : 'border-neutral-50 hover:border-neutral-200 hover:bg-neutral-50'
+                                                ? 'border-primary-600 bg-primary-50/30'
+                                                : 'border-neutral-50 hover:border-neutral-200 hover:bg-neutral-50'
                                                 }`}
                                         >
                                             <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl group-hover:rotate-12 group-hover:scale-110 transition-all duration-500" style={{

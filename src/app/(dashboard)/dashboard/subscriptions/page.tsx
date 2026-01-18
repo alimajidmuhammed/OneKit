@@ -30,11 +30,11 @@ export default function SubscriptionsPage() {
         <div className="p-6 md:p-8 lg:p-12 max-w-7xl mx-auto space-y-10 animate-reveal">
             {/* Header Section */}
             <div className="space-y-4 mb-12">
-                <span className="inline-block px-4 py-1 bg-primary-100 text-primary-700 text-[10px] font-black uppercase tracking-[0.3em] rounded-full border border-primary-200/50">
+                <span className="inline-block px-4 py-1.5 bg-primary-50 text-primary-600 text-[10px] font-black uppercase tracking-[0.3em] rounded-full border border-primary-100">
                     Account Management
                 </span>
-                <h1 className="text-3xl md:text-4xl font-black text-neutral-900 tracking-tighter leading-none">
-                    My <span className="bg-brand-gradient bg-clip-text text-transparent italic">Subscriptions</span>
+                <h1 className="text-3xl md:text-5xl font-black text-neutral-900 tracking-tighter leading-none">
+                    My <span className="text-primary-500 italic">Subscriptions</span>
                 </h1>
                 <p className="text-base text-neutral-400 font-medium max-w-lg">
                     Manage your service subscriptions
@@ -141,7 +141,7 @@ export default function SubscriptionsPage() {
                                     {sub.status === 'active' ? (
                                         <Link
                                             href={`/services/${service?.slug}`}
-                                            className="btn-premium inline-flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-lg hover:shadow-xl transition-all active:scale-95"
+                                            className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-xl shadow-primary-500/25 hover:shadow-2xl hover:scale-[1.02] transition-all active:scale-95"
                                         >
                                             Use Service
                                             <ArrowRight size={16} />
@@ -175,7 +175,7 @@ export default function SubscriptionsPage() {
                         <p className="text-neutral-400 mb-8">Subscribe to a service to get started</p>
                         <Link
                             href="/#services"
-                            className="btn-premium inline-flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-lg hover:shadow-xl transition-all active:scale-95"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-xl shadow-primary-500/25 hover:shadow-2xl hover:scale-[1.02] transition-all active:scale-95"
                         >
                             Browse Services
                             <ArrowRight size={16} />

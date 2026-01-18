@@ -266,7 +266,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                     </button>
                     <button
                         onClick={handlePublish}
-                        className={`btn-premium flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest text-white shadow-xl transition-all active:scale-95 ${menu.is_published ? 'bg-neutral-900 hover:bg-black shadow-neutral-900/20' : 'bg-green-600 hover:bg-green-700 shadow-green-600/20'
+                        className={`btn-premium flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest text-white shadow-xl transition-all active:scale-95 ${menu.is_published ? 'bg-[#1E293B] hover:bg-[#0F172A] shadow-neutral-900/20' : 'bg-[#22C55E] hover:bg-[#16A34A] shadow-green-600/20'
                             }`}
                     >
                         {menu.is_published ? <X size={16} /> : <Globe size={16} />}
@@ -297,7 +297,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-[0.1em] whitespace-nowrap transition-all duration-500 ${activeTab === tab.id
-                                ? 'bg-primary-950 text-white shadow-premium-layered'
+                                ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25'
                                 : 'text-neutral-400 hover:bg-primary-50 hover:text-primary-600'
                                 }`}
                         >
@@ -534,7 +534,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                                         <button
                                             onClick={downloadBadge}
                                             disabled={downloading}
-                                            className="px-10 py-5 bg-primary-950 text-white rounded-[24px] font-black text-sm shadow-premium-layered hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-4 disabled:opacity-50"
+                                            className="px-10 py-5 bg-primary-500 text-white rounded-[24px] font-black text-sm shadow-xl shadow-primary-500/25 hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-4 disabled:opacity-50"
                                         >
                                             {downloading ? <Loader2 className="animate-spin" /> : <Download size={22} />}
                                             {downloading ? 'Compiling Assets...' : 'Download Full Badge'}
@@ -591,7 +591,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                         </div>
                         <div className="p-8 bg-neutral-50/50 border-t border-neutral-50 flex items-center gap-4">
                             <button className="flex-1 py-4 font-black text-neutral-400 uppercase tracking-widest text-[10px]" onClick={() => setShowCategoryModal(false)}>Abort</button>
-                            <button className="flex-[2] py-4 bg-primary-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-neutral-900/10 active:scale-95 transition-all" onClick={handleSaveCategory}>{editingCategory ? 'Overwrite' : 'Inject Block'}</button>
+                            <button className="flex-[2] py-4 bg-primary-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary-500/20 active:scale-95 transition-all" onClick={handleSaveCategory}>{editingCategory ? 'Overwrite' : 'Inject Block'}</button>
                         </div>
                     </div>
                 </div>
@@ -668,7 +668,7 @@ export default function MenuEditorPage({ params }: { params: Promise<{ id: strin
                         </div>
                         <div className="p-10 bg-neutral-50/50 border-t border-neutral-100 flex items-center justify-between gap-8">
                             <button className="flex-1 py-5 font-black text-neutral-400 uppercase tracking-widest text-[11px] hover:text-neutral-900 transition-colors" onClick={() => setShowItemModal(false)}>Abort Deployment</button>
-                            <button className="flex-[2] py-5 bg-primary-950 text-white rounded-[24px] font-black text-sm shadow-premium-layered active:scale-[0.98] transition-all disabled:opacity-50" onClick={handleSaveItem} disabled={saving || uploadingItemImage}>{editingItem ? 'Finalize Master Overhaul' : 'Initialize Content Release'}</button>
+                            <button className="flex-[2] py-5 bg-primary-500 text-white rounded-[24px] font-black text-sm shadow-xl shadow-primary-500/25 active:scale-[0.98] transition-all disabled:opacity-50" onClick={handleSaveItem} disabled={saving || uploadingItemImage}>{editingItem ? 'Finalize Master Overhaul' : 'Initialize Content Release'}</button>
                         </div>
                     </div>
                 </div>

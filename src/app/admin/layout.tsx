@@ -40,9 +40,9 @@ export default function AdminLayout({ children }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-neutral-950">
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
                 <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-                <p className="text-neutral-400">Loading...</p>
+                <p className="text-neutral-400 font-medium tracking-tight">Synchronizing Protocol...</p>
             </div>
         );
     }
@@ -54,19 +54,19 @@ export default function AdminLayout({ children }) {
     return (
         <div className="flex min-h-screen">
             {/* Mobile Header */}
-            <header className="fixed top-0 left-0 right-0 h-15 bg-neutral-900 items-center px-4 gap-3 z-50 hidden lg:hidden flex">
+            <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-neutral-100 items-center px-4 gap-3 z-50 hidden lg:hidden flex">
                 <button
                     className="w-10 h-10 flex flex-col justify-center items-center gap-1.5 bg-transparent border-none cursor-pointer p-2"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     aria-label="Toggle menu"
                 >
                     {mobileMenuOpen ? (
-                        <X className="w-6 h-6 text-white" />
+                        <X className="w-6 h-6 text-neutral-900" />
                     ) : (
-                        <Menu className="w-6 h-6 text-white" />
+                        <Menu className="w-6 h-6 text-neutral-900" />
                     )}
                 </button>
-                <span className="text-lg font-semibold text-white">OneKit Admin</span>
+                <span className="text-lg font-black text-neutral-900 tracking-tighter">OneKit <span className="text-primary-500">Admin</span></span>
             </header>
 
             {/* Mobile Overlay */}
@@ -78,20 +78,20 @@ export default function AdminLayout({ children }) {
             )}
 
             {/* Sidebar */}
-            <aside className={`w-70 bg-neutral-900 flex flex-col fixed top-0 left-0 bottom-0 z-50 transition-transform duration-300 lg:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="p-6 border-b border-neutral-800">
-                    <Link href="/admin" className="flex items-center gap-3 no-underline">
-                        <div className="w-9 h-9 text-primary-400">
-                            <Shield className="w-full h-full" />
+            <aside className={`w-72 bg-white border-r border-neutral-100 flex flex-col fixed top-0 left-0 bottom-0 z-50 transition-transform duration-300 lg:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-8 border-b border-neutral-100">
+                    <Link href="/" className="flex items-center gap-3 no-underline group">
+                        <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:rotate-6 transition-all duration-500">
+                            <img src="/onekit-logo.png" alt="OneKit" className="h-5 w-5 invert" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-lg font-bold text-white">OneKit</span>
-                            <span className="text-xs text-primary-400 uppercase tracking-wider">Admin</span>
+                            <span className="text-xl font-black text-neutral-900 tracking-tighter leading-none">OneKit</span>
+                            <span className="text-[10px] font-black text-primary-500 uppercase tracking-[0.2em] mt-1">Master Admin</span>
                         </div>
                     </Link>
                 </div>
 
-                <nav className="flex-1 p-4 overflow-y-auto">
+                <nav className="flex-1 p-6 space-y-1.5 overflow-y-auto">
                     {ADMIN_NAV.map((item) => {
                         const IconComponent = iconMap[item.icon] || LayoutDashboard;
                         const isActive = pathname === item.href;
@@ -99,13 +99,16 @@ export default function AdminLayout({ children }) {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 text-sm font-medium no-underline rounded-lg mb-1 transition-all ${isActive
-                                        ? 'text-white bg-primary-600 hover:bg-primary-700'
-                                        : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                                className={`flex items-center gap-3.5 px-4 py-3.5 text-sm font-bold rounded-2xl transition-all relative group ${isActive
+                                    ? 'text-primary-600 bg-primary-50'
+                                    : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
                                     }`}
                             >
-                                <IconComponent className="w-5 h-5" />
+                                <IconComponent className={`w-5 h-5 transition-transform group-hover:scale-110 ${isActive ? 'text-primary-600' : 'text-neutral-400'}`} />
                                 {item.label}
+                                {isActive && (
+                                    <span className="absolute left-0 w-1.5 h-6 bg-primary-500 rounded-r-full" />
+                                )}
                             </Link>
                         );
                     })}
@@ -118,19 +121,23 @@ export default function AdminLayout({ children }) {
                     </Link>
                 </nav>
 
-                <div className="p-4 border-t border-neutral-800 flex items-center gap-3">
+                <div className="p-6 border-t border-neutral-100 bg-neutral-50/30 flex items-center gap-4">
                     <div className="flex-1 flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                            {profile?.full_name?.[0] || user.email[0].toUpperCase()}
+                        <div className="w-11 h-11 rounded-2xl bg-primary-500 flex items-center justify-center text-white font-black text-sm flex-shrink-0 border-2 border-white shadow-lg overflow-hidden ring-1 ring-primary-100">
+                            {profile?.avatar_url ? (
+                                <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                            ) : (
+                                <span>{profile?.full_name?.[0] || user.email[0].toUpperCase()}</span>
+                            )}
                         </div>
                         <div className="flex-1 min-w-0 flex flex-col">
-                            <span className="text-sm font-medium text-white truncate">{profile?.full_name || 'Admin'}</span>
-                            <span className="text-xs text-neutral-500 capitalize">{profile?.role || 'admin'}</span>
+                            <span className="text-sm font-black text-neutral-900 truncate">{profile?.full_name || 'Admin'}</span>
+                            <span className="text-[10px] font-black text-primary-500 uppercase tracking-widest">{profile?.role || 'admin'}</span>
                         </div>
                     </div>
                     <button
                         onClick={signOut}
-                        className="w-9 h-9 flex items-center justify-center bg-transparent border-none rounded-lg cursor-pointer text-neutral-500 transition-all hover:bg-neutral-800 hover:text-red-400"
+                        className="w-10 h-10 flex items-center justify-center bg-white border border-neutral-100 rounded-xl cursor-pointer text-neutral-400 transition-all hover:bg-red-50 hover:text-red-500 hover:border-red-100 shadow-sm"
                     >
                         <LogOut className="w-5 h-5" />
                     </button>
@@ -138,7 +145,7 @@ export default function AdminLayout({ children }) {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 ml-0 lg:ml-70 min-h-screen bg-neutral-950 pt-15 lg:pt-0">
+            <main className="flex-1 ml-0 lg:ml-72 min-h-screen bg-[#F8FAFC] pt-16 lg:pt-0">
                 {children}
             </main>
         </div>

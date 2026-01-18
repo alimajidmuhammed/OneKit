@@ -86,94 +86,91 @@ export default function Header({ initialUser = null, initialProfile = null }) {
     };
 
     return (
-        <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-700 ${isScrolled
-            ? 'bg-white/80 backdrop-blur-2xl border-b border-white shadow-[0_8px_40px_rgba(10,36,114,0.06)] h-16'
-            : 'bg-white h-[76px] border-b border-transparent'
+        <header className={`fixed top-0 left-0 right-0 z-[1030] transition-all duration-500 ${isScrolled
+            ? 'bg-white/90 backdrop-blur-xl border-b border-neutral-100 shadow-sm h-16'
+            : 'bg-transparent h-20'
             }`}>
-            {/* Top Border Glass Highlight */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
             <div className="w-full max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-3 group relative z-[20]">
-                    <img
-                        src="/onekit-logo.png"
-                        alt="OneKit"
-                        className="w-auto transition-transform group-hover:scale-105"
-                        style={{ height: '36px', minHeight: '36px' }}
-                    />
-                    <span className="font-display font-extrabold text-2xl text-primary-900 tracking-tight">OneKit</span>
+                <Link href="/" className="flex items-center gap-2 group relative z-[20]">
+                    <div className="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:rotate-6 transition-transform">
+                        <img
+                            src="/onekit-logo.png"
+                            alt="OneKit"
+                            className="w-5 h-5 object-contain invert"
+                        />
+                    </div>
+                    <span className="font-display font-black text-2xl text-neutral-900 tracking-tight">OneKit</span>
                 </Link>
 
-
                 {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8 translate-x-4">
+                <nav className="hidden md:flex items-center gap-1">
                     {NAV_ITEMS.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`text-sm font-bold transition-all hover:text-primary-600 hover:scale-105 ${activeSection === item.href ? 'text-primary-600' : 'text-neutral-600'
-                                }`}
-                        >
-                            {item.label}
-                        </Link>
+                        <div key={item.href} className="flex items-center">
+                            <Link
+                                href={item.href}
+                                className={`px-4 py-2 text-sm font-bold transition-all hover:text-primary-500 relative flex items-center gap-1 ${activeSection === item.href ? 'text-primary-500' : 'text-neutral-700'
+                                    }`}
+                            >
+                                {item.label}
+                                {activeSection === item.href && (
+                                    <span className="w-1 h-1 rounded-full bg-primary-500 animate-pulse mt-0.5" />
+                                )}
+                            </Link>
+                            <span className="text-neutral-300 font-light opacity-50 last:hidden">.</span>
+                        </div>
                     ))}
                 </nav>
 
-
-
                 {/* Auth Actions */}
-                <div className="flex items-center gap-2 sm:gap-4 relative z-[20]">
-
+                <div className="flex items-center gap-3 relative z-[20]">
                     {auth.loading ? (
-                        <div className="w-24 h-9 bg-neutral-100 animate-pulse rounded-xl" />
+                        <div className="w-20 h-9 bg-neutral-100 animate-pulse rounded-full" />
                     ) : user ? (
                         <div className="flex items-center gap-4">
-                            <Link href="/dashboard" className="hidden sm:inline-flex bg-primary-900 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-primary-800 transition-colors">
+                            <Link href="/dashboard" className="hidden sm:inline-flex bg-primary-500 text-white px-6 py-2.5 rounded-full text-sm font-black hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/25 active:scale-95">
                                 Dashboard
                             </Link>
 
                             <div className="relative">
                                 <button
-                                    className="flex items-center gap-2 p-1 rounded-full hover:bg-neutral-50 transition-colors"
+                                    className="flex items-center gap-2 p-1 rounded-full hover:bg-white transition-all border border-transparent hover:border-neutral-100"
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                    aria-expanded={isProfileOpen}
                                 >
-                                    <div className="w-9 h-9 rounded-full bg-brand-gradient flex items-center justify-center text-white overflow-hidden border-2 border-white shadow-sm">
+                                    <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 overflow-hidden border-2 border-white shadow-sm font-black">
                                         {profile?.avatar_url ? (
                                             <img src={profile.avatar_url} alt={profile.full_name || 'User'} className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-sm font-bold">{profile?.full_name?.[0] || user.email[0].toUpperCase()}</span>
+                                            <span className="text-sm">{profile?.full_name?.[0] || user.email[0].toUpperCase()}</span>
                                         )}
                                     </div>
-                                    <ChevronDown size={16} className={`text-neutral-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {isProfileOpen && (
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setIsProfileOpen(false)} />
-                                        <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl border border-neutral-100 shadow-2xl z-20 overflow-hidden animate-in fade-in zoom-in duration-200">
-                                            <div className="p-4 bg-neutral-50 border-b border-neutral-100">
-                                                <p className="font-bold text-neutral-900 truncate">{profile?.full_name || 'User'}</p>
-                                                <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                                        <div className="absolute right-0 mt-4 w-64 bg-white rounded-3xl border border-neutral-100 shadow-2xl z-20 overflow-hidden animate-in fade-in zoom-in duration-300">
+                                            <div className="p-5 bg-neutral-50/50 border-b border-neutral-100">
+                                                <p className="font-black text-neutral-900 truncate">{profile?.full_name || 'User'}</p>
+                                                <p className="text-xs text-neutral-500 truncate font-medium">{user.email}</p>
                                             </div>
                                             <div className="p-2">
-                                                <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 rounded-xl transition-colors">
-                                                    <LayoutGrid size={18} className="text-neutral-400" />
+                                                <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-primary-50 hover:text-primary-600 rounded-2xl transition-all">
+                                                    <LayoutGrid size={18} />
                                                     Dashboard
                                                 </Link>
-                                                <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 rounded-xl transition-colors">
-                                                    <Settings size={18} className="text-neutral-400" />
-                                                    Settings
+                                                <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-primary-50 hover:text-primary-600 rounded-2xl transition-all">
+                                                    <Settings size={18} />
+                                                    Account Settings
                                                 </Link>
                                                 {isAdmin && (
-                                                    <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 rounded-xl transition-colors">
-                                                        <ShieldCheck size={18} className="text-primary-600" />
+                                                    <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-primary-50 hover:text-primary-600 rounded-2xl transition-all">
+                                                        <ShieldCheck size={18} />
                                                         Admin Panel
                                                     </Link>
                                                 )}
-                                                <div className="h-px bg-neutral-100 my-2" />
-                                                <button onClick={handleSignOut} className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors">
+                                                <div className="h-px bg-neutral-100 my-2 mx-2" />
+                                                <button onClick={handleSignOut} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 rounded-2xl transition-all">
                                                     <LogOut size={18} />
                                                     Sign Out
                                                 </button>
@@ -184,21 +181,20 @@ export default function Header({ initialUser = null, initialProfile = null }) {
                             </div>
                         </div>
                     ) : (
-                        <div className="hidden sm:flex items-center gap-4">
-                            <Link href="/login" className="text-sm font-bold text-neutral-600 hover:text-primary-600 transition-colors">
-                                Sign In
+                        <div className="hidden sm:flex items-center gap-3">
+                            <Link href="/login" className="px-5 py-2.5 text-sm font-black text-primary-500 hover:bg-primary-50 rounded-full transition-all border border-primary-500/20">
+                                Log In
                             </Link>
-                            <Link href="/register" className="bg-primary-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-800 transition-colors shadow-lg">
-                                Get Started
+                            <Link href="/register" className="bg-primary-500 text-white px-7 py-2.5 rounded-full text-sm font-black hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/25 active:scale-95">
+                                Sign Up
                             </Link>
                         </div>
                     )}
 
                     {/* Mobile Menu Toggle */}
                     <button
-                        className="md:hidden p-2 text-neutral-600 hover:bg-neutral-50 rounded-lg transition-colors"
+                        className="md:hidden p-2 text-neutral-600 hover:bg-neutral-100 rounded-full transition-all"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        aria-label="Toggle menu"
                     >
                         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -206,31 +202,27 @@ export default function Header({ initialUser = null, initialProfile = null }) {
             </div>
 
             {/* Mobile Menu */}
-            <div className={`md:hidden absolute top-full left-0 right-0 bg-white border-b border-neutral-100 shadow-xl transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? 'max-h-[80vh] py-6' : 'max-h-0'
+            <div className={`md:hidden absolute top-full left-0 right-0 bg-white border-b border-neutral-100 shadow-2xl transition-all duration-500 overflow-hidden ${isMobileMenuOpen ? 'max-h-[100vh] py-8 opacity-100' : 'max-h-0 opacity-0'
                 }`}>
-                <nav className="flex flex-col gap-4 px-6 font-semibold">
+                <nav className="flex flex-col gap-2 px-6">
                     {NAV_ITEMS.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`text-lg py-2 transition-colors ${activeSection === item.href ? 'text-primary-600' : 'text-neutral-600'
+                            className={`text-2xl font-black py-3 px-4 rounded-2xl transition-all ${activeSection === item.href ? 'bg-primary-50 text-primary-600' : 'text-neutral-700 hover:bg-neutral-50'
                                 }`}
                         >
                             {item.label}
                         </Link>
                     ))}
-                    <div className="h-px bg-neutral-100 my-2" />
+                    <div className="h-px bg-neutral-100 my-4" />
                     {user ? (
-                        <>
-                            <Link href="/dashboard" className="text-lg py-2 text-neutral-600">Dashboard</Link>
-                            <Link href="/dashboard/settings" className="text-lg py-2 text-neutral-600">Settings</Link>
-                            <button onClick={handleSignOut} className="text-lg py-2 text-red-600 text-left">Sign Out</button>
-                        </>
+                        <Link href="/dashboard" className="text-xl font-black py-4 px-6 text-white bg-primary-500 rounded-2xl text-center shadow-lg">Dashboard</Link>
                     ) : (
-                        <>
-                            <Link href="/login" className="text-lg py-2 text-neutral-600">Sign In</Link>
-                            <Link href="/register" className="text-lg py-3 text-white bg-primary-900 rounded-xl text-center">Get Started</Link>
-                        </>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                            <Link href="/login" className="text-lg font-black py-3 rounded-2xl border border-primary-500/20 text-primary-600 text-center">Log In</Link>
+                            <Link href="/register" className="text-lg font-black py-3 text-white bg-primary-500 rounded-2xl text-center shadow-lg">Sign Up</Link>
+                        </div>
                     )}
                 </nav>
             </div>

@@ -42,7 +42,7 @@ function RegisterForm() {
                 </p>
                 <Link
                     href="/login"
-                    className="flex items-center justify-center w-full py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-base font-bold rounded-xl shadow-lg hover:-translate-y-0.5 transition-all"
+                    className="flex items-center justify-center w-full py-4 bg-primary-500 text-white text-base font-bold rounded-2xl shadow-xl shadow-primary-500/20 hover:-translate-y-0.5 transition-all"
                 >
                     Return to login
                 </Link>
@@ -52,16 +52,11 @@ function RegisterForm() {
 
     return (
         <div className="bg-white rounded-[32px] border border-neutral-100 p-10 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-500">
-            <Link href="/" className="flex items-center justify-center gap-3 no-underline mb-8 group">
-                <div className="w-10 h-10 text-primary-600 transition-transform group-hover:scale-110">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                        <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
-                        <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
-                        <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
-                        <rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.6" />
-                    </svg>
+            <Link href="/" className="flex items-center justify-center gap-2.5 no-underline mb-10 group">
+                <div className="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:rotate-6 transition-all duration-500">
+                    <img src="/onekit-logo.png" alt="OneKit" className="h-5 w-5 invert" />
                 </div>
-                <span className="text-2xl font-bold bg-gradient-to-br from-primary-600 to-primary-800 bg-clip-text text-transparent">OneKit</span>
+                <span className="text-2xl font-black text-neutral-900 tracking-tighter">OneKit</span>
             </Link>
 
             <h1 className="text-2xl font-extrabold text-center text-neutral-900 mb-2">Create an account</h1>
@@ -149,13 +144,13 @@ function RegisterForm() {
 
                 <button
                     type="submit"
-                    className="flex items-center justify-center gap-2 w-full py-4 mt-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-base font-bold rounded-xl shadow-lg shadow-primary-900/20 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-900/30 active:translate-y-0 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                    className="flex items-center justify-center gap-2 w-full py-4 mt-2 bg-primary-500 text-white text-base font-bold rounded-2xl shadow-xl shadow-primary-500/20 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-primary-500/30 active:translate-y-0 transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                     disabled={loading}
                 >
                     {loading ? (
                         <><Loader2 className="animate-spin" size={20} /> Creating account...</>
                     ) : (
-                        'Create account'
+                        'Create Account'
                     )}
                 </button>
             </form>

@@ -124,7 +124,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
                             {getServiceIcon(service.icon)}
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-black text-neutral-900 mb-8 tracking-tighter leading-tight font-display animate-reveal">
+                        <h1 className="text-5xl md:text-8xl font-black text-neutral-900 mb-8 tracking-tighter leading-[0.9] font-display animate-reveal">
                             {service.name}
                         </h1>
                         <p className="text-xl md:text-2xl text-neutral-500 font-medium leading-relaxed max-w-2xl mb-12 animate-fade-in-up">
@@ -160,7 +160,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
                             ) : canAccess ? (
                                 <Link
                                     href={service.dashboardPath}
-                                    className="inline-flex items-center gap-3 px-10 py-5 bg-primary-900 text-white rounded-[24px] font-black uppercase tracking-widest text-sm shadow-xl hover:bg-primary-950 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                                    className="inline-flex items-center gap-3 px-10 py-5 bg-primary-500 text-white rounded-[24px] font-black uppercase tracking-widest text-sm shadow-xl shadow-primary-500/25 hover:bg-primary-600 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                                 >
                                     Launch Tool <ArrowRight size={20} />
                                 </Link>
@@ -168,11 +168,11 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
                                 <div className="flex flex-col gap-4 items-center">
                                     <button
                                         onClick={handleSubscribe}
-                                        className="inline-flex items-center gap-3 px-10 py-5 bg-primary-900 text-white rounded-[24px] font-black uppercase tracking-widest text-sm shadow-xl hover:bg-primary-950 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                                        className="inline-flex items-center gap-3 px-10 py-5 bg-primary-500 text-white rounded-[24px] font-black uppercase tracking-widest text-sm shadow-xl shadow-primary-500/25 hover:bg-primary-600 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                                     >
                                         Subscribe via WhatsApp <ChevronRight size={20} />
                                     </button>
-                                    <p className="text-xs text-neutral-400 font-medium">
+                                    <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest mt-2">
                                         Instant activation upon payment
                                     </p>
                                 </div>

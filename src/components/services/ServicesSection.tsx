@@ -26,40 +26,31 @@ export default function ServicesSection() {
     }
 
     return (
-        <section id="services" className="py-32 lg:py-48 bg-white overflow-visible relative">
-            {/* OneKit 3.0: Subtle Section Divider */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-neutral-50/50 to-transparent pointer-events-none" />
-
+        <section id="services" className="py-24 lg:py-32 bg-white overflow-visible relative">
             <div className="container mx-auto px-6 relative z-10">
                 {/* Section Header */}
-                <div className="max-w-5xl mx-auto mb-24 text-center lg:text-left flex flex-col lg:flex-row lg:items-end justify-between gap-12 animate-fade-in-up">
-                    <div className="flex-1">
-                        <span className="inline-block px-5 py-2 bg-primary-50 text-primary-700 text-xs font-black rounded-full uppercase tracking-[0.3em] border border-primary-100/50 mb-6">Master Ecosystem</span>
-                        <h2 className="text-5xl md:text-7xl font-black text-neutral-900 tracking-tighter leading-[0.95] mb-4">
-                            Tools for <br />
-                            <span className="bg-brand-gradient bg-clip-text text-transparent italic px-1">Modern Iraq.</span>
-                        </h2>
-                    </div>
-                    <p className="text-xl md:text-2xl text-neutral-500 lg:max-w-md font-medium leading-relaxed opacity-80">
-                        A specialized digital infrastructure designed for the specific needs of Iraqi high-performers. One ecosystem, infinite possibilities.
+                <div className="max-w-4xl mx-auto mb-20 text-center animate-fade-in-up">
+                    <span className="inline-block px-4 py-1.5 bg-primary-50 text-primary-600 text-[11px] font-black rounded-full uppercase tracking-widest border border-primary-100 mb-6">Master Ecosystem</span>
+                    <h2 className="text-4xl md:text-6xl font-black text-neutral-900 leading-tight tracking-tight mb-8">
+                        The Tools Your Vision <br />
+                        <span className="text-primary-500">Actually Deserves</span>
+                    </h2>
+                    <p className="text-lg text-neutral-500 font-medium leading-relaxed max-w-2xl mx-auto">
+                        Precision-engineered digital modules designed specifically for the Iraqi creative economy.
                     </p>
                 </div>
 
-                {/* OneKit 3.0: Bento Grid with Enhanced Gaps */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 auto-rows-fr overflow-visible">
-                    {services.map((service, index) => {
-                        // Make Menu Maker a flagship card (col-span-2)
-                        const isFlagship = service.slug === 'menu-maker';
-                        return (
-                            <div
-                                key={service.id || service.slug}
-                                className={`overflow-visible animate-fade-in-up ${isFlagship ? 'lg:col-span-2' : 'col-span-1'}`}
-                                style={{ animationDelay: `${index * 0.1}s` }}
-                            >
-                                <ServiceCard service={{ ...service, id: index + 1 }} />
-                            </div>
-                        );
-                    })}
+                {/* Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr">
+                    {services.map((service, index) => (
+                        <div
+                            key={service.id || service.slug}
+                            className="animate-fade-in-up"
+                            style={{ animationDelay: `${index * 0.1}s` }}
+                        >
+                            <ServiceCard service={{ ...service, id: index + 1 }} />
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

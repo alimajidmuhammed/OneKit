@@ -80,16 +80,14 @@ function ResetPasswordForm() {
     if (success) {
         return (
             <div className="bg-white rounded-[32px] border border-neutral-100 p-10 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-500">
-                <Link href="/" className="flex items-center justify-center gap-3 no-underline mb-8 group">
-                    <div className="w-10 h-10 text-primary-600 transition-transform group-hover:scale-110">
-                        <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                            <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
-                            <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
-                            <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
-                            <rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.6" />
-                        </svg>
+                <Link href="/" className="flex items-center justify-center gap-3 no-underline mb-10 group">
+                    <div className="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:rotate-6 transition-all duration-500">
+                        <img src="/onekit-logo.png" alt="OneKit" className="h-5 w-5 invert" />
                     </div>
-                    <span className="text-2xl font-bold bg-gradient-to-br from-primary-600 to-primary-800 bg-clip-text text-transparent">OneKit</span>
+                    <div className="flex flex-col items-start translate-y-0.5">
+                        <span className="text-xl font-black text-neutral-900 tracking-tighter leading-none">OneKit</span>
+                        <span className="text-[10px] font-black text-primary-500 uppercase tracking-widest mt-1">Identity Node</span>
+                    </div>
                 </Link>
                 <div className="flex flex-col items-center gap-4 text-center">
                     <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-2">
@@ -106,16 +104,14 @@ function ResetPasswordForm() {
 
     return (
         <div className="bg-white rounded-[2.5rem] border border-neutral-100 p-8 md:p-12 shadow-2xl animate-in fade-in slide-in-from-bottom-6 duration-500">
-            <Link href="/" className="flex items-center justify-center gap-3 no-underline mb-10 group">
-                <div className="w-12 h-12 text-primary-600 transition-transform group-hover:scale-110">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                        <rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity="0.8" />
-                        <rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" />
-                        <rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" />
-                        <rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity="0.6" />
-                    </svg>
+            <Link href="/" className="flex items-center justify-center gap-3 no-underline mb-12 group">
+                <div className="w-12 h-12 bg-primary-500 rounded-2xl flex items-center justify-center shadow-xl shadow-primary-500/20 group-hover:rotate-6 transition-all duration-500">
+                    <img src="/onekit-logo.png" alt="OneKit" className="h-6 w-6 invert" />
                 </div>
-                <span className="text-3xl font-black bg-gradient-to-br from-primary-600 to-primary-800 bg-clip-text text-transparent tracking-tight">OneKit</span>
+                <div className="flex flex-col items-start translate-y-1">
+                    <span className="text-3xl font-black text-neutral-900 tracking-tighter leading-none">OneKit</span>
+                    <span className="text-xs font-black text-primary-500 uppercase tracking-[0.3em] mt-1">Security Nexus</span>
+                </div>
             </Link>
 
             <h1 className="text-3xl font-black text-center text-neutral-900 mb-2 leading-tight">Reset Password</h1>

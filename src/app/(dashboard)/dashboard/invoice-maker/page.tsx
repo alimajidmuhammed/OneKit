@@ -58,13 +58,12 @@ export default function InvoiceMakerPage() {
                         Standardize your revenue documentation with professional financial blueprints.
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="btn-premium group flex items-center gap-3 px-8 py-4 bg-primary-950 text-white rounded-[24px] font-black text-sm shadow-premium-layered hover:scale-105 transition-all active:scale-95"
+                <Link
+                    href="/dashboard/invoice-maker/new"
+                    className="flex items-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-primary-500/25 hover:shadow-2xl transition-all active:scale-95"
                 >
-                    <Plus size={20} className="group-hover:rotate-90 transition-transform duration-500" />
-                    New Document Build
-                </button>
+                    <Plus size={16} /> New Asset
+                </Link>
             </div>
 
             {/* Premium Stats/Banner Overlay */}
@@ -209,8 +208,8 @@ export default function InvoiceMakerPage() {
                                             key={template.id}
                                             onClick={() => setSelectedTemplate(template.id)}
                                             className={`relative flex flex-col items-center gap-4 p-8 border-2 rounded-[36px] transition-all cursor-pointer group active:scale-95 ${selectedTemplate === template.id
-                                                    ? 'border-green-600 bg-green-50/30'
-                                                    : 'border-neutral-50 hover:border-neutral-200 hover:bg-neutral-50'
+                                                ? 'border-green-600 bg-green-50/30'
+                                                : 'border-neutral-50 hover:border-neutral-200 hover:bg-neutral-50'
                                                 }`}
                                         >
                                             <div className="text-4xl group-hover:scale-125 transition-transform duration-500 grayscale group-hover:grayscale-0">{template.preview}</div>

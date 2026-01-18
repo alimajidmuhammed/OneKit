@@ -37,21 +37,17 @@ export default function DashboardLayout({ children }) {
     }
 
     return (
-        <div className="flex min-h-screen bg-neutral-50 selection:bg-primary-900 selection:text-white">
-            {/* Mobile Header: Glassmorphism 2.0 */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-2xl border-b border-neutral-200/50 flex items-center px-6 gap-4 z-[1040] shadow-sm">
+        <div className="flex min-h-screen bg-background">
+            {/* Mobile Header: Monst Style */}
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-neutral-100 flex items-center px-6 gap-4 z-[1040] shadow-sm">
                 <button
-                    className="w-11 h-11 flex items-center justify-center rounded-xl bg-neutral-50/50 hover:bg-neutral-100 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-neutral-50"
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                 >
-                    <div className="relative w-5 h-4">
-                        <span className={`absolute left-0 w-full h-0.5 bg-neutral-900 rounded-full transition-all ${sidebarOpen ? 'top-1.5 rotate-45' : 'top-0'}`} />
-                        <span className={`absolute left-0 w-full h-0.5 bg-neutral-900 rounded-full top-1.5 transition-opacity ${sidebarOpen ? 'opacity-0' : 'opacity-100'}`} />
-                        <span className={`absolute left-0 w-full h-0.5 bg-neutral-900 rounded-full transition-all ${sidebarOpen ? 'top-1.5 -rotate-45' : 'top-3'}`} />
-                    </div>
+                    <Menu className="w-5 h-5 text-neutral-600" />
                 </button>
                 <Link href="/" className="flex items-center gap-2">
-                    <img src="/onekit-logo.png" alt="OneKit" className="h-8 w-auto" />
+                    <img src="/onekit-logo.png" alt="OneKit" className="h-7 w-auto" />
                     <span className="font-display font-black text-xl text-neutral-900 tracking-tighter">OneKit</span>
                 </Link>
             </header>
@@ -59,59 +55,56 @@ export default function DashboardLayout({ children }) {
             {/* Sidebar Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-neutral-900/40 backdrop-blur-sm z-[1045] lg:hidden animate-fade-in"
+                    className="fixed inset-0 bg-neutral-900/20 backdrop-blur-sm z-[1045] lg:hidden animate-fade-in"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar: Premium Shell */}
-            <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white border-r border-neutral-200/50 z-[1050] flex flex-col transition-all duration-500 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} shadow-premium-layered`}>
-                <div className="px-8 py-10 flex items-center justify-between border-b border-neutral-100/50">
-                    <Link href="/" className="flex items-center gap-3">
-                        <img src="/onekit-logo.png" alt="OneKit" className="h-10 w-auto" />
-                        <span className="font-display font-black text-2xl text-primary-950 tracking-tighter">OneKit</span>
+            {/* Sidebar: Monst Clean Shell */}
+            <aside className={`fixed inset-y-0 left-0 w-[280px] bg-white border-r border-neutral-100 z-[1050] flex flex-col transition-all duration-500 ease-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="px-8 py-10 flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-2.5 group">
+                        <div className="w-9 h-9 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:rotate-6 transition-all duration-500">
+                            <img src="/onekit-logo.png" alt="OneKit" className="h-5 w-5 invert" />
+                        </div>
+                        <span className="font-display font-black text-2xl text-neutral-900 tracking-tighter">OneKit</span>
                     </Link>
-                    <button
-                        className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-neutral-50 text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-all"
-                        onClick={() => setSidebarOpen(false)}
-                    >
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                        </svg>
-                    </button>
                 </div>
 
-                <nav className="flex-1 px-4 py-8 overflow-y-auto no-scrollbar space-y-2">
+                <nav className="flex-1 px-4 py-6 overflow-y-auto no-scrollbar space-y-1">
                     {DASHBOARD_NAV.map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`flex items-center gap-4 px-5 py-3.5 rounded-[20px] font-bold text-sm transition-all duration-300 group ${isActive
-                                        ? 'bg-primary-950 text-white shadow-premium-layered translate-x-1'
-                                        : 'text-neutral-500 hover:bg-primary-50 hover:text-primary-600'
+                                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 relative group truncate ${isActive
+                                    ? 'bg-primary-500 text-white shadow-xl shadow-primary-500/25'
+                                    : 'text-neutral-500 hover:bg-primary-50 hover:text-primary-600'
                                     }`}
                             >
-                                <div className={`transition-colors ${isActive ? 'text-white' : 'text-primary-400/50 group-hover:text-primary-500'}`}>
+                                <div className={`transition-colors ${isActive ? 'text-white' : 'text-neutral-400 group-hover:text-primary-500'}`}>
                                     <NavIcon type={item.icon} />
                                 </div>
                                 {item.label}
+                                {isActive && (
+                                    <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                )}
                             </Link>
                         );
                     })}
 
                     {isAdmin && (
                         <>
-                            <div className="h-px bg-neutral-100/50 mx-4 my-6" />
+                            <div className="h-px bg-neutral-100 mx-4 my-6" />
                             <Link
                                 href="/admin"
-                                className={`flex items-center gap-4 px-5 py-3.5 rounded-[20px] font-bold text-sm transition-all group ${pathname.startsWith('/admin')
-                                        ? 'bg-accent-600 text-white shadow-lg'
-                                        : 'text-neutral-500 hover:bg-neutral-50'
+                                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all group ${pathname.startsWith('/admin')
+                                    ? 'bg-violet-500 text-white shadow-xl shadow-violet-500/25'
+                                    : 'text-neutral-500 hover:bg-neutral-50'
                                     }`}
                             >
-                                <div className="text-accent-500/50 group-hover:text-accent-600">
+                                <div className={`${pathname.startsWith('/admin') ? 'text-white' : 'text-neutral-400 group-hover:text-violet-500'}`}>
                                     <NavIcon type="admin" />
                                 </div>
                                 Admin Panel
@@ -120,39 +113,36 @@ export default function DashboardLayout({ children }) {
                     )}
                 </nav>
 
-                <div className="p-6 border-t border-neutral-100/50 flex items-center gap-4">
-                    <div className="flex-1 flex items-center gap-4 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-brand-gradient flex items-center justify-center text-white font-black text-sm relative overflow-hidden ring-4 ring-neutral-50">
+                <div className="p-6 border-t border-neutral-100 space-y-4">
+                    <div className="flex items-center gap-3 p-2 rounded-2xl bg-neutral-50/50">
+                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-black text-sm border-2 border-white shadow-sm shrink-0">
                             {profile?.avatar_url ? (
-                                <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                                <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover rounded-full" />
                             ) : (
                                 <span>{profile?.full_name?.[0] || user.email[0].toUpperCase()}</span>
                             )}
-                            <div className="absolute inset-0 bg-black/10 opacity-0 hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-black text-neutral-900 truncate leading-none mb-1">{profile?.full_name || 'User'}</span>
+                            <span className="text-sm font-black text-neutral-900 truncate">{profile?.full_name || 'User'}</span>
                             <span className="text-[10px] font-bold text-neutral-400 truncate uppercase tracking-widest">{user.email}</span>
                         </div>
                     </div>
+
                     <button
                         onClick={signOut}
-                        className="w-10 h-10 flex items-center justify-center rounded-xl text-neutral-300 hover:bg-red-50 hover:text-red-500 transition-all active:scale-95"
-                        title="Sign Out"
+                        className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl font-bold text-xs text-red-500 hover:bg-red-50 transition-all active:scale-95 group"
                     >
-                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                            <path d="M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
+                        Sign Out System
                     </button>
                 </div>
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 lg:ml-[280px] min-h-screen pt-16 lg:pt-0 relative">
-                {/* OneKit 3.0: Texture Overlay & Background Motion */}
-                <div className="texture-noise absolute inset-0 opacity-[0.02] pointer-events-none" />
-                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-100/10 blur-[120px] rounded-full -mr-40 -mt-40 pointer-events-none" />
+            <main className="flex-1 lg:ml-[280px] min-h-screen pt-20 lg:pt-0 relative">
+                {/* Organic Background Elements */}
+                <div className="absolute top-20 right-20 w-64 h-64 bg-primary-100/30 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute bottom-20 left-20 w-64 h-64 bg-[#FEF08A]/20 rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="relative z-10 w-full h-full">
                     {children}

@@ -1374,7 +1374,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
                                         <button
                                             onClick={addLanguage}
-                                            className="flex items-center gap-3 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl transition-all font-bold text-xs shadow-xl shadow-primary-600/20 active:scale-95 group"
+                                            className="flex items-center gap-3 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl transition-all font-bold text-xs shadow-xl shadow-primary-500/20 active:scale-95 group"
                                         >
                                             <Icons.add size={18} className="group-hover:rotate-90 transition-transform duration-300" />
                                             <span>Add Protocol</span>
@@ -1444,7 +1444,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
                                         <button
                                             onClick={addCertification}
-                                            className="flex items-center gap-3 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl transition-all font-bold text-xs shadow-xl shadow-primary-600/20 active:scale-95 group"
+                                            className="flex items-center gap-3 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl transition-all font-bold text-xs shadow-xl shadow-primary-500/20 active:scale-95 group"
                                         >
                                             <Icons.add size={18} className="group-hover:rotate-90 transition-transform duration-300" />
                                             <span>Add Credential</span>
@@ -1521,7 +1521,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
 
                                         <button
                                             onClick={addOrganization}
-                                            className="flex items-center gap-3 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl transition-all font-bold text-xs shadow-xl shadow-primary-600/20 active:scale-95 group"
+                                            className="flex items-center gap-3 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl transition-all font-bold text-xs shadow-xl shadow-primary-500/20 active:scale-95 group"
                                         >
                                             <Icons.add size={18} className="group-hover:rotate-90 transition-transform duration-300" />
                                             <span>Add Guild</span>
@@ -1608,9 +1608,9 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                         <button
                                             onClick={handleAIStylist}
                                             disabled={generatingStyle}
-                                            className="flex items-center gap-3 px-6 py-3 bg-white border border-neutral-200 hover:border-indigo-200 hover:bg-indigo-50 text-neutral-700 hover:text-indigo-600 rounded-2xl transition-all font-bold text-xs shadow-xl shadow-neutral-200/40 active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="flex items-center gap-3 px-6 py-3 bg-white border border-neutral-200 hover:border-primary-200 hover:bg-primary-50 text-neutral-700 hover:text-primary-600 rounded-2xl transition-all font-bold text-xs shadow-xl shadow-neutral-200/40 active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            {generatingStyle ? <Icons.spinner size={18} className="animate-spin text-indigo-500" /> : <Icons.magic size={18} className="group-hover:rotate-12 transition-transform text-indigo-500" />}
+                                            {generatingStyle ? <Icons.spinner size={18} className="animate-spin text-primary-500" /> : <Icons.magic size={18} className="group-hover:rotate-12 transition-transform text-primary-500" />}
                                             <span>AI STYLIST</span>
                                         </button>
                                     </div>
@@ -1633,7 +1633,7 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                                                                 <div className="h-0.5 w-3/4 bg-neutral-50" />
                                                             </div>
                                                         </div>
-                                                        <div className="absolute -bottom-2 -right-2 bg-primary-600 text-white p-1 rounded-full border-2 border-white shadow-lg">
+                                                        <div className="absolute -bottom-2 -right-2 bg-primary-500 text-white p-1 rounded-full border-2 border-white shadow-lg">
                                                             <Icons.success size={10} />
                                                         </div>
                                                     </div>
@@ -1740,6 +1740,12 @@ export default function CVEditorPage({ params }: { params: Promise<{ id: string 
                             >
                                 {/* Modal Header */}
                                 <div className="px-12 py-10 border-b border-neutral-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-2xl bg-primary-100 flex items-center justify-center text-primary-600 group-hover:rotate-6 transition-all duration-500">
+                                            <img src="/onekit-logo.png" alt="OneKit" className="h-6 w-6" />
+                                        </div>
+                                        <h2 className="text-xl font-black text-neutral-900 tracking-tighter italic">Career Studio</h2>
+                                    </div>
                                     <div className="flex items-center gap-6">
                                         <div className="w-12 h-12 bg-neutral-900 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-neutral-900/20">
                                             <Palette size={24} />

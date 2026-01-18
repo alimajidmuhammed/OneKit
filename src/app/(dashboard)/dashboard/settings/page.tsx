@@ -170,9 +170,12 @@ export default function SettingsPage() {
 
     return (
         <div className="p-6 md:p-8 max-w-5xl mx-auto min-h-screen">
-            <div className="mb-8">
-                <h1 className="text-2xl font-black text-neutral-900 mb-1">Settings</h1>
-                <p className="text-sm text-neutral-400 font-medium">Manage your account settings and profile</p>
+            <div className="mb-12">
+                <span className="inline-block px-4 py-1.5 bg-primary-50 text-primary-600 text-[10px] font-black uppercase tracking-[0.3em] rounded-full border border-primary-100 mb-4">
+                    Identity Management
+                </span>
+                <h1 className="text-3xl md:text-5xl font-black text-neutral-900 tracking-tighter">Account <span className="text-primary-500 italic">Settings</span></h1>
+                <p className="text-base text-neutral-400 font-medium max-w-lg mt-2">Manage your digital presence and security protocols.</p>
             </div>
 
             <div className="space-y-8">
@@ -206,7 +209,7 @@ export default function SettingsPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-8">
                             <div className="flex items-center gap-6">
-                                <div className="w-20 h-20 rounded-3xl bg-brand-gradient flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-xl overflow-hidden">
+                                <div className="w-20 h-20 rounded-3xl bg-primary-500 flex items-center justify-center text-white text-2xl font-black border-4 border-white shadow-xl overflow-hidden ring-1 ring-primary-100">
                                     {profile?.avatar_url ? (
                                         <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
                                     ) : (
@@ -280,10 +283,10 @@ export default function SettingsPage() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-primary-900 hover:bg-primary-800 text-white px-8 py-3.5 rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all shadow-xl shadow-primary-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={loading}
                                 >
-                                    {loading ? 'Saving...' : 'Save Changes'}
+                                    {loading ? 'Synchronizing...' : 'Save Configuration'}
                                 </button>
                             </div>
                         </form>
@@ -424,7 +427,7 @@ export default function SettingsPage() {
                                 <button
                                     type="submit"
                                     disabled={passwordLoading}
-                                    className="flex-1 py-3 bg-primary-900 text-white rounded-xl font-bold hover:bg-primary-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-all shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {passwordLoading ? (
                                         <span className="flex items-center justify-center gap-2">

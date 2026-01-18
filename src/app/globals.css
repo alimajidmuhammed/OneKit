@@ -12,61 +12,52 @@
   --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
 
   /* Semantic Colors for Shadcn/Default compatibility */
-  --color-background: #ffffff;
-  --color-foreground: #0f172a;
-  --color-border: #e2e8f0;
-  --color-ring: #3b5cff;
+  --color-background: #F8FAFC;
+  --color-foreground: #1E293B;
+  --color-border: #E2E8F0;
+  --color-ring: #3B82F6;
 
-  /* Primary Colors - OneKit Navy */
-  --color-primary-50: #f0f4ff;
-  --color-primary-100: #dbe4ff;
-  --color-primary-200: #bfcfff;
-  --color-primary-300: #93afff;
-  --color-primary-400: #6085ff;
-  --color-primary-500: #3b5cff;
-  --color-primary-600: #1e3a8a;
-  --color-primary-700: #1a337a;
-  --color-primary-800: #162a66;
-  --color-primary-900: #0a2472;
-  --color-primary-950: #071233;
+  /* Primary Colors - Monst Blue */
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #1E3A8A;
+  --color-primary-950: #172554;
 
-  /* Accent Colors - Vibrant Teal */
-  --color-accent-50: #f0fdfa;
-  --color-accent-100: #ccfbf1;
-  --color-accent-200: #99f6e4;
-  --color-accent-300: #5eead4;
-  --color-accent-400: #2dd4bf;
-  --color-accent-500: #14b8a6;
-  --color-accent-600: #0d9488;
-  --color-accent-700: #0f766e;
-  --color-accent-800: #115e59;
-  --color-accent-900: #134e4a;
+  /* Accent Colors - Soft Indigo/Purple Transitions */
+  --color-accent-50: #F5F3FF;
+  --color-accent-100: #EDE9FE;
+  --color-accent-200: #DDD6FE;
+  --color-accent-300: #C4B5FD;
+  --color-accent-400: #A78BFA;
+  --color-accent-500: #8B5CF6;
+  --color-accent-600: #7C3AED;
+  --color-accent-700: #6D28D9;
+  --color-accent-800: #5B21B6;
+  --color-accent-900: #4C1D95;
 
-  /* Neutrals */
-  --color-neutral-50: #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-400: #94a3b8;
-  --color-neutral-500: #64748b;
+  /* Neutrals - Monst Clean Slate */
+  --color-neutral-50: #F8FAFC;
+  --color-neutral-100: #F1F5F9;
+  --color-neutral-200: #E2E8F0;
+  --color-neutral-300: #CBD5E1;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
   --color-neutral-600: #475569;
   --color-neutral-700: #334155;
-  --color-neutral-800: #1e293b;
-  --color-neutral-900: #0f172a;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
   --color-neutral-950: #020617;
 
-  /* Success/Warning/Error */
-  --color-success-50: #f0fdf4;
-  --color-success-500: #22c55e;
-  --color-warning-50: #fffbeb;
-  --color-warning-500: #f59e0b;
-  --color-error-50: #fef2f2;
-  --color-error-500: #ef4444;
-
-  /* OneKit 3.0: Premium Depth & Gradients */
-  --color-brand-gradient: linear-gradient(135deg, #0a2472 0%, #14b8a6 100%);
-  --color-iridescent: linear-gradient(135deg, #3b5cff 0%, #14b8a6 40%, #ea580c 100%);
-  --color-glass-highlight: rgba(255, 255, 255, 0.4);
+  /* Monst Effects */
+  --color-brand-gradient: linear-gradient(135deg, #3B82F6 0%, #4F46E5 100%);
+  --color-soft-blob: rgba(254, 240, 138, 0.4);
 
   /* Animation Keyframes */
   @keyframes reveal {
@@ -74,51 +65,31 @@
       clip-path: inset(0 100% 0 0);
       opacity: 0;
     }
-
     to {
       clip-path: inset(0 0 0 0);
       opacity: 1;
     }
   }
 
-  @keyframes pulse-glow {
-
-    0%,
-    100% {
-      opacity: 0.3;
-      transform: scale(1);
-    }
-
-    50% {
-      opacity: 0.6;
-      transform: scale(1.1);
-    }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-20px) rotate(5deg); }
   }
 
-  @keyframes background-drift {
-    0% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-
-    100% {
-      background-position: 0% 50%;
-    }
+  @keyframes pulse-soft {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.1); opacity: 0.6; }
   }
 
   /* Utility mapping */
   --animate-reveal: reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
-  --animate-background-drift: background-drift 15s ease infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 8s ease-in-out infinite;
 
-  /* OneKit 3.0: Layered Shadows */
-  --shadow-premium-layered: 0 2px 4px rgba(10, 36, 114, 0.02),
-  0 10px 20px rgba(10, 36, 114, 0.04),
-  0 20px 40px rgba(10, 36, 114, 0.06),
-  0 40px 80px rgba(10, 36, 114, 0.1);
+  /* Monst Shadows */
+  --shadow-premium-layered: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+  0 10px 15px -3px rgba(0, 0, 0, 0.05),
+  0 20px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
 /* Base Overrides */

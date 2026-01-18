@@ -56,8 +56,8 @@ export default function BusinessCardDashboard() {
                         Design professional networking cards for free
                     </p>
                 </div>
-                <button 
-                    className="btn-premium flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-premium-layered hover:shadow-xl hover:-translate-y-1" 
+                <button
+                    className="btn-premium flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-premium-layered hover:shadow-xl hover:-translate-y-1"
                     onClick={() => setShowCreateModal(true)}
                 >
                     <Plus size={18} />
@@ -93,14 +93,14 @@ export default function BusinessCardDashboard() {
                                 <span className="text-sm text-neutral-400">Updated {formatDate(card.updated_at)}</span>
                             </div>
                             <div className="px-6 pb-6 pt-0 flex gap-3 border-t border-neutral-50 bg-neutral-50/50">
-                                <Link 
-                                    href={`/dashboard/card-maker/${card.id}`} 
+                                <Link
+                                    href={`/dashboard/card-maker/${card.id}`}
                                     className="flex-1 text-center bg-white text-neutral-900 px-5 py-3 rounded-2xl font-bold text-sm border border-neutral-100 hover:border-primary-200 hover:bg-primary-50 transition-all"
                                 >
                                     Edit
                                 </Link>
-                                <button 
-                                    className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-all active:scale-95" 
+                                <button
+                                    className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-all active:scale-95"
                                     onClick={() => setDeleteId(card.id)}
                                 >
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -116,8 +116,8 @@ export default function BusinessCardDashboard() {
                     <div className="text-7xl mb-6">📇</div>
                     <h3 className="text-2xl font-black text-neutral-900 mb-2">No designs yet</h3>
                     <p className="text-neutral-400 mb-8">Create your first high-end business card today</p>
-                    <button 
-                        className="btn-premium inline-flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-premium-layered hover:shadow-xl hover:-translate-y-1" 
+                    <button
+                        className="btn-premium inline-flex items-center gap-2 px-8 py-4 bg-primary-950 text-white rounded-[28px] font-black text-[11px] uppercase tracking-widest shadow-premium-layered hover:shadow-xl hover:-translate-y-1"
                         onClick={() => setShowCreateModal(true)}
                     >
                         <Plus size={18} />
@@ -142,11 +142,10 @@ export default function BusinessCardDashboard() {
                             {CARD_TEMPLATES.map(t => (
                                 <div
                                     key={t.id}
-                                    className={`p-4 rounded-2xl border-2 cursor-pointer text-center transition-all duration-300 ${
-                                        selectedTemplate === t.id 
-                                            ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-lg' 
+                                    className={`p-4 rounded-2xl border-2 cursor-pointer text-center transition-all duration-300 ${selectedTemplate === t.id
+                                            ? 'border-primary-600 bg-primary-50 text-primary-700 shadow-lg'
                                             : 'border-neutral-100 bg-neutral-50 text-neutral-500 hover:border-neutral-200 hover:bg-white'
-                                    }`}
+                                        }`}
                                     onClick={() => setSelectedTemplate(t.id)}
                                 >
                                     <span className="text-3xl block mb-2">{t.preview}</span>
@@ -155,14 +154,14 @@ export default function BusinessCardDashboard() {
                             ))}
                         </div>
                         <div className="flex gap-3 pt-2">
-                            <button 
+                            <button
                                 onClick={() => setShowCreateModal(false)}
                                 className="flex-1 px-6 py-4 rounded-2xl font-bold text-sm border-2 border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all active:scale-95"
                             >
                                 Cancel
                             </button>
-                            <button 
-                                onClick={handleCreate} 
+                            <button
+                                onClick={handleCreate}
                                 disabled={saving || !newName.trim()}
                                 className="btn-premium flex-1 px-6 py-4 bg-primary-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
                             >
@@ -180,15 +179,15 @@ export default function BusinessCardDashboard() {
                         <h2 className="text-2xl font-black text-neutral-900">Delete Card?</h2>
                         <p className="text-neutral-500">This will permanently remove your design.</p>
                         <div className="flex gap-3 pt-2">
-                            <button 
+                            <button
                                 onClick={() => setDeleteId(null)}
                                 className="flex-1 px-6 py-4 rounded-2xl font-bold text-sm border-2 border-neutral-200 text-neutral-600 hover:bg-neutral-50 transition-all active:scale-95"
                             >
                                 Cancel
                             </button>
-                            <button 
+                            <button
                                 onClick={handleDelete}
-                                className="btn-premium flex-1 px-6 py-4 bg-red-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg hover:bg-red-700 hover:shadow-xl transition-all active:scale-95"
+                                className="flex-1 px-6 py-4 bg-red-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg hover:bg-red-700 hover:shadow-xl transition-all active:scale-95"
                             >
                                 Delete
                             </button>

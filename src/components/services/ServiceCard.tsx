@@ -69,84 +69,64 @@ export default function ServiceCard({ service, customPriceLabel, showStatus = fa
         <Link
             href={cardLink}
             onMouseMove={handleMouseMove}
-            className={`flex flex-col w-full h-full bg-white/80 backdrop-blur-xl border rounded-[48px] p-10 transition-all duration-700 hover:-translate-y-3 hover:shadow-premium-layered group relative overflow-hidden ${themeClasses[service.color as keyof typeof themeClasses] || themeClasses.primary
-                }`}
+            className={`flex flex-col w-full h-full bg-white border border-neutral-100 rounded-[48px] p-8 md:p-10 transition-all duration-700 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary-500/10 group relative overflow-hidden`}
         >
-            {/* OneKit 3.0: Dynamic Spotlight Effect */}
+            {/* Monst: Dynamic Spotlight Effect */}
             <div
-                className="absolute inset-0 rounded-[56px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"
+                className="absolute inset-0 rounded-[48px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"
                 style={{
-                    background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(59, 92, 255, 0.04), transparent 40%)`
+                    background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(59, 130, 246, 0.05), transparent 40%)`
                 }}
             />
 
-            {/* OneKit 3.0: Noise Texture Overlay */}
-            <div className="texture-noise absolute inset-0 rounded-[56px] z-0" />
-
             {/* Header: Icon (Left) & Badge (Right) */}
             <div className="flex justify-between items-start mb-10 relative z-10">
-                <div className={`w-20 h-20 rounded-[24px] flex items-center justify-center transition-all duration-700 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-xl translate-z-10 ${iconBgClasses[service.color as keyof typeof iconBgClasses] || iconBgClasses.primary
+                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl md:rounded-[24px] flex items-center justify-center transition-all duration-700 group-hover:scale-110 group-hover:-rotate-3 translate-z-10 ${iconBgClasses[service.color as keyof typeof iconBgClasses] || iconBgClasses.primary
                     }`}>
-                    <ServiceIcon type={service.icon} className="w-10 h-10" />
+                    <ServiceIcon type={service.icon} className="w-8 h-8 md:w-10 md:h-10" />
                 </div>
 
-                <div className="flex flex-col items-end gap-3 pt-4">
-                    {/* Status Badge (Dashboard only) */}
-                    {status === 'active' && (
-                        <div className="flex items-center gap-2 px-4 py-1.5 bg-green-50 text-green-700 rounded-full border border-green-100/50 shadow-sm animate-fade-in">
-                            <CheckCircle2 size={12} strokeWidth={3} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Active</span>
-                        </div>
-                    )}
-
+                <div className="flex flex-col items-end gap-3 pt-2">
                     {/* Price/Type Badge */}
                     <div className="flex items-center">
                         {customPriceLabel ? (
-                            <span className="px-5 py-2 bg-neutral-900 text-white text-[10px] font-black rounded-full uppercase tracking-[0.25em] shadow-xl">
+                            <span className="px-5 py-2 bg-primary-500 text-white text-[10px] font-black rounded-full uppercase tracking-[0.2em] shadow-lg shadow-primary-500/20">
                                 {customPriceLabel}
                             </span>
                         ) : service.isFree ? (
-                            <span className="px-5 py-2 bg-white text-green-700 text-[10px] font-black rounded-full uppercase tracking-[0.25em] border border-green-200 shadow-sm">
-                                Free Tool
+                            <span className="px-4 py-1.5 bg-green-50 text-green-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-green-100">
+                                Free
                             </span>
-                        ) : service.priceLabel ? (
-                            <span className="px-5 py-2 bg-primary-900 text-white text-[10px] font-black rounded-full uppercase tracking-[0.25em] border border-primary-800 shadow-xl">
-                                {service.priceLabel}
+                        ) : (
+                            <span className="px-4 py-1.5 bg-primary-50 text-primary-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-primary-100">
+                                {service.priceLabel || 'Premium'}
                             </span>
-                        ) : null}
+                        )}
                     </div>
                 </div>
             </div>
 
             {/* Content Body */}
             <div className="flex-1 relative z-10">
-                <span className="text-[11px] font-bold text-primary-500 uppercase tracking-[0.4em] mb-4 block opacity-80 group-hover:opacity-100 transition-opacity">
-                    {service.category || 'Professional Suite'}
-                </span>
-                <h3 className="text-4xl font-black text-neutral-900 mb-6 group-hover:text-primary-950 transition-colors tracking-tight leading-[1.1] font-display">
+                <h3 className="text-3xl md:text-4xl font-black text-[#1E293B] mb-4 group-hover:text-primary-500 transition-colors tracking-tight leading-[1.1] font-display">
                     {service.name}
                 </h3>
-                <p className="text-xl text-neutral-500 leading-relaxed mb-12 font-medium opacity-90 group-hover:opacity-100 transition-opacity">
+                <p className="text-lg text-neutral-500 leading-relaxed mb-10 font-medium group-hover:text-neutral-600 transition-colors">
                     {service.description}
                 </p>
             </div>
 
-            {/* Footer Link: OneKit 3.0 Polish */}
+            {/* Footer Link: Monst Style */}
             <div className="flex items-center justify-between relative z-10 mt-auto">
-                <div className="flex items-center gap-4 text-primary-600 font-black text-[13px] uppercase tracking-widest transition-all group-hover:gap-6">
-                    <span className="whitespace-nowrap">Launch Editor</span>
-                    <div className="w-12 h-px bg-primary-100 group-hover:w-20 transition-all duration-700" />
-                    <ArrowRight size={20} className="transition-transform group-hover:translate-x-2 flex-shrink-0" />
+                <div className="flex items-center gap-2 text-primary-500 font-black text-[14px] transition-all">
+                    <span>Explore Tool</span>
+                    <ArrowRight size={18} className="transition-transform group-hover:translate-x-2" />
                 </div>
 
-                {/* Subtle numbering for grid rhythm */}
-                <span className="text-neutral-100 font-display font-black text-6xl absolute -bottom-4 right-0 group-hover:text-neutral-200/50 transition-colors pointer-events-none select-none">
+                <span className="text-neutral-100 font-display font-black text-6xl absolute -bottom-4 right-0 opacity-0 group-hover:opacity-40 transition-opacity pointer-events-none select-none">
                     0{service.id || '?'}
                 </span>
             </div>
-
-            {/* OneKit 3.0: Glass Border Highlight */}
-            <div className="absolute inset-0 rounded-[56px] border border-white/40 pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity" />
         </Link>
     );
 }
